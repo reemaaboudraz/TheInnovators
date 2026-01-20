@@ -1,0 +1,118 @@
+@startuml Domain Model
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 16
+skinparam DefaultFontStyle bold
+skinparam ArrowThickness 2.2
+title Domain Model - large scale view
+hide empty members
+
+class "Terminal" as terminal {}
+
+class "CampusCatalog" as CampusCatalog {}
+class "Campus" as Campus {
+    - location: String
+    - name: String
+    - codename : String
+}
+
+class "BuildingCatalog" as Buildings {}
+class "Building" as Building {
+    - location: String
+    - name: String
+    - address: String
+    - numberOfFloors: int
+    - codename : String
+}
+
+class "RoomCatalog" as Rooms {}
+class "Room" as Room {
+    - location: String
+    - roomNumber: String
+    - capacity: int
+    - floorNB: int
+}
+class "PointOfInterestCatalog" as PointOfInterestCatalog {}
+
+abstract class "PointOfInterest" as PointOfInterest {}
+abstract class "Indoor" as Indoor {}
+class "Washroom" as Washroom {
+    - location: String
+    - isPublic: boolean
+    - isGenderNeutral: boolean
+    - isMale: boolean
+    - isFemale: boolean
+    - isAccessible: boolean
+    - floorNB: int
+}
+class "Elevator" as Elevator {
+    - location: String
+    - isAccessible: boolean
+}
+class "Stairs" as Stairs {
+    - location: String
+}
+class "WaterFountain" as WaterFountain {
+    - location: String
+    - hasBottleFiller: boolean
+}
+
+abstract class "Outdoor" as Outdoor {}
+
+class "Restaurant" as Restaurant {
+    - location: String
+    - name: String
+    - cuisineType: String
+}
+class "CoffeeShop" as CoffeeShop {
+    - location: String
+    - name: String
+}
+
+terminal "1" -- "1" CampusCatalog
+terminal "1"-- "1" Buildings
+terminal "1" -- "1" Rooms
+terminal "1" -- "1" PointOfInterestCatalog
+
+note top of terminal
+    The terminal class will use a controller design pattern by which it
+    will act as the interface of the system by receiving user inputs and
+    will delegate the tasks to the appropriate catalog classes.
+end note
+
+note left of PointOfInterestCatalog
+    PointOfInterestCatalog will be using the factory design pattern
+    to create different types of PointOfInterest objects within a 
+    single method.
+end note
+
+note as CreatorInfoGRASP
+    Note : All the catalog classes (CampusCatalog, Buildings, Rooms, 
+    PointOfInterestCatalog) take on the CREATOR and INFORMATION 
+    EXPERT responsibilities from the GRASP by being the classes 
+    responsible for the creation of their respective objects and 
+    by finding objects based on some relevant attributes.
+end note
+
+CampusCatalog "1" -- "2" Campus
+
+Buildings "1" -- "*" Building
+
+Rooms "1" -- "*" Room
+
+Campus "1" -- "*" Building
+
+Building "1" -- "*" Room
+
+Building "1" -- "*" PointOfInterest
+
+PointOfInterestCatalog "1" -- "*" PointOfInterest
+PointOfInterest <|-- Indoor
+Indoor <|-- Washroom
+Indoor <|-- Elevator
+Indoor <|-- Stairs
+Indoor <|-- WaterFountain
+PointOfInterest <|-- Outdoor
+Outdoor <|-- Restaurant
+Outdoor <|-- CoffeeShop
+
+@enduml
