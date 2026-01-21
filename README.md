@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="400" src="assets/README_banner.png" />
+  <img width="300" src="assets/README_banner.png" />
 </p>
 
 # The Innovators — Concordia Campus Guide App
