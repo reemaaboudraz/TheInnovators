@@ -16,25 +16,25 @@ This repository will evolve as we rapidly iterate, ship new features, and contin
 
 ## Tech Stack
 
-### 📱 Frontend / Mobile
+### Frontend / Mobile
 - **React Native** — Cross-platform mobile development (iOS & Android)
 
-### ☁️ Backend
+### Backend
 - **Firebase** — Authentication, Firestore database, real-time sync, offline persistence
 
-### 🗺️ Services & APIs
+### Services & APIs
 - **Google Maps API** — Interactive campus maps  
 - **Google Directions API** — Indoor & outdoor routing  
 - **Google Places API** — Location search and points of interest  
 - **Google Geocoding API** — Address and coordinate resolution  
 
-### 🧪 Testing
+### Testing
 - **Jest** — Unit and API testing  
 - **React Native Testing Library** — Component testing  
 - **Detox** — End-to-end (E2E) testing for iOS & Android  
 - Automated test execution in CI/CD pipelines  
 
-### 🚀 CI/CD
+### CI/CD
 - **GitHub Actions**  
   - Automated builds  
   - Continuous integration testing  
