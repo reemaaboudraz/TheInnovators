@@ -3,7 +3,7 @@ skinparam DefaultFontName Arial
 skinparam DefaultFontSize 16
 skinparam DefaultFontStyle bold
 skinparam ArrowThickness 2.2
-title Domain Model - Campus Navigation System for Condordia University - Version 1 (with annotations)
+title <u>Domain Model - Concordia Campus Guide App - Version 1 (with annotations)</u>\n<i>Date : 2026-01-19 </i>\n<i>Author : Malak Sefrioui</i>
 hide empty members
 
 note as Scope
@@ -21,23 +21,21 @@ class "Terminal" as terminal {}
 
 class "CampusCatalog" as CampusCatalog {}
 class "Campus" as Campus {
-    - location: String
+    - coordinates: String
     - name: String
     - codename : String
 }
 
 class "BuildingCatalog" as Buildings {}
 class "Building" as Building {
-    - location: String
+    - coordinates: String
     - name: String
     - address: String
     - numberOfFloors: int
     - codename : String
 }
-
-class "RoomCatalog" as Rooms {}
 class "Room" as Room {
-    - location: String
+    - coordinates: String
     - roomNumber: String
     - capacity: int
     - floorNB: int
@@ -47,7 +45,7 @@ class "PointOfInterestCatalog" as PointOfInterestCatalog {}
 abstract class "PointOfInterest" as PointOfInterest {}
 abstract class "Indoor" as Indoor {}
 class "Washroom" as Washroom {
-    - location: String
+    - coordinates: String
     - isPublic: boolean
     - isGenderNeutral: boolean
     - isMale: boolean
@@ -56,32 +54,34 @@ class "Washroom" as Washroom {
     - floorNB: int
 }
 class "Elevator" as Elevator {
-    - location: String
+    - coordinates: String
     - isAccessible: boolean
 }
 class "Stairs" as Stairs {
-    - location: String
+    - coordinates: String
 }
 class "WaterFountain" as WaterFountain {
-    - location: String
+    - coordinates: String
     - hasBottleFiller: boolean
+    - floorNB: int
 }
 
 abstract class "Outdoor" as Outdoor {}
 
 class "Restaurant" as Restaurant {
-    - location: String
+    - coordinates: String
+    - address: String
     - name: String
     - cuisineType: String
 }
 class "CoffeeShop" as CoffeeShop {
-    - location: String
+    - coordinates: String
+    - address: String
     - name: String
 }
 
 terminal "1" -- "1" CampusCatalog
 terminal "1" -- "1" Buildings
-terminal "1" -- "1" Rooms
 terminal "1" -- "1" PointOfInterestCatalog
 
 note top of terminal
@@ -91,31 +91,33 @@ note top of terminal
     will delegate the tasks to the appropriate catalog classes.
 end note
 
-note left of PointOfInterestCatalog
+note as Factory
     <size:18><b><u>Factory Design Pattern :</u></b></size>
     PointOfInterestCatalog will be using the factory design pattern
     to create different types of PointOfInterest objects within a 
     single method.
 end note
 
-note right of Rooms
+note as Creators
     <size:18><b><u>Creators and Information Experts :</u></b></size>
-    All the catalog classes (CampusCatalog, Buildings, Rooms, 
-    PointOfInterestCatalog) take on the CREATOR and INFORMATION 
-    EXPERT responsibilities from the GRASP by being the classes 
-    responsible for the creation of their respective objects and 
-    by finding objects based on some relevant attributes.
+    All the catalog classes (CampusCatalog, Buildings, 
+    Rooms, PointOfInterestCatalog) take on the CREATOR 
+    and INFORMATION EXPERT responsibilities from the 
+    GRASP by being the classes responsible for the 
+    creation of their respective objects and by finding objects
+    based on some relevant attributes.
 end note
+
+Creators .. CampusCatalog
+Creators .. Buildings
+Creators .. PointOfInterestCatalog
+Factory .. PointOfInterestCatalog
 
 CampusCatalog "1" *-- "2" Campus
 
 Buildings "1" *-- "*" Building
 
-Rooms "1" *-- "*" Room
-
 Campus "1" -- "*" Building
-
-Building "1" -- "*" Room
 
 Building "1" -- "*" PointOfInterest
 
@@ -126,6 +128,7 @@ Indoor <|-- Washroom
 Indoor <|-- Elevator
 Indoor <|-- Stairs
 Indoor <|-- WaterFountain
+Indoor <|-- Room
 PointOfInterest <|-- Outdoor
 Outdoor <|-- Restaurant
 Outdoor <|-- CoffeeShop
