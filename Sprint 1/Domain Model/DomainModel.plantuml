@@ -21,21 +21,22 @@ class "Terminal" as terminal {}
 
 class "CampusCatalog" as CampusCatalog {}
 class "Campus" as Campus {
-    - coordinates: String
+    - latitude: double
+    - longitude: double
     - name: String
     - codename : String
 }
 
 class "BuildingCatalog" as Buildings {}
 class "Building" as Building {
-    - coordinates: String
+    - latitude: double
+    - longitude: double
     - name: String
     - address: String
     - numberOfFloors: int
     - codename : String
 }
 class "Room" as Room {
-    - coordinates: String
     - roomNumber: String
     - capacity: int
     - floorNB: int
@@ -43,9 +44,12 @@ class "Room" as Room {
 class "PointOfInterestCatalog" as PointOfInterestCatalog {}
 
 abstract class "PointOfInterest" as PointOfInterest {}
-abstract class "Indoor" as Indoor {}
+abstract class "Indoor" as Indoor {
+    - latitude: double
+    - longitude: double
+}
+
 class "Washroom" as Washroom {
-    - coordinates: String
     - isPublic: boolean
     - isGenderNeutral: boolean
     - isMale: boolean
@@ -54,30 +58,27 @@ class "Washroom" as Washroom {
     - floorNB: int
 }
 class "Elevator" as Elevator {
-    - coordinates: String
     - isAccessible: boolean
 }
 class "Stairs" as Stairs {
-    - coordinates: String
 }
 class "WaterFountain" as WaterFountain {
-    - coordinates: String
     - hasBottleFiller: boolean
     - floorNB: int
 }
 
-abstract class "Outdoor" as Outdoor {}
-
-class "Restaurant" as Restaurant {
-    - coordinates: String
+abstract class "Outdoor" as Outdoor {
+    - latitude: double
+    - longitude: double
     - address: String
     - name: String
+    - type : String
+}
+
+class "Restaurant" as Restaurant {
     - cuisineType: String
 }
 class "CoffeeShop" as CoffeeShop {
-    - coordinates: String
-    - address: String
-    - name: String
 }
 
 terminal "1" -- "1" CampusCatalog
@@ -119,7 +120,7 @@ Buildings "1" *-- "*" Building
 
 Campus "1" -- "*" Building
 
-Building "1" -- "*" PointOfInterest
+Building "1" -- "*" Indoor
 
 PointOfInterestCatalog "1" *-- "*" PointOfInterest
 
