@@ -11,21 +11,6 @@
     "ios": {
       "supportsTablet": true
     },
-    "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
-      },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
-      "config": {
-        "googleMaps": {
-          "apiKey": "AIzaSyDJqnvpj4NZoenH9z3Qb0u-OJwqRTzhiCQ"
-        }
-      }
-    },
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png"
