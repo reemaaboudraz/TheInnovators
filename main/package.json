@@ -3,7 +3,13 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "jest": {
-    "preset": "jest-expo"
+    "preset": "jest-expo",
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.js"
+    ],
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/$1"
+    }
   },
   "scripts": {
     "start": "expo start",
@@ -51,6 +57,7 @@
     "react-native-worklets": "0.5.1"
   },
   "devDependencies": {
+    "@testing-library/jest-native": "^5.4.3",
     "@testing-library/react-native": "^13.0.0",
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
