@@ -20,7 +20,6 @@ end note
 class "Terminal" as terminal {}
 
 class "ClassCatalog" as ClassCatalog {
-    - classes
 }
 
 class "Class" as Class {
@@ -46,7 +45,6 @@ note left of ClassCatalog
 end note
 
 class "CampusCatalog" as CampusCatalog {
-  - campuses
 }
 
 class "Campus" as Campus {
