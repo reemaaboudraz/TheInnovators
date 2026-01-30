@@ -6,20 +6,20 @@ import { router } from "expo-router";
 import WelcomeScreen from "@/app/(auth)/welcome";
 
 describe("WelcomeScreen", () => {
-    it("navigates to map when continuing as guest", () => {
-        const { getByText } = render(<WelcomeScreen />);
+  it("navigates to map when continuing as guest", () => {
+    const { getByText } = render(<WelcomeScreen />);
 
-        fireEvent.press(getByText("Continue without signing in"));
-        expect(router.replace).toHaveBeenCalledWith("/(tabs)/map");
-    });
+    fireEvent.press(getByText("Continue without signing in"));
+    expect(router.replace).toHaveBeenCalledWith("/(tabs)/map");
+  });
 
-    it("shows alert when Google sign-in pressed", () => {
-        const alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {});
-        const { getByText } = render(<WelcomeScreen />);
+  it("shows alert when Google sign-in pressed", () => {
+    const alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {});
+    const { getByText } = render(<WelcomeScreen />);
 
-        fireEvent.press(getByText("Sign in with Google"));
-        expect(alertSpy).toHaveBeenCalled();
+    fireEvent.press(getByText("Sign in with Google"));
+    expect(alertSpy).toHaveBeenCalled();
 
-        alertSpy.mockRestore();
-    });
+    alertSpy.mockRestore();
+  });
 });

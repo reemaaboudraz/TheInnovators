@@ -7,28 +7,28 @@ import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 
 const MapTabIcon = ({ color }: { color: string }) => (
-    <IconSymbol size={28} name="paperplane.fill" color={color} />
+  <IconSymbol size={28} name="paperplane.fill" color={color} />
 );
 
 export default function TabLayout() {
-    const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme();
 
-    return (
-        <Tabs
-            screenOptions={{
-                tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-                headerShown: false,
-                tabBarButton: HapticTab,
-                tabBarStyle: { display: "none" },
-            }}
-        >
-            <Tabs.Screen
-                name="map"
-                options={{
-                    title: "Map",
-                    tabBarIcon: MapTabIcon,
-                }}
-            />
-        </Tabs>
-    );
+  return (
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        headerShown: false,
+        tabBarButton: HapticTab,
+        tabBarStyle: { display: "none" },
+      }}
+    >
+      <Tabs.Screen
+        name="map"
+        options={{
+          title: "Map",
+          tabBarIcon: MapTabIcon,
+        }}
+      />
+    </Tabs>
+  );
 }
