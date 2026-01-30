@@ -1,4 +1,4 @@
-import { SGW_BUILDINGS } from "./SGWBuildings";
+import { SGW_BUILDINGS } from "./SGW/SGWBuildings";
 import type { Building } from "./types";
 
 export function searchSGWBuildings(query: string, limit = 6): Building[] {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "@jest/globals";
-import { SGW_BUILDINGS } from "@/components/Buildings/SGWBuildings";
+import { SGW_BUILDINGS } from "@/components/Buildings/SGW/SGWBuildings";
 
 describe("SGW_BUILDINGS data", () => {
   it("contains valid SGW buildings", () => {

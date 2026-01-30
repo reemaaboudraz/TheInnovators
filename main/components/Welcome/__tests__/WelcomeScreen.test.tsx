@@ -3,7 +3,7 @@ import { render, fireEvent } from "@testing-library/react-native";
 import { describe, it, expect, jest } from "@jest/globals";
 import { Alert } from "react-native";
 import { router } from "expo-router";
-import WelcomeScreen from "@/app/(auth)/welcome";
+import WelcomeScreen from "@/components/Welcome/WelcomeScreen";
 
 describe("WelcomeScreen", () => {
   it("navigates to map when continuing as guest", () => {

@@ -12,7 +12,7 @@ import { StatusBar } from "expo-status-bar";
 import type { Building } from "@/components/Buildings/types";
 import { searchSGWBuildings } from "@/components/Buildings/search";
 import SGWBrandBar from "@/components/layout/SGWBrandBar";
-import { styles } from "@/components/style";
+import { styles } from "@/components/Styles/mapStyle";
 
 const SGW_REGION: Region = {
   latitude: 45.4973,

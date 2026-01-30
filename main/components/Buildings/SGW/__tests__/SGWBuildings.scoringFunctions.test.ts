@@ -2,7 +2,7 @@ import { describe, it, expect } from "@jest/globals";
 import {
   searchSGWBuildings,
   getSGWBuildingByCode,
-} from "@/components/Buildings/SGWBuildings";
+} from "@/components/Buildings/SGW/SGWBuildings";
 
 describe("SGWBuildings scoring functions", () => {
   it("returns [] for empty query", () => {
