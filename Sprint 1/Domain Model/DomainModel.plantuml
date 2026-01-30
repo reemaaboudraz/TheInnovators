@@ -20,7 +20,7 @@ end note
 class "Terminal" as terminal {}
 
 class "ClassCatalog" as ClassCatalog {
-    - classes: List<Class>
+    - classes
 }
 
 class "Class" as Class {
@@ -45,16 +45,21 @@ note left of ClassCatalog
     catalog classes in the domain model.
 end note
 
-class "CampusCatalog" as CampusCatalog {}
+class "CampusCatalog" as CampusCatalog {
+  - campuses
+}
 
 class "Campus" as Campus {
     - latitude
     - longitude
     - name
     - codename
+    - buildings
 }
 
-class "BuildingCatalog" as Buildings {}
+class "BuildingCatalog" as Buildings {
+-buildings
+}
 class "Building" as Building {
     - latitude
     - longitude
@@ -62,13 +67,19 @@ class "Building" as Building {
     - address
     - numberOfFloors
     - codename
+    - indoors
+
 }
 class "Room" as Room {
+    - latitude
+    - longitude
     - roomNumber
     - capacity
     - floorNB
 }
-class "PointOfInterestCatalog" as PointOfInterestCatalog {}
+class "PointOfInterestCatalog" as PointOfInterestCatalog {
+ 
+}
 
 abstract class "PointOfInterest" as PointOfInterest {
     - latitude
@@ -76,9 +87,14 @@ abstract class "PointOfInterest" as PointOfInterest {
 }
 
 abstract class "Indoor" as Indoor {
+
+    - latitude
+    - longitude
 }
 
 class "Washroom" as Washroom {
+    - latitude
+    - longitude
     - isPublic
     - isGenderNeutral
     - isMale
@@ -87,11 +103,17 @@ class "Washroom" as Washroom {
     - floorNB
 }
 class "Elevator" as Elevator {
+    - latitude
+    - longitude
     - isAccessible
 }
 class "Stairs" as Stairs {
+    - latitude
+    - longitude
 }
 class "WaterFountain" as WaterFountain {
+    - latitude
+    - longitude
     - hasBottleFiller
     - floorNB
 }
@@ -100,12 +122,24 @@ abstract class "Outdoor" as Outdoor {
     - address
     - name
     - type
+    - latitude
+    - longitude
 }
 
 class "Restaurant" as Restaurant {
+    - latitude
+    - longitude
     - cuisineType
+    - address
+    - name
+    - type
 }
 class "CoffeeShop" as CoffeeShop {
+    - latitude
+    - longitude
+    - address
+    - name
+    - type
 }
 
 terminal "1" -- "1" CampusCatalog : contains
