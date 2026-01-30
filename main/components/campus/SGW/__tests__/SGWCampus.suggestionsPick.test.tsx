@@ -1,19 +1,26 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
+import SGWCampus from "@/app/(tabs)/map";
 
 const mockAnimateToRegion = jest.fn();
 
 jest.mock("react-native-maps", () => {
-  const React = require("react");
-  const { View } = require("react-native");
+  const ReactActual = jest.requireActual("react") as typeof React;
+  const RN = jest.requireActual(
+    "react-native",
+  ) as typeof import("react-native");
+  const { View } = RN;
 
-  const MockMapView = React.forwardRef((props: any, ref: any) => {
-    React.useImperativeHandle(ref, () => ({
+  const MockMapView = ReactActual.forwardRef((props: any, ref: any) => {
+    ReactActual.useImperativeHandle(ref, () => ({
       animateToRegion: mockAnimateToRegion,
     }));
-    return <View testID="mapView" {...props} />;
+
+    return ReactActual.createElement(View, { testID: "mapView", ...props });
   });
+
+  (MockMapView as any).displayName = "MockMapView";
 
   return {
     __esModule: true,
@@ -21,8 +28,6 @@ jest.mock("react-native-maps", () => {
     PROVIDER_GOOGLE: "google",
   };
 });
-
-import SGWCampus from "@/app/(tabs)/map";
 
 describe("SGWCampus - suggestions", () => {
   beforeEach(() => {
@@ -37,7 +42,6 @@ describe("SGWCampus - suggestions", () => {
     const row = await findByText(/H — Henry F\. Hall Building/i);
     fireEvent.press(row);
 
-    // map animation called
     expect(mockAnimateToRegion).toHaveBeenCalledTimes(1);
     expect(mockAnimateToRegion).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -49,7 +53,6 @@ describe("SGWCampus - suggestions", () => {
       500,
     );
 
-    // input updated
     expect(getByPlaceholderText("Where to next?").props.value).toMatch(
       /^H - Henry F\. Hall Building/i,
     );
