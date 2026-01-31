@@ -9,16 +9,41 @@ jest.mock("expo-router", () => ({
   },
 }));
 
-// Mock react-native-maps
+/**
+ * Mock expo-linear-gradient
+ */
+jest.mock("expo-linear-gradient", () => {
+  const React = require("react");
+  const PropTypes = require("prop-types");
+  const { View } = require("react-native");
+
+  function LinearGradient({ children, ...props }) {
+    return React.createElement(View, props, children);
+  }
+
+  LinearGradient.propTypes = {
+    children: PropTypes.node,
+  };
+
+  return { LinearGradient };
+});
+
+/**
+ * Mock react-native-maps
+ * Expose animateToRegion as a stable spy so tests can assert calls.
+ */
+globalThis.__animateToRegionMock = jest.fn();
+
 jest.mock("react-native-maps", () => {
   const React = require("react");
   const { View } = require("react-native");
 
   const MockMapView = React.forwardRef((props, ref) => {
     React.useImperativeHandle(ref, () => ({
-      animateToRegion: jest.fn(),
+      animateToRegion: globalThis.__animateToRegionMock,
     }));
-    return <View testID="mapView" {...props} />;
+
+    return React.createElement(View, props);
   });
 
   return {

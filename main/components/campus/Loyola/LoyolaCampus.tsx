@@ -10,43 +10,44 @@ import {
 import MapView, { PROVIDER_GOOGLE, Region } from "react-native-maps";
 import { StatusBar } from "expo-status-bar";
 import type { Building } from "@/components/Buildings/types";
-import { searchSGWBuildings } from "@/components/Buildings/search";
+import { searchLoyolaBuildings } from "@/components/Buildings/search";
 import BrandBar from "@/components/layout/BrandBar";
 import { styles } from "@/components/Styles/mapStyle";
 
-const SGW_REGION: Region = {
-  latitude: 45.4973,
-  longitude: -73.5794,
+const LOYOLA_INITIAL_REGION: Region = {
+  latitude: 45.457984,
+  longitude: -73.639834,
   latitudeDelta: 0.006,
   longitudeDelta: 0.006,
 };
 
-const THEME = {
-  burgundy: "#800020",
+const UI_THEME = {
+  burgundy: "#e3ac20",
   surface: "rgba(255,255,255,0.92)",
   textDark: "#111111",
   textMuted: "rgba(17,17,17,0.55)",
 };
 
-export default function SGWCampus() {
-  const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState<Building | null>(null);
-  const mapRef = useRef<MapView>(null);
+export default function LoyolaCampus() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(
+    null,
+  );
+  const mapViewRef = useRef<MapView>(null);
 
-  const suggestions = useMemo(() => {
-    //  show suggestions after 1 char
-    if (query.trim().length < 1) return [];
-    return searchSGWBuildings(query, 6);
-  }, [query]);
+  const buildingSuggestions = useMemo(() => {
+    if (searchQuery.trim().length < 1) return [];
+    return searchLoyolaBuildings(searchQuery, 6);
+  }, [searchQuery]);
 
-  const onPickBuilding = (b: Building) => {
-    setSelected(b);
-    setQuery(`${b.code} - ${b.name}`);
+  const handleSelectBuilding = (building: Building) => {
+    setSelectedBuilding(building);
+    setSearchQuery(`${building.code} - ${building.name}`);
 
-    mapRef.current?.animateToRegion(
+    mapViewRef.current?.animateToRegion(
       {
-        latitude: b.latitude,
-        longitude: b.longitude,
+        latitude: building.latitude,
+        longitude: building.longitude,
         latitudeDelta: 0.0025,
         longitudeDelta: 0.0025,
       },
@@ -59,11 +60,11 @@ export default function SGWCampus() {
       <StatusBar style="dark" translucent backgroundColor="transparent" />
 
       <MapView
-        testID="mapView"
-        ref={mapRef}
+        testID="loyola-mapView"
+        ref={mapViewRef}
         provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
         style={StyleSheet.absoluteFillObject}
-        initialRegion={SGW_REGION}
+        initialRegion={LOYOLA_INITIAL_REGION}
         showsUserLocation={false}
         showsMyLocationButton={false}
         showsCompass={false}
@@ -78,23 +79,25 @@ export default function SGWCampus() {
           <Text style={styles.searchIcon}>⌕</Text>
 
           <TextInput
-            value={query}
-            onChangeText={(t) => {
-              setQuery(t);
-              if (selected) setSelected(null);
+            testID="loyola-search-input"
+            value={searchQuery}
+            onChangeText={(text) => {
+              setSearchQuery(text);
+              if (selectedBuilding) setSelectedBuilding(null);
             }}
             placeholder="Where to next?"
-            placeholderTextColor={THEME.textMuted}
+            placeholderTextColor={UI_THEME.textMuted}
             style={styles.searchInput}
             autoCorrect={false}
             autoCapitalize="none"
           />
 
-          {query.length > 0 && (
+          {searchQuery.length > 0 && (
             <Pressable
+              testID="clear-search-button"
               onPress={() => {
-                setQuery("");
-                setSelected(null);
+                setSearchQuery("");
+                setSelectedBuilding(null);
               }}
               hitSlop={8}
               style={styles.clearButton}
@@ -104,19 +107,20 @@ export default function SGWCampus() {
           )}
         </View>
 
-        {/* Suggestions dropdown when looking for a building */}
-        {suggestions.length > 0 && (
+        {/* Suggestions dropdown */}
+        {buildingSuggestions.length > 0 && (
           <View style={styles.suggestions}>
-            {suggestions.map((b) => (
+            {buildingSuggestions.map((building) => (
               <Pressable
-                key={b.id}
-                onPress={() => onPickBuilding(b)}
+                testID={`suggestion-${building.code}`}
+                key={building.id}
+                onPress={() => handleSelectBuilding(building)}
                 style={styles.suggestionRow}
               >
                 <Text style={styles.suggestionTitle}>
-                  {b.code} — {b.name}
+                  {building.code} — {building.name}
                 </Text>
-                <Text style={styles.suggestionSub}>{b.address}</Text>
+                <Text style={styles.suggestionSub}>{building.address}</Text>
               </Pressable>
             ))}
           </View>
@@ -124,7 +128,7 @@ export default function SGWCampus() {
       </View>
 
       {/* Bottom accent */}
-      <BrandBar testID="sgw-brandbar" backgroundColor={THEME.burgundy} />
+      <BrandBar testID="loyola-brandbar" backgroundColor={UI_THEME.burgundy} />
     </View>
   );
 }
