@@ -7,7 +7,6 @@ type SGWBrandBarProps = {
   backgroundColor?: string;
 };
 
-// Shade helper (same as Loyola)
 function shadeColor(color: string, percent: number) {
   const f = Number.parseInt(color.slice(1), 16);
   const t = percent < 0 ? 0 : 255;
@@ -29,12 +28,12 @@ function shadeColor(color: string, percent: number) {
   );
 }
 
-export default function SGWBrandBar({
+export default function LoyolaBrandBar({
   height = 40,
-  backgroundColor = "#800020",
+  backgroundColor = "#e3ac20",
 }: Readonly<SGWBrandBarProps>) {
-  const edgeColor = shadeColor(backgroundColor, -0.28); // darker edges
-  const centerColor = shadeColor(backgroundColor, 0.08); // slightly brighter center
+  const edgeColor = shadeColor(backgroundColor, -0.25); // darker
+  const centerColor = shadeColor(backgroundColor, 0.1); // slightly lighter
 
   return (
     <LinearGradient
@@ -44,11 +43,11 @@ export default function SGWBrandBar({
       end={{ x: 1, y: 0 }}
       style={[styles.brandBar, { height }]}
     >
-      {/* Glassy highlight */}
+      {/* Glass shine */}
       <LinearGradient
         colors={[
-          "rgba(255,255,255,0.22)",
-          "rgba(255,255,255,0.05)",
+          "rgba(255,255,255,0.28)",
+          "rgba(255,255,255,0.06)",
           "rgba(0,0,0,0.18)",
         ]}
         locations={[0, 0.45, 1]}
