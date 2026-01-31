@@ -7,7 +7,7 @@ type BrandBarProps = {
   backgroundColor?: string;
 };
 
-function adjustColorShade(baseColor: string, intensity: number) {
+export function adjustColorShade(baseColor: string, intensity: number) {
   const colorValue = Number.parseInt(baseColor.slice(1), 16);
   const targetValue = intensity < 0 ? 0 : 255;
   const factor = Math.abs(intensity);
@@ -38,14 +38,15 @@ export default function LoyolaBrandBar({
 
   return (
     <LinearGradient
+      testID="loyola-brandbar"
       colors={[gradientEdgeColor, gradientCenterColor, gradientEdgeColor]}
       locations={[0, 0.5, 1]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
       style={[styles.brandBar, { height }]}
     >
-      {/* Glass shine overlay */}
       <LinearGradient
+        testID="loyola-brandbar-overlay"
         colors={[
           "rgba(255,255,255,0.28)",
           "rgba(255,255,255,0.06)",

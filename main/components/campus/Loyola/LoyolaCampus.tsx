@@ -78,6 +78,7 @@ export default function LoyolaCampus() {
           <Text style={styles.searchIcon}>⌕</Text>
 
           <TextInput
+            testID="loyola-search-input"
             value={searchQuery}
             onChangeText={(text) => {
               setSearchQuery(text);
@@ -92,6 +93,7 @@ export default function LoyolaCampus() {
 
           {searchQuery.length > 0 && (
             <Pressable
+              testID="clear-search-button"
               onPress={() => {
                 setSearchQuery("");
                 setSelectedBuilding(null);
@@ -109,6 +111,7 @@ export default function LoyolaCampus() {
           <View style={styles.suggestions}>
             {buildingSuggestions.map((building) => (
               <Pressable
+                testID={`suggestion-${building.code}`}
                 key={building.id}
                 onPress={() => handleSelectBuilding(building)}
                 style={styles.suggestionRow}
