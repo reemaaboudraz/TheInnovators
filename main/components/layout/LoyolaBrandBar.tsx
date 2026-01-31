@@ -2,26 +2,27 @@ import React from "react";
 import { StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
-type SGWBrandBarProps = {
+type BrandBarProps = {
   height?: number;
   backgroundColor?: string;
 };
 
-function shadeColor(color: string, percent: number) {
-  const f = Number.parseInt(color.slice(1), 16);
-  const t = percent < 0 ? 0 : 255;
-  const p = Math.abs(percent);
-  const R = f >> 16;
-  const G = (f >> 8) & 0x00ff;
-  const B = f & 0x0000ff;
+function adjustColorShade(baseColor: string, intensity: number) {
+  const colorValue = Number.parseInt(baseColor.slice(1), 16);
+  const targetValue = intensity < 0 ? 0 : 255;
+  const factor = Math.abs(intensity);
+
+  const red = colorValue >> 16;
+  const green = (colorValue >> 8) & 0x00ff;
+  const blue = colorValue & 0x0000ff;
 
   return (
     "#" +
     (
       0x1000000 +
-      (Math.round((t - R) * p) + R) * 0x10000 +
-      (Math.round((t - G) * p) + G) * 0x100 +
-      (Math.round((t - B) * p) + B)
+      (Math.round((targetValue - red) * factor) + red) * 0x10000 +
+      (Math.round((targetValue - green) * factor) + green) * 0x100 +
+      (Math.round((targetValue - blue) * factor) + blue)
     )
       .toString(16)
       .slice(1)
@@ -31,19 +32,19 @@ function shadeColor(color: string, percent: number) {
 export default function LoyolaBrandBar({
   height = 40,
   backgroundColor = "#e3ac20",
-}: Readonly<SGWBrandBarProps>) {
-  const edgeColor = shadeColor(backgroundColor, -0.25); // darker
-  const centerColor = shadeColor(backgroundColor, 0.1); // slightly lighter
+}: Readonly<BrandBarProps>) {
+  const gradientEdgeColor = adjustColorShade(backgroundColor, -0.25);
+  const gradientCenterColor = adjustColorShade(backgroundColor, 0.1);
 
   return (
     <LinearGradient
-      colors={[edgeColor, centerColor, edgeColor]}
+      colors={[gradientEdgeColor, gradientCenterColor, gradientEdgeColor]}
       locations={[0, 0.5, 1]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
       style={[styles.brandBar, { height }]}
     >
-      {/* Glass shine */}
+      {/* Glass shine overlay */}
       <LinearGradient
         colors={[
           "rgba(255,255,255,0.28)",

@@ -1,38 +1,53 @@
 import { Building } from "@/components/Buildings/types";
-import rawLoyolaBuildings from "@/components/Buildings/data/Loyola_data.json";
+import rawLoyolaBuildingData from "@/components/Buildings/data/Loyola_data.json";
 
-export const Loyola_BUILDINGS = rawLoyolaBuildings as Building[];
+export const LOYOLA_BUILDINGS = rawLoyolaBuildingData as Building[];
 
-const normalize = (s: string) =>
-  s
+export const normalizeText = (text: string) =>
+  text
     .toLowerCase()
     .normalize("NFD") // separate accent marks
-    .replaceAll(/[\u0300-\u036f]/g, "") // remove accent marks (works on Hermes)
+    .replaceAll(/[\u0300-\u036f]/g, "") // remove accent marks (Hermes-safe)
     .replaceAll(/[^a-z0-9]+/g, " ")
     .trim();
 
-export function searchLoyolaBuildings(query: string, limit = 10): Building[] {
-  const q = normalize(query);
-  if (!q) return [];
+export function searchLoyolaBuildings(
+  searchQuery: string,
+  resultLimit = 10,
+): Building[] {
+  const normalizedQuery = normalizeText(searchQuery);
+  if (!normalizedQuery) return [];
 
-  return Loyola_BUILDINGS.map((b) => {
-    const haystack = normalize(
-      [b.code, b.name, b.address, ...b.aliases].join(" "),
+  return LOYOLA_BUILDINGS.map((building) => {
+    const searchableText = normalizeText(
+      [
+        building.code,
+        building.name,
+        building.address,
+        ...building.aliases,
+      ].join(" "),
     );
-    // simple scoring: exact code > name prefix > contains
-    let score = 0;
-    if (normalize(b.code) === q) score += 100;
-    if (normalize(b.name).startsWith(q)) score += 50;
-    if (haystack.includes(q)) score += 10;
-    return { b, score };
+
+    // scoring priority: exact code > name prefix > contains
+    let matchScore = 0;
+
+    if (normalizeText(building.code) === normalizedQuery) matchScore += 100;
+    if (normalizeText(building.name).startsWith(normalizedQuery))
+      matchScore += 50;
+    if (searchableText.includes(normalizedQuery)) matchScore += 10;
+
+    return { building, matchScore };
   })
-    .filter((x) => x.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, limit)
-    .map((x) => x.b);
+    .filter((result) => result.matchScore > 0)
+    .sort((a, b) => b.matchScore - a.matchScore)
+    .slice(0, resultLimit)
+    .map((result) => result.building);
 }
 
 export function getLoyolaBuildingByCode(code: string): Building | undefined {
-  const c = normalize(code);
-  return Loyola_BUILDINGS.find((b) => normalize(b.code) === c);
+  const normalizedCode = normalizeText(code);
+
+  return LOYOLA_BUILDINGS.find(
+    (building) => normalizeText(building.code) === normalizedCode,
+  );
 }

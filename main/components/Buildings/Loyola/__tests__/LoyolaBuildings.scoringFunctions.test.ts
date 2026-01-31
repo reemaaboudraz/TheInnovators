@@ -4,36 +4,44 @@ import {
   getLoyolaBuildingByCode,
 } from "@/components/Buildings/Loyola/LoyolaBuildings";
 
-describe("LoyolaBuildings scoring functions", () => {
-  it("returns [] for empty query", () => {
+describe("Loyola building search scoring", () => {
+  it("returns an empty list when the query is empty or only spaces", () => {
     expect(searchLoyolaBuildings("")).toEqual([]);
     expect(searchLoyolaBuildings("   ")).toEqual([]);
   });
 
-  it("exact code match returns building first (AD)", () => {
-    const res = searchLoyolaBuildings("AD", 10);
-    expect(res.length).toBeGreaterThan(0);
-    expect(res[0].code).toBe("AD");
+  it("prioritizes an exact building code match (expects AD at index 0)", () => {
+    const searchResults = searchLoyolaBuildings("AD", 10);
+    expect(searchResults.length).toBeGreaterThan(0);
+    expect(searchResults[0].code).toBe("AD");
   });
 
-  it("name prefix match works (admin -> AD)", () => {
-    const res = searchLoyolaBuildings("admin", 10);
-    expect(res.some((b) => b.code === "AD")).toBe(true);
+  it("supports prefix matching on the building name (admin should include AD)", () => {
+    const searchResults = searchLoyolaBuildings("admin", 10);
+    const containsAdminBuilding = searchResults.some(
+      (building) => building.code === "AD",
+    );
+
+    expect(containsAdminBuilding).toBe(true);
   });
 
-  it("contains match works (hingston -> HA)", () => {
-    const res = searchLoyolaBuildings("hingston", 10);
-    const codes = res.map((b) => b.code);
+  it("supports substring matching across searchable fields (hingston should include HA)", () => {
+    const searchResults = searchLoyolaBuildings("hingston", 10);
+    const returnedCodes = searchResults.map((building) => building.code);
 
-    expect(codes.some((c) => ["HA"].includes(c))).toBe(true);
+    const includesHingstonHall = returnedCodes.some(
+      (buildingCode) => buildingCode === "HA",
+    );
+
+    expect(includesHingstonHall).toBe(true);
   });
 
-  it("respects limit", () => {
-    const res = searchLoyolaBuildings("a", 1);
-    expect(res.length).toBe(1);
+  it("enforces the maximum number of returned results", () => {
+    const searchResults = searchLoyolaBuildings("a", 1);
+    expect(searchResults.length).toBe(1);
   });
 
-  it("getLoyolaBuildingByCode works + undefined when missing", () => {
+  it("finds a building by code (case-insensitive) and returns undefined if absent", () => {
     expect(getLoyolaBuildingByCode("ad")?.code).toBe("AD");
     expect(getLoyolaBuildingByCode("NOTREAL")).toBeUndefined();
   });

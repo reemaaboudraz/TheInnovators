@@ -1,5 +1,5 @@
 import { SGW_BUILDINGS } from "./SGW/SGWBuildings";
-import { Loyola_BUILDINGS } from "./Loyola/LoyolaBuildings";
+import { LOYOLA_BUILDINGS } from "./Loyola/LoyolaBuildings";
 import type { Building } from "./types";
 
 function searchBuildings(
@@ -27,5 +27,5 @@ export function searchSGWBuildings(query: string, limit = 6): Building[] {
 }
 
 export function searchLoyolaBuildings(query: string, limit = 6): Building[] {
-  return searchBuildings(Loyola_BUILDINGS, query, limit);
+  return searchBuildings(LOYOLA_BUILDINGS, query, limit);
 }

@@ -1,23 +1,24 @@
 import { describe, it, expect } from "@jest/globals";
-import { Loyola_BUILDINGS } from "@/components/Buildings/Loyola/LoyolaBuildings";
+import { LOYOLA_BUILDINGS } from "@/components/Buildings/Loyola/LoyolaBuildings";
 
-describe("SGW_BUILDINGS data", () => {
-  it("contains valid SGW buildings", () => {
-    expect(Loyola_BUILDINGS.length).toBeGreaterThan(0);
+describe("Loyola buildings dataset", () => {
+  it("includes at least one valid Loyola campus building entry", () => {
+    expect(LOYOLA_BUILDINGS.length).toBeGreaterThan(0);
 
-    for (const b of Loyola_BUILDINGS) {
-      expect(b.campus).toBe("LOY");
-      expect(b.id).toBeTruthy();
-      expect(b.code).toBeTruthy();
-      expect(b.name).toBeTruthy();
-      expect(b.address).toBeTruthy();
-      expect(typeof b.latitude).toBe("number");
-      expect(typeof b.longitude).toBe("number");
+    for (const building of LOYOLA_BUILDINGS) {
+      expect(building.campus).toBe("LOY");
+      expect(building.id).toBeTruthy();
+      expect(building.code).toBeTruthy();
+      expect(building.name).toBeTruthy();
+      expect(building.address).toBeTruthy();
+      expect(typeof building.latitude).toBe("number");
+      expect(typeof building.longitude).toBe("number");
     }
   });
 
-  it("has unique building codes", () => {
-    const codes = Loyola_BUILDINGS.map((b) => b.code);
-    expect(new Set(codes).size).toBe(codes.length);
+  it("ensures that all Loyola building codes are unique", () => {
+    const buildingCodes = LOYOLA_BUILDINGS.map((building) => building.code);
+
+    expect(new Set(buildingCodes).size).toBe(buildingCodes.length);
   });
 });

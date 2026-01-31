@@ -14,14 +14,14 @@ import { searchLoyolaBuildings } from "@/components/Buildings/search";
 import LoyolaBrandBar from "@/components/layout/LoyolaBrandBar";
 import { styles } from "@/components/Styles/mapStyle";
 
-const SGW_REGION: Region = {
+const LOYOLA_INITIAL_REGION: Region = {
   latitude: 45.457984,
   longitude: -73.639834,
   latitudeDelta: 0.006,
   longitudeDelta: 0.006,
 };
 
-const THEME = {
+const UI_THEME = {
   burgundy: "#e3ac20",
   surface: "rgba(255,255,255,0.92)",
   textDark: "#111111",
@@ -29,24 +29,25 @@ const THEME = {
 };
 
 export default function LoyolaCampus() {
-  const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState<Building | null>(null);
-  const mapRef = useRef<MapView>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(
+    null,
+  );
+  const mapViewRef = useRef<MapView>(null);
 
-  const suggestions = useMemo(() => {
-    //  show suggestions after 1 char
-    if (query.trim().length < 1) return [];
-    return searchLoyolaBuildings(query, 6);
-  }, [query]);
+  const buildingSuggestions = useMemo(() => {
+    if (searchQuery.trim().length < 1) return [];
+    return searchLoyolaBuildings(searchQuery, 6);
+  }, [searchQuery]);
 
-  const onPickBuilding = (b: Building) => {
-    setSelected(b);
-    setQuery(`${b.code} - ${b.name}`);
+  const handleSelectBuilding = (building: Building) => {
+    setSelectedBuilding(building);
+    setSearchQuery(`${building.code} - ${building.name}`);
 
-    mapRef.current?.animateToRegion(
+    mapViewRef.current?.animateToRegion(
       {
-        latitude: b.latitude,
-        longitude: b.longitude,
+        latitude: building.latitude,
+        longitude: building.longitude,
         latitudeDelta: 0.0025,
         longitudeDelta: 0.0025,
       },
@@ -59,10 +60,10 @@ export default function LoyolaCampus() {
       <StatusBar style="dark" translucent backgroundColor="transparent" />
 
       <MapView
-        ref={mapRef}
+        ref={mapViewRef}
         provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
         style={StyleSheet.absoluteFillObject}
-        initialRegion={SGW_REGION}
+        initialRegion={LOYOLA_INITIAL_REGION}
         showsUserLocation={false}
         showsMyLocationButton={false}
         showsCompass={false}
@@ -77,23 +78,23 @@ export default function LoyolaCampus() {
           <Text style={styles.searchIcon}>⌕</Text>
 
           <TextInput
-            value={query}
-            onChangeText={(t) => {
-              setQuery(t);
-              if (selected) setSelected(null);
+            value={searchQuery}
+            onChangeText={(text) => {
+              setSearchQuery(text);
+              if (selectedBuilding) setSelectedBuilding(null);
             }}
             placeholder="Where to next?"
-            placeholderTextColor={THEME.textMuted}
+            placeholderTextColor={UI_THEME.textMuted}
             style={styles.searchInput}
             autoCorrect={false}
             autoCapitalize="none"
           />
 
-          {query.length > 0 && (
+          {searchQuery.length > 0 && (
             <Pressable
               onPress={() => {
-                setQuery("");
-                setSelected(null);
+                setSearchQuery("");
+                setSelectedBuilding(null);
               }}
               hitSlop={8}
               style={styles.clearButton}
@@ -103,19 +104,19 @@ export default function LoyolaCampus() {
           )}
         </View>
 
-        {/* Suggestions dropdown when looking for a building */}
-        {suggestions.length > 0 && (
+        {/* Suggestions dropdown */}
+        {buildingSuggestions.length > 0 && (
           <View style={styles.suggestions}>
-            {suggestions.map((b) => (
+            {buildingSuggestions.map((building) => (
               <Pressable
-                key={b.id}
-                onPress={() => onPickBuilding(b)}
+                key={building.id}
+                onPress={() => handleSelectBuilding(building)}
                 style={styles.suggestionRow}
               >
                 <Text style={styles.suggestionTitle}>
-                  {b.code} — {b.name}
+                  {building.code} — {building.name}
                 </Text>
-                <Text style={styles.suggestionSub}>{b.address}</Text>
+                <Text style={styles.suggestionSub}>{building.address}</Text>
               </Pressable>
             ))}
           </View>
@@ -123,7 +124,7 @@ export default function LoyolaCampus() {
       </View>
 
       {/* Bottom accent */}
-      <LoyolaBrandBar backgroundColor={THEME.burgundy} />
+      <LoyolaBrandBar backgroundColor={UI_THEME.burgundy} />
     </View>
   );
 }
