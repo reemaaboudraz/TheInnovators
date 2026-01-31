@@ -59,6 +59,7 @@ export default function SGWCampus() {
       <StatusBar style="dark" translucent backgroundColor="transparent" />
 
       <MapView
+        testID="mapView"
         ref={mapRef}
         provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
         style={StyleSheet.absoluteFillObject}
