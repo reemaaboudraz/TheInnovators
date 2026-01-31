@@ -56,7 +56,12 @@ export const hallBuilding = new Building(
     {latitude: 45.4974801225439, longitude: -73.5785245624228},
     "1455 De Maisonneuve Blvd W, Montreal, QC H3G 1M8, Canada",
     campusCatalog.campuses[0],
-    [{latitude: 45.496829249284595, longitude: -73.57884980943825},{latitude: 45.49716390448993, longitude: -73.57954383100119},{latitude: 45.497708654988124, longitude: -73.57903421129053},{latitude: 45.497372122950125, longitude: -73.57833750751425}],
+    [
+        {latitude: 45.496829249284595, longitude: -73.57884980943825},
+        {latitude: 45.49716390448993, longitude: -73.57954383100119},
+        {latitude: 45.497708654988124, longitude: -73.57903421129053},
+        {latitude: 45.497372122950125, longitude: -73.57833750751425}
+    ],
     13);
 
 export const evBuilding = new Building(
@@ -69,7 +74,8 @@ export const evBuilding = new Building(
         {latitude: 45.49522511727483, longitude: -73.5779109060698},
         {latitude: 45.49583146062335, longitude: -73.57724974157962},
         {latitude:45.49604955462382,longitude:-73.57770638763837},
-        {latitude:45.495667419542904,longitude:-73.57807250915977}],
+        {latitude:45.495667419542904,longitude:-73.57807250915977}
+    ],
     10);
 
 /**

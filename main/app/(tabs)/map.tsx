@@ -13,15 +13,16 @@ export default function MapScreen() {
           longitude: -73.5794,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
+          //initialZoom: 9
         }}
       >
       
       {buildingCatalog.buildings.map((building:Building) => (
-          <Polygon 
-          coordinates={building.polygon}
-          key={building.name}
-          strokeColor="#000"
-          fillColor="rgba(96, 6, 6, 0.52)"
+        <Polygon
+        coordinates={building.polygon}
+        key={building.name}
+        strokeColor="#000"
+        fillColor="rgba(96, 6, 6, 1)"
         />
       ))}
 
