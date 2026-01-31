@@ -5,6 +5,7 @@ import { LinearGradient } from "expo-linear-gradient";
 type BrandBarProps = {
   height?: number;
   backgroundColor?: string;
+  testID?: string;
 };
 
 export function adjustColorShade(baseColor: string, intensity: number) {
@@ -29,16 +30,17 @@ export function adjustColorShade(baseColor: string, intensity: number) {
   );
 }
 
-export default function LoyolaBrandBar({
+export default function BrandBar({
   height = 40,
-  backgroundColor = "#e3ac20",
+  backgroundColor = "#800020",
+  testID = "brandbar",
 }: Readonly<BrandBarProps>) {
   const gradientEdgeColor = adjustColorShade(backgroundColor, -0.25);
   const gradientCenterColor = adjustColorShade(backgroundColor, 0.1);
 
   return (
     <LinearGradient
-      testID="loyola-brandbar"
+      testID={testID}
       colors={[gradientEdgeColor, gradientCenterColor, gradientEdgeColor]}
       locations={[0, 0.5, 1]}
       start={{ x: 0, y: 0 }}
@@ -46,7 +48,7 @@ export default function LoyolaBrandBar({
       style={[styles.brandBar, { height }]}
     >
       <LinearGradient
-        testID="loyola-brandbar-overlay"
+        testID={`${testID}-overlay`}
         colors={[
           "rgba(255,255,255,0.28)",
           "rgba(255,255,255,0.06)",

@@ -11,7 +11,7 @@ import MapView, { PROVIDER_GOOGLE, Region } from "react-native-maps";
 import { StatusBar } from "expo-status-bar";
 import type { Building } from "@/components/Buildings/types";
 import { searchLoyolaBuildings } from "@/components/Buildings/search";
-import LoyolaBrandBar from "@/components/layout/LoyolaBrandBar";
+import BrandBar from "@/components/layout/BrandBar";
 import { styles } from "@/components/Styles/mapStyle";
 
 const LOYOLA_INITIAL_REGION: Region = {
@@ -128,7 +128,7 @@ export default function LoyolaCampus() {
       </View>
 
       {/* Bottom accent */}
-      <LoyolaBrandBar backgroundColor={UI_THEME.burgundy} />
+      <BrandBar testID="loyola-brandbar" backgroundColor={UI_THEME.burgundy} />
     </View>
   );
 }

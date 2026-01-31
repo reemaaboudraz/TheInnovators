@@ -11,7 +11,7 @@ import MapView, { PROVIDER_GOOGLE, Region } from "react-native-maps";
 import { StatusBar } from "expo-status-bar";
 import type { Building } from "@/components/Buildings/types";
 import { searchSGWBuildings } from "@/components/Buildings/search";
-import SGWBrandBar from "@/components/layout/SGWBrandBar";
+import BrandBar from "@/components/layout/BrandBar";
 import { styles } from "@/components/Styles/mapStyle";
 
 const SGW_REGION: Region = {
@@ -124,7 +124,7 @@ export default function SGWCampus() {
       </View>
 
       {/* Bottom accent */}
-      <SGWBrandBar backgroundColor={THEME.burgundy} />
+      <BrandBar testID="sgw-brandbar" backgroundColor={THEME.burgundy} />
     </View>
   );
 }

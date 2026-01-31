@@ -1,30 +1,35 @@
 import React from "react";
 import { render } from "@testing-library/react-native";
 import { describe, it, expect } from "@jest/globals";
-import LoyolaBrandBar, {
-  adjustColorShade,
-} from "@/components/layout/LoyolaBrandBar";
+import BrandBar, { adjustColorShade } from "@/components/layout/BrandBar";
 
-describe("LoyolaBrandBar", () => {
+describe("BrandBar", () => {
   describe("rendering", () => {
     it("renders with default props", () => {
-      const { getByTestId } = render(<LoyolaBrandBar />);
+      const { getByTestId } = render(<BrandBar />);
+
+      const brandBar = getByTestId("brandbar");
+      expect(brandBar).toBeTruthy();
+    });
+
+    it("renders with custom testID", () => {
+      const { getByTestId } = render(<BrandBar testID="loyola-brandbar" />);
 
       const brandBar = getByTestId("loyola-brandbar");
       expect(brandBar).toBeTruthy();
     });
 
-    it("renders the overlay gradient", () => {
-      const { getByTestId } = render(<LoyolaBrandBar />);
+    it("renders the overlay gradient with matching testID", () => {
+      const { getByTestId } = render(<BrandBar testID="sgw-brandbar" />);
 
-      const overlay = getByTestId("loyola-brandbar-overlay");
+      const overlay = getByTestId("sgw-brandbar-overlay");
       expect(overlay).toBeTruthy();
     });
 
     it("applies default height of 40", () => {
-      const { getByTestId } = render(<LoyolaBrandBar />);
+      const { getByTestId } = render(<BrandBar />);
 
-      const brandBar = getByTestId("loyola-brandbar");
+      const brandBar = getByTestId("brandbar");
       const styles = brandBar.props.style;
       const flatStyle = Array.isArray(styles)
         ? Object.assign({}, ...styles)
@@ -34,9 +39,9 @@ describe("LoyolaBrandBar", () => {
     });
 
     it("applies custom height when provided", () => {
-      const { getByTestId } = render(<LoyolaBrandBar height={60} />);
+      const { getByTestId } = render(<BrandBar height={60} />);
 
-      const brandBar = getByTestId("loyola-brandbar");
+      const brandBar = getByTestId("brandbar");
       const styles = brandBar.props.style;
       const flatStyle = Array.isArray(styles)
         ? Object.assign({}, ...styles)
@@ -45,52 +50,50 @@ describe("LoyolaBrandBar", () => {
       expect(flatStyle.height).toBe(60);
     });
 
-    it("uses default gold color (#e3ac20) for gradient", () => {
-      const { getByTestId } = render(<LoyolaBrandBar />);
+    it("uses default burgundy color (#800020) for gradient", () => {
+      const { getByTestId } = render(<BrandBar />);
 
-      const brandBar = getByTestId("loyola-brandbar");
+      const brandBar = getByTestId("brandbar");
       const colors = brandBar.props.colors;
 
-      // The center color should be a lighter shade of #e3ac20
       expect(colors).toHaveLength(3);
       expect(colors[0]).toBe(colors[2]); // Edge colors should match
     });
 
     it("applies custom backgroundColor to gradient", () => {
-      const customColor = "#ff5500";
+      const customColor = "#e3ac20"; // Loyola gold
       const { getByTestId } = render(
-        <LoyolaBrandBar backgroundColor={customColor} />,
+        <BrandBar backgroundColor={customColor} />,
       );
 
-      const brandBar = getByTestId("loyola-brandbar");
+      const brandBar = getByTestId("brandbar");
       const colors = brandBar.props.colors;
 
-      // Gradient should have 3 colors derived from custom color
       expect(colors).toHaveLength(3);
       expect(colors[0]).toBe(colors[2]); // Edge colors should match
     });
 
     it("has correct gradient locations", () => {
-      const { getByTestId } = render(<LoyolaBrandBar />);
+      const { getByTestId } = render(<BrandBar />);
 
-      const brandBar = getByTestId("loyola-brandbar");
+      const brandBar = getByTestId("brandbar");
 
       expect(brandBar.props.locations).toEqual([0, 0.5, 1]);
     });
 
     it("has horizontal gradient direction", () => {
-      const { getByTestId } = render(<LoyolaBrandBar />);
+      const { getByTestId } = render(<BrandBar />);
 
-      const brandBar = getByTestId("loyola-brandbar");
+      const brandBar = getByTestId("brandbar");
 
       expect(brandBar.props.start).toEqual({ x: 0, y: 0 });
       expect(brandBar.props.end).toEqual({ x: 1, y: 0 });
     });
 
     it("overlay has vertical gradient direction", () => {
-      const { getByTestId } = render(<LoyolaBrandBar />);
+      const { getByTestId } = render(<BrandBar />);
 
-      const overlay = getByTestId("loyola-brandbar-overlay");
+      const overlay = getByTestId("brandbar-overlay");
 
       expect(overlay.props.start).toEqual({ x: 0, y: 0 });
       expect(overlay.props.end).toEqual({ x: 0, y: 1 });
@@ -118,14 +121,23 @@ describe("LoyolaBrandBar", () => {
       expect(result).toBe("#ff5500");
     });
 
-    it("handles the default gold color", () => {
-      const defaultColor = "#e3ac20";
-      const darkerShade = adjustColorShade(defaultColor, -0.25);
-      const lighterShade = adjustColorShade(defaultColor, 0.1);
+    it("handles the SGW burgundy color", () => {
+      const burgundy = "#800020";
+      const darkerShade = adjustColorShade(burgundy, -0.25);
+      const lighterShade = adjustColorShade(burgundy, 0.1);
 
-      // Darker shade should have lower RGB values
-      expect(darkerShade).not.toBe(defaultColor);
-      expect(lighterShade).not.toBe(defaultColor);
+      expect(darkerShade).not.toBe(burgundy);
+      expect(lighterShade).not.toBe(burgundy);
+      expect(darkerShade).not.toBe(lighterShade);
+    });
+
+    it("handles the Loyola gold color", () => {
+      const gold = "#e3ac20";
+      const darkerShade = adjustColorShade(gold, -0.25);
+      const lighterShade = adjustColorShade(gold, 0.1);
+
+      expect(darkerShade).not.toBe(gold);
+      expect(lighterShade).not.toBe(gold);
       expect(darkerShade).not.toBe(lighterShade);
     });
 
