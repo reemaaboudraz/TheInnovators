@@ -1,3 +1,7 @@
 .idea/
 .env
 
+
+coverage/
+lcov.info
+coverage-final.json

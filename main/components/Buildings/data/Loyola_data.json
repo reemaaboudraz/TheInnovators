@@ -1,0 +1,298 @@
+[
+  {
+    "id": "LOY-AD",
+    "campus": "LOY",
+    "code": "AD",
+    "name": "Administration Building",
+    "address": "7141 Sherbrooke West",
+    "latitude": 45.457984,
+    "longitude": -73.639834,
+    "aliases": ["AD", "AD Building", "Administration Building"]
+  },
+  {
+    "id": "LOY-BB",
+    "campus": "LOY",
+    "code": "BB",
+    "name": "BB-BH Annex",
+    "address": "3502 Bermore Avenue",
+    "latitude": 45.459793,
+    "longitude": -73.639174,
+    "aliases": ["BB", "BB Building", "BB-BH Annex"]
+  },
+  {
+    "id": "LOY-BH",
+    "campus": "LOY",
+    "code": "BH",
+    "name": "BB-BH Annex",
+    "address": "3500 Bermore Avenue",
+    "latitude": 45.459819,
+    "longitude": -73.639152,
+    "aliases": ["BH", "BB-BH Annex", "BH Building"]
+  },
+  {
+    "id": "LOY-CC",
+    "campus": "LOY",
+    "code": "CC",
+    "name": "Central Building",
+    "address": "7141 Sherbrooke West",
+    "latitude": 45.458204,
+    "longitude": -73.6403,
+    "aliases": ["CC", "Central Building", "CC Building"]
+  },
+  {
+    "id": "LOY-CJA",
+    "campus": "LOY",
+    "code": "CJA",
+    "name": "Communication Studies and Journalism Building",
+    "address": "7141, Sherbrooke Wes",
+    "latitude": 45.457478,
+    "longitude": -73.640354,
+    "aliases": [
+      "CJA",
+      "CJ Building - wing A",
+      "Communication Studies and Journalism Building"
+    ]
+  },
+  {
+    "id": "LOY-CJN",
+    "campus": "LOY",
+    "code": "CJN",
+    "name": "Communication Studies and Journalism Building",
+    "address": "7141, Sherbrooke Wes",
+    "latitude": 45.457478,
+    "longitude": -73.640354,
+    "aliases": [
+      "CJN",
+      "CJ Building - wing N",
+      "Communication Studies and Journalism Building"
+    ]
+  },
+  {
+    "id": "LOY-CJS",
+    "campus": "LOY",
+    "code": "CJS",
+    "name": "Communication Studies and Journalism Building",
+    "address": "7141, Sherbrooke Wes",
+    "latitude": 45.457478,
+    "longitude": -73.640354,
+    "aliases": [
+      "CJS",
+      "CJ Building - wing S",
+      "Communication Studies and Journalism Building"
+    ]
+  },
+  {
+    "id": "LOY-FC",
+    "campus": "LOY",
+    "code": "FC",
+    "name": "F.C. Smith Building",
+    "address": "7141 Sherbrooke West",
+    "latitude": 45.458493,
+    "longitude": -73.639287,
+    "aliases": ["FC", "F.C. Smith Building", "FC Building"]
+  },
+  {
+    "id": "LOY-GE",
+    "campus": "LOY",
+    "code": "GE",
+    "name": "Centre for Structural and Functional Genomics",
+    "address": "7141 Sherbrooke W",
+    "latitude": 45.457017,
+    "longitude": -73.640432,
+    "aliases": [
+      "GE",
+      "Centre for Structural and Functional Genomics",
+      "GE Building"
+    ]
+  },
+  {
+    "id": "LOY-HA",
+    "campus": "LOY",
+    "code": "HA",
+    "name": "Hingston Hall, wing HA",
+    "address": "7141 Sherbrooke West",
+    "latitude": 45.459356,
+    "longitude": -73.64127,
+    "aliases": ["HA", "Hingston Hall, wing HA", "HA Building"]
+  },
+  {
+    "id": "LOY-HB",
+    "campus": "LOY",
+    "code": "HB",
+    "name": "Hingston Hall, wing HB",
+    "address": "7141 Sherbrooke West",
+    "latitude": 45.459308,
+    "longitude": -73.641849,
+    "aliases": ["HB", "Hingston Hall, wing HB", "HB Building"]
+  },
+  {
+    "id": "LOY-HC",
+    "campus": "LOY",
+    "code": "HC",
+    "name": "Hingston Hall, wing HC",
+    "address": "7141 Sherbrooke West",
+    "latitude": 45.459663,
+    "longitude": -73.64208,
+    "aliases": ["HC", "Hingston Hall, wing HC", "HC Building"]
+  },
+  {
+    "id": "LOY-HU",
+    "campus": "LOY",
+    "code": "HU",
+    "name": "Applied Science Hub",
+    "address": "7141, Sherbrooke W",
+    "latitude": 45.458513,
+    "longitude": -73.641921,
+    "aliases": ["HU", "Applied Science Hub", "HU Building"]
+  },
+  {
+    "id": "LOY-JR",
+    "campus": "LOY",
+    "code": "JR",
+    "name": "Jesuit Residence",
+    "address": "7141 Sherbrooke West",
+    "latitude": 45.458432,
+    "longitude": -73.643235,
+    "aliases": ["JR", "Jesuit Residence", "JR Building"]
+  },
+  {
+    "id": "LOY-PB",
+    "campus": "LOY",
+    "code": "PB",
+    "name": "PB Building",
+    "address": "7200 Sherbrooke W",
+    "latitude": 45.456534,
+    "longitude": -73.638106,
+    "aliases": ["PB", "PB Building", "PB Building"]
+  },
+  {
+    "id": "LOY-PC",
+    "campus": "LOY",
+    "code": "PC",
+    "name": "PERFORM centre",
+    "address": "7200 Sherbrooke W",
+    "latitude": 45.457088,
+    "longitude": -73.637683,
+    "aliases": ["PC", "PERFORM centre", "PC Building"]
+  },
+  {
+    "id": "LOY-PS",
+    "campus": "LOY",
+    "code": "PS",
+    "name": "Physical Services Building",
+    "address": "7141 Sherbrooke W",
+    "latitude": 45.459636,
+    "longitude": -73.639758,
+    "aliases": ["PS", "Physical Services Building", "PS Building"]
+  },
+  {
+    "id": "LOY-PT",
+    "campus": "LOY",
+    "code": "PT",
+    "name": "Oscar Peterson Concert Hall",
+    "address": "7141 Sherbrooke W",
+    "latitude": 45.459308,
+    "longitude": -73.638941,
+    "aliases": ["PT", "Oscar Peterson Concert Hall", "PT Building"]
+  },
+  {
+    "id": "LOY-PY",
+    "campus": "LOY",
+    "code": "PY",
+    "name": "Psychology Building",
+    "address": "7141 Sherbrooke W",
+    "latitude": 45.458938,
+    "longitude": -73.640467,
+    "aliases": ["PY", "Psychology Building", "PY Building"]
+  },
+  {
+    "id": "LOY-RA",
+    "campus": "LOY",
+    "code": "RA",
+    "name": "Recreation and Athletics Complex",
+    "address": "7200 Sherbrooke W",
+    "latitude": 45.456774,
+    "longitude": -73.63761,
+    "aliases": ["RA", "Recreation and Athletics Complex", "RA Building"]
+  },
+  {
+    "id": "LOY-RF",
+    "campus": "LOY",
+    "code": "RF",
+    "name": "Loyola Jesuit Hall and Conference Centre",
+    "address": "7141 Sherbrooke W",
+    "latitude": 45.458489,
+    "longitude": -73.641028,
+    "aliases": ["RF", "Loyola Jesuit Hall and Conference Centre", "RF Building"]
+  },
+  {
+    "id": "LOY-SC",
+    "campus": "LOY",
+    "code": "SC",
+    "name": "Student Centre",
+    "address": "7141 Sherbrooke W",
+    "latitude": 45.459131,
+    "longitude": -73.639251,
+    "aliases": ["SC", "Student Centre", "SC Building"]
+  },
+  {
+    "id": "LOY-SH",
+    "campus": "LOY",
+    "code": "SH",
+    "name": "Solar House",
+    "address": "7141 Sherbrooke W",
+    "latitude": 45.459298,
+    "longitude": -73.642478,
+    "aliases": ["SH", "Solar House", "SH Building"]
+  },
+  {
+    "id": "LOY-SP",
+    "campus": "LOY",
+    "code": "SP",
+    "name": "Richard J. Renaud Science Complex",
+    "address": "7141 Sherbrooke W",
+    "latitude": 45.457881,
+    "longitude": -73.641565,
+    "aliases": ["SP", "Richard J. Renaud Science Complex", "SP Building"]
+  },
+  {
+    "id": "LOY-TA",
+    "campus": "LOY",
+    "code": "TA",
+    "name": "Terrebonne Building",
+    "address": "7079 Terrebonne",
+    "latitude": 45.459992,
+    "longitude": -73.640897,
+    "aliases": ["TA", "Terrebonne Building", "TA Building"]
+  },
+  {
+    "id": "LOY-TB",
+    "campus": "LOY",
+    "code": "TB",
+    "name": "TB Annex",
+    "address": "7075 Terrebonne",
+    "latitude": 45.460051,
+    "longitude": -73.640842,
+    "aliases": ["TB", "TB Annex", "TB Building"]
+  },
+  {
+    "id": "LOY-VE",
+    "campus": "LOY",
+    "code": "VE",
+    "name": "Vanier Extension",
+    "address": "7141 Sherbrooke W",
+    "latitude": 45.459026,
+    "longitude": -73.638606,
+    "aliases": ["VE", "Vanier Extension", "VE Building"]
+  },
+  {
+    "id": "LOY-VL",
+    "campus": "LOY",
+    "code": "VL",
+    "name": "Vanier Library Building",
+    "address": "7141 Sherbrooke W",
+    "latitude": 45.459026,
+    "longitude": -73.638606,
+    "aliases": ["VL", "Vanier Library Building", "VL Building"]
+  }
+]
