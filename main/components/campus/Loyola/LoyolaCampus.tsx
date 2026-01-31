@@ -60,6 +60,7 @@ export default function LoyolaCampus() {
       <StatusBar style="dark" translucent backgroundColor="transparent" />
 
       <MapView
+        testID="loyola-mapView"
         ref={mapViewRef}
         provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
         style={StyleSheet.absoluteFillObject}
