@@ -58,18 +58,18 @@ export default function SGWCampus() {
     <View style={styles.container}>
       <StatusBar style="dark" translucent backgroundColor="transparent" />
 
-      <MapView
-        testID="mapView"
-        ref={mapRef}
-        provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
-        style={StyleSheet.absoluteFillObject}
-        initialRegion={SGW_REGION}
-        showsUserLocation={false}
-        showsMyLocationButton={false}
-        showsCompass={false}
-        toolbarEnabled={false}
-        rotateEnabled={false}
-      />
+        <MapView
+            testID="mapView"
+            ref={mapRef}
+            provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
+            style={StyleSheet.absoluteFillObject}
+            initialRegion={SGW_REGION}
+            showsUserLocation={false}
+            showsMyLocationButton={false}
+            showsCompass={false}
+            toolbarEnabled={false}
+            rotateEnabled={false}
+        />
 
       {/* Top UI */}
       <View style={styles.topOverlay}>

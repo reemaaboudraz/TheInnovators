@@ -7,7 +7,8 @@ import {
   Pressable,
   StyleSheet,
 } from "react-native";
-import MapView, { PROVIDER_GOOGLE, Region } from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE, Region, Polygon } from "react-native-maps";
+import { LOYOLA_BUILDINGS } from "@/components/Buildings/Loyola/LoyolaBuildings";
 import { StatusBar } from "expo-status-bar";
 import type { Building } from "@/components/Buildings/types";
 import { searchLoyolaBuildings } from "@/components/Buildings/search";
@@ -59,18 +60,35 @@ export default function LoyolaCampus() {
     <View style={styles.container}>
       <StatusBar style="dark" translucent backgroundColor="transparent" />
 
-      <MapView
-        testID="loyola-mapView"
-        ref={mapViewRef}
-        provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
-        style={StyleSheet.absoluteFillObject}
-        initialRegion={LOYOLA_INITIAL_REGION}
-        showsUserLocation={false}
-        showsMyLocationButton={false}
-        showsCompass={false}
-        toolbarEnabled={false}
-        rotateEnabled={false}
-      />
+        <MapView
+            testID="loyola-mapView"
+            ref={mapViewRef}
+            provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
+            style={StyleSheet.absoluteFillObject}
+            initialRegion={LOYOLA_INITIAL_REGION}
+            showsUserLocation={false}
+            showsMyLocationButton={false}
+            showsCompass={false}
+            toolbarEnabled={false}
+            rotateEnabled={false}
+        >
+            {LOYOLA_BUILDINGS.map((b) =>
+                b.polygon?.length ? (
+                    <Polygon
+                        key={b.id}
+                        coordinates={b.polygon}
+                        tappable
+                        onPress={() => handleSelectBuilding(b)}
+
+                        strokeColor="#E0B100"
+                        strokeWidth={2}
+                        fillColor="rgba(224, 177, 0, 0.35)"
+                    />
+
+                ) : null,
+            )}
+        </MapView>
+
 
       {/* Top UI */}
       <View style={styles.topOverlay}>
