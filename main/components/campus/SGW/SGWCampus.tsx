@@ -7,12 +7,13 @@ import {
   Pressable,
   StyleSheet,
 } from "react-native";
-import MapView, { PROVIDER_GOOGLE, Region } from "react-native-maps";
+import MapView, { Polygon, PROVIDER_GOOGLE, Region } from "react-native-maps";
 import { StatusBar } from "expo-status-bar";
 import type { Building } from "@/components/Buildings/types";
 import { searchSGWBuildings } from "@/components/Buildings/search";
 import BrandBar from "@/components/layout/BrandBar";
 import { styles } from "@/components/Styles/mapStyle";
+import { buildingCatalog, CampusBuilding } from "@/components/Buildings/SGW/Building";
 
 const SGW_REGION: Region = {
   latitude: 45.4973,
@@ -69,7 +70,17 @@ export default function SGWCampus() {
         showsCompass={false}
         toolbarEnabled={false}
         rotateEnabled={false}
-      />
+      >
+        {buildingCatalog.buildings.map((building:CampusBuilding) => (
+        <Polygon
+        coordinates={building.polygon}
+        key={building.name}
+        strokeColor="#000"
+        fillColor="rgba(96, 6, 6, 1)"
+        />
+      ))}
+
+      </MapView>
 
       {/* Top UI */}
       <View style={styles.topOverlay}>

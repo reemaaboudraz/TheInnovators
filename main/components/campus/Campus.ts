@@ -1,4 +1,4 @@
-import { LatLng } from "./Building";
+import { LatLng } from "../Buildings/SGW/Building";
 
 export class CampusCatalog {
     campuses: Campus[];
