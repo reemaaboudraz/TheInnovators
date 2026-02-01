@@ -7,7 +7,12 @@ import {
   Pressable,
   StyleSheet,
 } from "react-native";
-import MapView, { PROVIDER_GOOGLE, Region, Polygon } from "react-native-maps";
+import MapView, {
+  PROVIDER_GOOGLE,
+  Region,
+  Polygon,
+  Marker,
+} from "react-native-maps";
 import { LOYOLA_BUILDINGS } from "@/components/Buildings/Loyola/LoyolaBuildings";
 import { StatusBar } from "expo-status-bar";
 import type { Building } from "@/components/Buildings/types";
@@ -60,35 +65,67 @@ export default function LoyolaCampus() {
     <View style={styles.container}>
       <StatusBar style="dark" translucent backgroundColor="transparent" />
 
-        <MapView
-            testID="loyola-mapView"
-            ref={mapViewRef}
-            provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
-            style={StyleSheet.absoluteFillObject}
-            initialRegion={LOYOLA_INITIAL_REGION}
-            showsUserLocation={false}
-            showsMyLocationButton={false}
-            showsCompass={false}
-            toolbarEnabled={false}
-            rotateEnabled={false}
-        >
-            {LOYOLA_BUILDINGS.map((b) =>
-                b.polygon?.length ? (
-                    <Polygon
-                        key={b.id}
-                        coordinates={b.polygon}
-                        tappable
-                        onPress={() => handleSelectBuilding(b)}
+      <MapView
+        testID="loyola-mapView"
+        ref={mapViewRef}
+        provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
+        style={StyleSheet.absoluteFillObject}
+        initialRegion={LOYOLA_INITIAL_REGION}
+        showsUserLocation={false}
+        showsMyLocationButton={false}
+        showsCompass={false}
+        toolbarEnabled={false}
+        rotateEnabled={false}
+        onPress={() => setSelectedBuilding(null)} // tap outside to unselect
+      >
+        {LOYOLA_BUILDINGS.map((b) => {
+          const isSelected = selectedBuilding?.id === b.id;
 
-                        strokeColor="#E0B100"
-                        strokeWidth={2}
-                        fillColor="rgba(224, 177, 0, 0.35)"
-                    />
+          return (
+            <React.Fragment key={b.id}>
+              {/* Building polygon */}
+              {b.polygon?.length ? (
+                <Polygon
+                  coordinates={b.polygon}
+                  tappable
+                  onPress={() => handleSelectBuilding(b)}
+                  strokeColor={isSelected ? "#8C5F0A" : "#E0B100"}
+                  strokeWidth={isSelected ? 3 : 2}
+                  fillColor={
+                    isSelected
+                      ? "rgba(224, 177, 0, 0.55)"
+                      : "rgba(224, 177, 0, 0.35)"
+                  }
+                />
+              ) : null}
 
-                ) : null,
-            )}
-        </MapView>
-
+              {/* Building code label using ONLY (latitude, longitude) */}
+              <Marker
+                coordinate={{ latitude: b.latitude, longitude: b.longitude }}
+                onPress={() => handleSelectBuilding(b)}
+                tracksViewChanges={isSelected}
+                // selected pin has a tail, so anchor lower
+                anchor={isSelected ? { x: 0.5, y: 0.75 } : { x: 0.5, y: 0.5 }}
+              >
+                {isSelected ? (
+                  <View style={localLabelStyles.pinWrap}>
+                    <View style={localLabelStyles.pinHead}>
+                      <Text style={localLabelStyles.pinText}>{b.code}</Text>
+                    </View>
+                    <View style={localLabelStyles.pinTail} />
+                  </View>
+                ) : (
+                  <View style={localLabelStyles.codeCircle}>
+                    <Text style={localLabelStyles.codeCircleText}>
+                      {b.code}
+                    </Text>
+                  </View>
+                )}
+              </Marker>
+            </React.Fragment>
+          );
+        })}
+      </MapView>
 
       {/* Top UI */}
       <View style={styles.topOverlay}>
@@ -150,3 +187,55 @@ export default function LoyolaCampus() {
     </View>
   );
 }
+
+const localLabelStyles = StyleSheet.create({
+  codeCircle: {
+    minWidth: 26,
+    height: 26,
+    paddingHorizontal: 6,
+    borderRadius: 13,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(224,177,0,0.95)",
+    borderWidth: 1.5,
+    borderColor: "#8C5F0A",
+  },
+  codeCircleText: {
+    fontWeight: "800",
+    fontSize: 12,
+    color: "#2a1c00",
+  },
+
+  // Selected label (pin look like the prototype)
+  pinWrap: {
+    alignItems: "center",
+  },
+  pinHead: {
+    minWidth: 30,
+    height: 30,
+    paddingHorizontal: 7,
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(224,177,0,1)",
+    borderWidth: 2,
+    borderColor: "#8C5F0A",
+  },
+  pinText: {
+    fontWeight: "900",
+    fontSize: 12,
+    color: "#2a1c00",
+  },
+  pinTail: {
+    width: 0,
+    height: 0,
+    marginTop: -1,
+    borderLeftWidth: 7,
+    borderRightWidth: 7,
+    borderTopWidth: 11,
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+    borderTopColor: "#8C5F0A",
+    transform: [{ translateY: -2 }],
+  },
+});

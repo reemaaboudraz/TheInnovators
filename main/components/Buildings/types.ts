@@ -1,8 +1,8 @@
 export type Campus = "SGW" | "LOY";
 
 export type LatLng = {
-    latitude: number;
-    longitude: number;
+  latitude: number;
+  longitude: number;
 };
 
 export type Building = {
@@ -16,6 +16,5 @@ export type Building = {
   aliases: string[];
   polygon: LatLng[];
 
-
-    // use it later for coloring
+  // use it later for coloring
 };
