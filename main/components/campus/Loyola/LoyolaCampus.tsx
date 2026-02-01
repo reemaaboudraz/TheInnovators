@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   TextInput,
@@ -13,12 +13,14 @@ import MapView, {
   Polygon,
   Marker,
 } from "react-native-maps";
-import { LOYOLA_BUILDINGS } from "@/components/Buildings/Loyola/LoyolaBuildings";
 import { StatusBar } from "expo-status-bar";
+
+import { LOYOLA_BUILDINGS } from "@/components/Buildings/Loyola/LoyolaBuildings";
 import type { Building } from "@/components/Buildings/types";
 import { searchLoyolaBuildings } from "@/components/Buildings/search";
 import BrandBar from "@/components/layout/BrandBar";
 import { styles } from "@/components/Styles/mapStyle";
+import BuildingsLoadError from "@/components/ui/BuildingsLoadError";
 
 const LOYOLA_INITIAL_REGION: Region = {
   latitude: 45.457984,
@@ -29,9 +31,8 @@ const LOYOLA_INITIAL_REGION: Region = {
 
 const UI_THEME = {
   burgundy: "#e3ac20",
-  surface: "rgba(255,255,255,0.92)",
-  textDark: "#111111",
   textMuted: "rgba(17,17,17,0.55)",
+  errorRed: "#D84A4A",
 };
 
 export default function LoyolaCampus() {
@@ -39,7 +40,26 @@ export default function LoyolaCampus() {
   const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(
     null,
   );
+
+  // Used to force a remount of MapView when user presses Refresh.
+  const [reloadKey, setReloadKey] = useState(0);
+
+  // Controls the "Whoops! error loading buildings" popup.
+  const [buildingsError, setBuildingsError] = useState(false);
+
   const mapViewRef = useRef<MapView>(null);
+
+  // Validate buildings availability (today it's local constants; later this becomes your fetch error).
+  useEffect(() => {
+    try {
+      if (!Array.isArray(LOYOLA_BUILDINGS) || LOYOLA_BUILDINGS.length === 0) {
+        throw new Error("LOYOLA_BUILDINGS missing/empty");
+      }
+      setBuildingsError(false);
+    } catch {
+      setBuildingsError(true);
+    }
+  }, [reloadKey]);
 
   const buildingSuggestions = useMemo(() => {
     if (searchQuery.trim().length < 1) return [];
@@ -61,11 +81,22 @@ export default function LoyolaCampus() {
     );
   };
 
+  const handleRefreshBuildings = () => {
+    // Reset UI state
+    setSearchQuery("");
+    setSelectedBuilding(null);
+
+    // Hide popup and force MapView remount
+    setBuildingsError(false);
+    setReloadKey((k) => k + 1);
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" translucent backgroundColor="transparent" />
 
       <MapView
+        key={reloadKey}
         testID="loyola-mapView"
         ref={mapViewRef}
         provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
@@ -99,12 +130,11 @@ export default function LoyolaCampus() {
                 />
               ) : null}
 
-              {/* Building code label using ONLY (latitude, longitude) */}
+              {/* Building code label (Marker) */}
               <Marker
                 coordinate={{ latitude: b.latitude, longitude: b.longitude }}
                 onPress={() => handleSelectBuilding(b)}
                 tracksViewChanges={isSelected}
-                // selected pin has a tail, so anchor lower
                 anchor={isSelected ? { x: 0.5, y: 0.75 } : { x: 0.5, y: 0.5 }}
               >
                 {isSelected ? (
@@ -182,6 +212,14 @@ export default function LoyolaCampus() {
         )}
       </View>
 
+      {/* Error popup overlay (prototype "Whoops! ... Refresh") */}
+      <BuildingsLoadError
+        visible={buildingsError}
+        onRefresh={handleRefreshBuildings}
+        accentColor={UI_THEME.errorRed}
+        testIDPrefix="loyola-buildings-error"
+      />
+
       {/* Bottom accent */}
       <BrandBar testID="loyola-brandbar" backgroundColor={UI_THEME.burgundy} />
     </View>
@@ -206,7 +244,7 @@ const localLabelStyles = StyleSheet.create({
     color: "#2a1c00",
   },
 
-  // Selected label (pin look like the prototype)
+  // Selected label (pin look)
   pinWrap: {
     alignItems: "center",
   },
