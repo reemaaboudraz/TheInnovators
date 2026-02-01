@@ -136,6 +136,7 @@ jest.mock("react-native-maps", () => {
     const tid = first
       ? `polygon-${first.latitude}-${first.longitude}`
       : "polygon";
+
     return ReactActual.createElement(
       View,
       { testID: props.testID || tid, ...props },
@@ -146,6 +147,7 @@ jest.mock("react-native-maps", () => {
   const MockMarker = (props: any) => {
     const c = props.coordinate;
     const tid = c ? `marker-${c.latitude}-${c.longitude}` : "marker";
+
     return ReactActual.createElement(
       View,
       { testID: props.testID || tid, ...props },
@@ -292,5 +294,22 @@ describe("LoyolaCampus - building shapes (Polygon/Marker)", () => {
     const markerAfter = getByTestId(markerId);
     expect(markerAfter.props.anchor).toEqual({ x: 0.5, y: 0.75 });
     expect(markerAfter.props.tracksViewChanges).toBe(true);
+  });
+
+  // NEW TEST: covers MapView onPress={() => setSelectedBuilding(null)}
+  it("tapping on the map (outside buildings) unselects the selected building", () => {
+    const { getByTestId } = render(<LoyolaCampus />);
+
+    const markerId = "marker-45.458--73.64";
+
+    // Select a building first
+    fireEvent.press(getByTestId(markerId));
+    expect(getByTestId(markerId).props.anchor).toEqual({ x: 0.5, y: 0.75 });
+
+    // Tap outside (MapView onPress)
+    fireEvent.press(getByTestId("loyola-mapView"));
+
+    // Should unselect
+    expect(getByTestId(markerId).props.anchor).toEqual({ x: 0.5, y: 0.5 });
   });
 });
