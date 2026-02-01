@@ -1,9 +1,116 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
-import LoyolaCampus from "../LoyolaCampus";
 
 const mockAnimateToRegion = jest.fn();
+
+// Keep test data small + predictable so we can assert Marker/Polygon props.
+// Only the fields used by LoyolaCampus are required.
+const BUILDING_AD = {
+  id: "ad-1",
+  code: "AD",
+  name: "Administration Building",
+  address: "7141 Sherbrooke St W, Montreal, QC",
+  latitude: 45.458,
+  longitude: -73.64,
+  polygon: [
+    { latitude: 45.4581, longitude: -73.6401 },
+    { latitude: 45.4582, longitude: -73.6402 },
+    { latitude: 45.4583, longitude: -73.6403 },
+  ],
+};
+
+// Another building to ensure we don't accidentally select everything.
+const BUILDING_HB = {
+  id: "hb-1",
+  code: "HB",
+  name: "Hingston Hall, wing HB",
+  address: "7141 Sherbrooke St W, Montreal, QC",
+  latitude: 45.459,
+  longitude: -73.639,
+  polygon: [
+    { latitude: 45.4591, longitude: -73.6391 },
+    { latitude: 45.4592, longitude: -73.6392 },
+    { latitude: 45.4593, longitude: -73.6393 },
+  ],
+};
+
+// Mock the building data + search helper so suggestions are predictable.
+jest.mock("@/components/Buildings/Loyola/LoyolaBuildings", () => ({
+  LOYOLA_BUILDINGS: [BUILDING_AD, BUILDING_HB],
+}));
+
+jest.mock("@/components/Buildings/search", () => ({
+  searchLoyolaBuildings: (query: string, limit: number) => {
+    const q = query.toLowerCase();
+    const results = [] as any[];
+    if (q.includes("admin") || q.includes("ad")) results.push(BUILDING_AD);
+    if (q.includes("hing") || q.includes("hb")) results.push(BUILDING_HB);
+    return results.slice(0, limit);
+  },
+}));
+
+// Keep UI deps lightweight for tests.
+jest.mock("expo-status-bar", () => ({
+  StatusBar: () => null,
+}));
+
+jest.mock("@/components/layout/BrandBar", () => {
+  const ReactActual = jest.requireActual("react") as typeof React;
+  const RN = jest.requireActual(
+    "react-native",
+  ) as typeof import("react-native");
+  const { View } = RN;
+  return function BrandBarMock(props: any) {
+    return ReactActual.createElement(View, {
+      testID: props.testID || "brandbar",
+    });
+  };
+});
+
+jest.mock("@/components/Styles/mapStyle", () => {
+  const RN = jest.requireActual(
+    "react-native",
+  ) as typeof import("react-native");
+  return {
+    styles: RN.StyleSheet.create({
+      container: { flex: 1 },
+      topOverlay: {},
+      searchBar: {},
+      searchIcon: {},
+      searchInput: {},
+      clearButton: {},
+      clearIcon: {},
+      suggestions: {},
+      suggestionRow: {},
+      suggestionTitle: {},
+      suggestionSub: {},
+    }),
+  };
+});
+
+jest.mock("@/components/ui/BuildingsLoadError", () => {
+  const ReactActual = jest.requireActual("react") as typeof React;
+  const RN = jest.requireActual(
+    "react-native",
+  ) as typeof import("react-native");
+  const { View, Text, Pressable } = RN;
+
+  return function BuildingsLoadErrorMock(props: any) {
+    if (!props.visible) return null;
+    const prefix = props.testIDPrefix || "buildings-error";
+    return ReactActual.createElement(
+      View,
+      { testID: `${prefix}-overlay` },
+      ReactActual.createElement(Text, null, "Whoops!"),
+      ReactActual.createElement(
+        Pressable,
+        { testID: `${prefix}-refresh`, onPress: props.onRefresh },
+        ReactActual.createElement(Text, null, "Refresh"),
+      ),
+    );
+  };
+});
 
 jest.mock("react-native-maps", () => {
   const ReactActual = jest.requireActual("react") as typeof React;
@@ -24,11 +131,27 @@ jest.mock("react-native-maps", () => {
     );
   });
 
-  const MockPolygon = (props: any) =>
-    ReactActual.createElement(View, props, props.children);
+  const MockPolygon = (props: any) => {
+    const first = props.coordinates?.[0];
+    const tid = first
+      ? `polygon-${first.latitude}-${first.longitude}`
+      : "polygon";
+    return ReactActual.createElement(
+      View,
+      { testID: props.testID || tid, ...props },
+      props.children,
+    );
+  };
 
-  const MockMarker = (props: any) =>
-    ReactActual.createElement(View, props, props.children);
+  const MockMarker = (props: any) => {
+    const c = props.coordinate;
+    const tid = c ? `marker-${c.latitude}-${c.longitude}` : "marker";
+    return ReactActual.createElement(
+      View,
+      { testID: props.testID || tid, ...props },
+      props.children,
+    );
+  };
 
   (MockMapView as any).displayName = "MockMapView";
 
@@ -40,6 +163,8 @@ jest.mock("react-native-maps", () => {
     Marker: MockMarker,
   };
 });
+
+import LoyolaCampus from "../LoyolaCampus";
 
 describe("LoyolaCampus - initial region", () => {
   it("uses Loyola region as initialRegion", () => {
@@ -118,13 +243,54 @@ describe("LoyolaCampus - suggestions", () => {
     );
   });
 
-  it("hides suggestions when search query is empty", () => {
-    const { getByTestId, queryByTestId } = render(<LoyolaCampus />);
+  it("hides suggestions when search query is empty", async () => {
+    const { getByTestId, queryByTestId, findByTestId } = render(
+      <LoyolaCampus />,
+    );
 
     const input = getByTestId("loyola-search-input");
     fireEvent.changeText(input, "admin");
-    fireEvent.changeText(input, "");
+    await findByTestId("suggestion-AD");
 
+    fireEvent.changeText(input, "");
     expect(queryByTestId("suggestion-AD")).toBeNull();
+  });
+});
+
+describe("LoyolaCampus - building shapes (Polygon/Marker)", () => {
+  beforeEach(() => {
+    mockAnimateToRegion.mockClear();
+  });
+
+  it("pressing a building Polygon selects it (style changes) + animates map", () => {
+    const { getByTestId } = render(<LoyolaCampus />);
+
+    const polygonId = "polygon-45.4581--73.6401";
+    const polygonBefore = getByTestId(polygonId);
+    expect(polygonBefore.props.strokeWidth).toBe(2);
+
+    fireEvent.press(polygonBefore);
+
+    expect(mockAnimateToRegion).toHaveBeenCalledTimes(1);
+
+    const polygonAfter = getByTestId(polygonId);
+    expect(polygonAfter.props.strokeWidth).toBe(3);
+    expect(polygonAfter.props.fillColor).toBe("rgba(224, 177, 0, 0.55)");
+  });
+
+  it("pressing a building Marker selects it (anchor changes) + animates map", () => {
+    const { getByTestId } = render(<LoyolaCampus />);
+
+    const markerId = "marker-45.458--73.64";
+    const markerBefore = getByTestId(markerId);
+    expect(markerBefore.props.anchor).toEqual({ x: 0.5, y: 0.5 });
+
+    fireEvent.press(markerBefore);
+
+    expect(mockAnimateToRegion).toHaveBeenCalledTimes(1);
+
+    const markerAfter = getByTestId(markerId);
+    expect(markerAfter.props.anchor).toEqual({ x: 0.5, y: 0.75 });
+    expect(markerAfter.props.tracksViewChanges).toBe(true);
   });
 });
