@@ -7,7 +7,37 @@
     "address": "2160 Bishop St.",
     "latitude": 45.497856,
     "longitude": -73.579588,
-    "aliases": ["B", "B Annex", "B Building"]
+    "aliases": [
+      "B",
+      "B Annex",
+      "B Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.497887,
+        "longitude": -73.5793896
+      },
+      {
+        "latitude": 45.4979102,
+        "longitude": -73.5794406
+      },
+      {
+        "latitude": 45.4979241,
+        "longitude": -73.5794655
+      },
+      {
+        "latitude": 45.4977507,
+        "longitude": -73.5796322
+      },
+      {
+        "latitude": 45.4977144,
+        "longitude": -73.5795607
+      },
+      {
+        "latitude": 45.497887,
+        "longitude": -73.5793896
+      }
+    ]
   },
   {
     "id": "SGW-CI",
@@ -17,7 +47,53 @@
     "address": "2149 Mackay St.",
     "latitude": 45.497467,
     "longitude": -73.579925,
-    "aliases": ["CI", "CI Annex", "CI Building"]
+    "aliases": [
+      "CI",
+      "CI Annex",
+      "CI Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4974061,
+        "longitude": -73.5800149
+      },
+      {
+        "latitude": 45.4973958,
+        "longitude": -73.5799938
+      },
+      {
+        "latitude": 45.4973868,
+        "longitude": -73.5799742
+      },
+      {
+        "latitude": 45.497373,
+        "longitude": -73.5799734
+      },
+      {
+        "latitude": 45.4973615,
+        "longitude": -73.5799483
+      },
+      {
+        "latitude": 45.4973632,
+        "longitude": -73.5799218
+      },
+      {
+        "latitude": 45.4974912,
+        "longitude": -73.5798023
+      },
+      {
+        "latitude": 45.4975407,
+        "longitude": -73.5797543
+      },
+      {
+        "latitude": 45.4975819,
+        "longitude": -73.5798422
+      },
+      {
+        "latitude": 45.4974061,
+        "longitude": -73.5800149
+      }
+    ]
   },
   {
     "id": "SGW-CL",
@@ -27,7 +103,49 @@
     "address": "1665 Ste-Catherine St. W.",
     "latitude": 45.496944,
     "longitude": -73.5781,
-    "aliases": ["CL", "CL Annex", "CL Building"]
+    "aliases": [
+      "CL",
+      "CL Annex",
+      "CL Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4941615,
+        "longitude": -73.5796402
+      },
+      {
+        "latitude": 45.4939635,
+        "longitude": -73.5793327
+      },
+      {
+        "latitude": 45.4939729,
+        "longitude": -73.5792952
+      },
+      {
+        "latitude": 45.4939832,
+        "longitude": -73.5792697
+      },
+      {
+        "latitude": 45.494002,
+        "longitude": -73.5792348
+      },
+      {
+        "latitude": 45.4940152,
+        "longitude": -73.5792201
+      },
+      {
+        "latitude": 45.4942577,
+        "longitude": -73.5789277
+      },
+      {
+        "latitude": 45.4944711,
+        "longitude": -73.5792777
+      },
+      {
+        "latitude": 45.4941615,
+        "longitude": -73.5796402
+      }
+    ]
   },
   {
     "id": "SGW-D",
@@ -37,7 +155,45 @@
     "address": "2140 Bishop St.",
     "latitude": 45.497319,
     "longitude": -73.579414,
-    "aliases": ["D", "D Annex", "D Building"]
+    "aliases": [
+      "D",
+      "D Annex",
+      "D Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.49752363478567,
+        "longitude": -73.57974743843079
+      },
+      {
+        "latitude": 45.49762630003951,
+        "longitude": -73.5796350034266
+      },
+      {
+        "latitude": 45.49759713409136,
+        "longitude": -73.57957191756631
+      },
+      {
+        "latitude": 45.497685572726304,
+        "longitude": -73.57948802679465
+      },
+      {
+        "latitude": 45.49769592191919,
+        "longitude": -73.57950816057985
+      },
+      {
+        "latitude": 45.49777171061462,
+        "longitude": -73.57943967013365
+      },
+      {
+        "latitude": 45.497755260091516,
+        "longitude": -73.57940278976147
+      },
+      {
+        "latitude": 45.497849733030286,
+        "longitude": -73.57931092410716
+      }
+    ]
   },
   {
     "id": "SGW-EN",
@@ -47,7 +203,61 @@
     "address": "2070 Mackay St.",
     "latitude": 45.49655,
     "longitude": -73.57936,
-    "aliases": ["EN", "EN Annex", "EN Building"]
+    "aliases": [
+      "EN",
+      "EN Annex",
+      "EN Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4968834,
+        "longitude": -73.5794977
+      },
+      {
+        "latitude": 45.4968982,
+        "longitude": -73.5794838
+      },
+      {
+        "latitude": 45.4969165,
+        "longitude": -73.5795233
+      },
+      {
+        "latitude": 45.4969267,
+        "longitude": -73.5795137
+      },
+      {
+        "latitude": 45.4969507,
+        "longitude": -73.5795655
+      },
+      {
+        "latitude": 45.4969271,
+        "longitude": -73.5795884
+      },
+      {
+        "latitude": 45.4968297,
+        "longitude": -73.5796809
+      },
+      {
+        "latitude": 45.4967146,
+        "longitude": -73.5797877
+      },
+      {
+        "latitude": 45.496689,
+        "longitude": -73.5797324
+      },
+      {
+        "latitude": 45.4968073,
+        "longitude": -73.579621
+      },
+      {
+        "latitude": 45.4967907,
+        "longitude": -73.5795851
+      },
+      {
+        "latitude": 45.4968834,
+        "longitude": -73.5794977
+      }
+    ]
   },
   {
     "id": "SGW-ER",
@@ -57,7 +267,48 @@
     "address": "2155 Guy St.",
     "latitude": 45.49595,
     "longitude": -73.5799,
-    "aliases": ["ER", "ER Building"]
+    "aliases": [
+      "ER",
+      "ER Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4965177,
+        "longitude": -73.5796317
+      },
+      {
+        "latitude": 45.4966784,
+        "longitude": -73.5799683
+      },
+      {
+        "latitude": 45.4962366,
+        "longitude": -73.5803907
+      },
+      {
+        "latitude": 45.4961873,
+        "longitude": -73.5802304
+      },
+      {
+        "latitude": 45.4961492,
+        "longitude": -73.5800863
+      },
+      {
+        "latitude": 45.4961614,
+        "longitude": -73.5800729
+      },
+      {
+        "latitude": 45.4961343,
+        "longitude": -73.5799991
+      },
+      {
+        "latitude": 45.4962949,
+        "longitude": -73.5798436
+      },
+      {
+        "latitude": 45.4965177,
+        "longitude": -73.5796317
+      }
+    ]
   },
   {
     "id": "SGW-EV",
@@ -71,6 +322,112 @@
       "EV",
       "EV Building",
       "Engineering, Computer Science and Visual Arts Integrated Complex"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4959332,
+        "longitude": -73.578441
+      },
+      {
+        "latitude": 45.4956265,
+        "longitude": -73.578729
+      },
+      {
+        "latitude": 45.4956087,
+        "longitude": -73.5787035
+      },
+      {
+        "latitude": 45.4955877,
+        "longitude": -73.5786538
+      },
+      {
+        "latitude": 45.4955735,
+        "longitude": -73.5786662
+      },
+      {
+        "latitude": 45.4955639,
+        "longitude": -73.5786747
+      },
+      {
+        "latitude": 45.4955529,
+        "longitude": -73.5786836
+      },
+      {
+        "latitude": 45.4954065,
+        "longitude": -73.5783846
+      },
+      {
+        "latitude": 45.4952448,
+        "longitude": -73.5780359
+      },
+      {
+        "latitude": 45.4952542,
+        "longitude": -73.5780238
+      },
+      {
+        "latitude": 45.4951856,
+        "longitude": -73.5778682
+      },
+      {
+        "latitude": 45.4952218,
+        "longitude": -73.5778318
+      },
+      {
+        "latitude": 45.4954371,
+        "longitude": -73.5776149
+      },
+      {
+        "latitude": 45.4955018,
+        "longitude": -73.577742
+      },
+      {
+        "latitude": 45.4955147,
+        "longitude": -73.5777306
+      },
+      {
+        "latitude": 45.4955256,
+        "longitude": -73.5777562
+      },
+      {
+        "latitude": 45.4955902,
+        "longitude": -73.5776945
+      },
+      {
+        "latitude": 45.4955496,
+        "longitude": -73.5776118
+      },
+      {
+        "latitude": 45.4955134,
+        "longitude": -73.5775381
+      },
+      {
+        "latitude": 45.4958361,
+        "longitude": -73.5772325
+      },
+      {
+        "latitude": 45.495952,
+        "longitude": -73.5774777
+      },
+      {
+        "latitude": 45.4960636,
+        "longitude": -73.5777106
+      },
+      {
+        "latitude": 45.4957525,
+        "longitude": -73.578005
+      },
+      {
+        "latitude": 45.4959029,
+        "longitude": -73.5783135
+      },
+      {
+        "latitude": 45.4958841,
+        "longitude": -73.5783336
+      },
+      {
+        "latitude": 45.4959332,
+        "longitude": -73.578441
+      }
     ]
   },
   {
@@ -81,7 +438,39 @@
     "address": "2060 Mackay St.",
     "latitude": 45.49627,
     "longitude": -73.57922,
-    "aliases": ["FA", "FA Annex", "FA Building"]
+    "aliases": [
+      "FA",
+      "FA Annex",
+      "FA Building"
+    ],
+    "polygon": [
+      [
+        {
+          "latitude": 45.4967406,
+          "longitude": -73.5795156
+        },
+        {
+          "latitude": 45.4968443,
+          "longitude": -73.5794153
+        },
+        {
+          "latitude": 45.4968834,
+          "longitude": -73.5794977
+        },
+        {
+          "latitude": 45.4967907,
+          "longitude": -73.5795851
+        },
+        {
+          "latitude": 45.4967793,
+          "longitude": -73.579597
+        },
+        {
+          "latitude": 45.4967406,
+          "longitude": -73.5795156
+        }
+      ]
+    ]
   },
   {
     "id": "SGW-FB",
@@ -91,7 +480,105 @@
     "address": "1250 Guy St.",
     "latitude": 45.49485,
     "longitude": -73.57953,
-    "aliases": ["FB", "FB Building", "Faubourg Building"]
+    "aliases": [
+      "FB",
+      "FB Building",
+      "Faubourg Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4946786,
+        "longitude": -73.5780177
+      },
+      {
+        "latitude": 45.4944394,
+        "longitude": -73.5775911
+      },
+      {
+        "latitude": 45.4943818,
+        "longitude": -73.5774884
+      },
+      {
+        "latitude": 45.4946349,
+        "longitude": -73.5771989
+      },
+      {
+        "latitude": 45.4946797,
+        "longitude": -73.577282
+      },
+      {
+        "latitude": 45.4946736,
+        "longitude": -73.5772886
+      },
+      {
+        "latitude": 45.4947154,
+        "longitude": -73.57736
+      },
+      {
+        "latitude": 45.4947081,
+        "longitude": -73.5773687
+      },
+      {
+        "latitude": 45.494752,
+        "longitude": -73.5774421
+      },
+      {
+        "latitude": 45.4947451,
+        "longitude": -73.5774502
+      },
+      {
+        "latitude": 45.4947858,
+        "longitude": -73.5775203
+      },
+      {
+        "latitude": 45.4947776,
+        "longitude": -73.577528
+      },
+      {
+        "latitude": 45.4948208,
+        "longitude": -73.577598
+      },
+      {
+        "latitude": 45.4948133,
+        "longitude": -73.5776061
+      },
+      {
+        "latitude": 45.4948613,
+        "longitude": -73.577678
+      },
+      {
+        "latitude": 45.4948539,
+        "longitude": -73.5776899
+      },
+      {
+        "latitude": 45.4948923,
+        "longitude": -73.5777612
+      },
+      {
+        "latitude": 45.4948598,
+        "longitude": -73.5778026
+      },
+      {
+        "latitude": 45.4948398,
+        "longitude": -73.5778264
+      },
+      {
+        "latitude": 45.4948522,
+        "longitude": -73.5778474
+      },
+      {
+        "latitude": 45.4947542,
+        "longitude": -73.5779622
+      },
+      {
+        "latitude": 45.4947429,
+        "longitude": -73.5779414
+      },
+      {
+        "latitude": 45.4946786,
+        "longitude": -73.5780177
+      }
+    ]
   },
   {
     "id": "SGW-FG",
@@ -101,17 +588,65 @@
     "address": "1600 Ste-Catherine St. W.",
     "latitude": 45.49588,
     "longitude": -73.57761,
-    "aliases": ["FG", "FG Building", "Faubourg Ste-Catherine Building"]
-  },
-  {
-    "id": "SGW-GA",
-    "campus": "SGW",
-    "code": "GA",
-    "name": "Grey Nuns Annex",
-    "address": "1211 St-Mathieu St.",
-    "latitude": 45.49456,
-    "longitude": -73.57913,
-    "aliases": ["GA", "GA Annex", "GA Building", "Grey Nuns Annex"]
+    "aliases": [
+      "FG",
+      "FG Building",
+      "Faubourg Ste-Catherine Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4938097,
+        "longitude": -73.5790389
+      },
+      {
+        "latitude": 45.4936147,
+        "longitude": -73.5787064
+      },
+      {
+        "latitude": 45.4944018,
+        "longitude": -73.5777931
+      },
+      {
+        "latitude": 45.4944411,
+        "longitude": -73.5777475
+      },
+      {
+        "latitude": 45.4944091,
+        "longitude": -73.5776912
+      },
+      {
+        "latitude": 45.4944119,
+        "longitude": -73.5776335
+      },
+      {
+        "latitude": 45.4944394,
+        "longitude": -73.5775911
+      },
+      {
+        "latitude": 45.4946786,
+        "longitude": -73.5780177
+      },
+      {
+        "latitude": 45.4946624,
+        "longitude": -73.5780425
+      },
+      {
+        "latitude": 45.4945866,
+        "longitude": -73.5781316
+      },
+      {
+        "latitude": 45.4945281,
+        "longitude": -73.5782003
+      },
+      {
+        "latitude": 45.4943598,
+        "longitude": -73.5783982
+      },
+      {
+        "latitude": 45.4938097,
+        "longitude": -73.5790389
+      }
+    ]
   },
   {
     "id": "SGW-GM",
@@ -121,7 +656,25 @@
     "address": "1550 De Maisonneuve Blvd. W.",
     "latitude": 45.49637,
     "longitude": -73.57897,
-    "aliases": ["GM", "GM Building", "Guy-De Maisonneuve Building"]
+    "aliases": [
+      "GM",
+      "GM Building",
+      "Guy-De Maisonneuve Building"
+    ],
+    "polygon": [
+  { "latitude": 45.4959562, "longitude": -73.5784181 },
+  { "latitude": 45.4961299, "longitude": -73.5787809 },
+  { "latitude": 45.4959761, "longitude": -73.5789305 },
+  { "latitude": 45.4957789, "longitude": -73.5791217 },
+  { "latitude": 45.4957625, "longitude": -73.5790831 },
+  { "latitude": 45.4957825, "longitude": -73.5790637 },
+  { "latitude": 45.4957386, "longitude": -73.5789688 },
+  { "latitude": 45.4956209, "longitude": -73.5787359 },
+  { "latitude": 45.4956265, "longitude": -73.578729 },
+  { "latitude": 45.4959332, "longitude": -73.578441 },
+  { "latitude": 45.4959562, "longitude": -73.5784181 }
+]
+
   },
   {
     "id": "SGW-GN",
@@ -131,7 +684,72 @@
     "address": "1190 Guy St.",
     "latitude": 45.49427,
     "longitude": -73.57975,
-    "aliases": ["GN", "GN Building", "Grey Nuns Building"]
+    "aliases": [
+      "GN",
+      "GN Building",
+      "Grey Nuns Building"
+    ],
+    "polygon": [
+  { "latitude": 45.4932103, "longitude": -73.5774037 },
+  { "latitude": 45.4930975, "longitude": -73.5775124 },
+  { "latitude": 45.4929941, "longitude": -73.5773219 },
+  { "latitude": 45.4929358, "longitude": -73.5773823 },
+  { "latitude": 45.4928389, "longitude": -73.5771985 },
+  { "latitude": 45.4928972, "longitude": -73.5771462 },
+  { "latitude": 45.4928103, "longitude": -73.5769753 },
+  { "latitude": 45.4927841, "longitude": -73.5769717 },
+  { "latitude": 45.492722,  "longitude": -73.577036 },
+  { "latitude": 45.4927092, "longitude": -73.5770333 },
+  { "latitude": 45.4926772, "longitude": -73.5769582 },
+  { "latitude": 45.4926782, "longitude": -73.5769234 },
+  { "latitude": 45.4927327, "longitude": -73.5768617 },
+  { "latitude": 45.4925945, "longitude": -73.5765438 },
+  { "latitude": 45.4927365, "longitude": -73.576391 },
+  { "latitude": 45.4929094, "longitude": -73.576745 },
+  { "latitude": 45.492932,  "longitude": -73.576745 },
+  { "latitude": 45.4929471, "longitude": -73.5767651 },
+  { "latitude": 45.4929574, "longitude": -73.5767946 },
+  { "latitude": 45.4929583, "longitude": -73.5768161 },
+  { "latitude": 45.4929555, "longitude": -73.5768375 },
+  { "latitude": 45.4930335, "longitude": -73.5770005 },
+  { "latitude": 45.4933663, "longitude": -73.5766733 },
+  { "latitude": 45.4933428, "longitude": -73.5766242 },
+  { "latitude": 45.4934901, "longitude": -73.5764853 },
+  { "latitude": 45.493507,  "longitude": -73.5765362 },
+  { "latitude": 45.4937909, "longitude": -73.5762573 },
+  { "latitude": 45.4935747, "longitude": -73.5757933 },
+  { "latitude": 45.4937176, "longitude": -73.5756404 },
+  { "latitude": 45.4939319, "longitude": -73.5761071 },
+  { "latitude": 45.4940424, "longitude": -73.5759924 },
+  { "latitude": 45.4941331, "longitude": -73.5761728 },
+  { "latitude": 45.4940278, "longitude": -73.5762868 },
+  { "latitude": 45.4944029, "longitude": -73.5770539 },
+  { "latitude": 45.4941064, "longitude": -73.5773432 },
+  { "latitude": 45.4941356, "longitude": -73.5774116 },
+  { "latitude": 45.4939833, "longitude": -73.5775537 },
+  { "latitude": 45.4938686, "longitude": -73.5773405 },
+  { "latitude": 45.4941948, "longitude": -73.577024 },
+  { "latitude": 45.4939034, "longitude": -73.5764125 },
+  { "latitude": 45.4935644, "longitude": -73.5767451 },
+  { "latitude": 45.4936208, "longitude": -73.5768658 },
+  { "latitude": 45.4936744, "longitude": -73.5768229 },
+  { "latitude": 45.4937364, "longitude": -73.5769462 },
+  { "latitude": 45.4936875, "longitude": -73.5769892 },
+  { "latitude": 45.4937599, "longitude": -73.5771568 },
+  { "latitude": 45.4936405, "longitude": -73.5772708 },
+  { "latitude": 45.4935841, "longitude": -73.5771541 },
+  { "latitude": 45.4936057, "longitude": -73.577134 },
+  { "latitude": 45.4935747, "longitude": -73.5770844 },
+  { "latitude": 45.4935324, "longitude": -73.5771246 },
+  { "latitude": 45.4934553, "longitude": -73.5769731 },
+  { "latitude": 45.4934845, "longitude": -73.5769302 },
+  { "latitude": 45.493444,  "longitude": -73.5768564 },
+  { "latitude": 45.493367,  "longitude": -73.5769342 },
+  { "latitude": 45.4933773, "longitude": -73.5769597 },
+  { "latitude": 45.4931198, "longitude": -73.5772038 },
+  { "latitude": 45.4932103, "longitude": -73.5774037 }
+]
+
   },
   {
     "id": "SGW-GS",
@@ -141,7 +759,11 @@
     "address": "1538 Sherbrooke St. W.",
     "latitude": 45.49598,
     "longitude": -73.58237,
-    "aliases": ["GS", "GS Building"]
+    "aliases": [
+      "GS",
+      "GS Building"
+    ],
+    "polygon": []
   },
   {
     "id": "SGW-H",
@@ -151,7 +773,29 @@
     "address": "1455 De Maisonneuve Blvd W.",
     "latitude": 45.49729,
     "longitude": -73.57898,
-    "aliases": ["H", "H Building", "Henry F. Hall Building"]
+    "aliases": [
+      "H",
+      "H Building",
+      "Henry F. Hall Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.496829249284595,
+        "longitude": -73.57884980943825
+      },
+      {
+        "latitude": 45.49716390448993,
+        "longitude": -73.57954383100119
+      },
+      {
+        "latitude": 45.497708654988124,
+        "longitude": -73.57903421129053
+      },
+      {
+        "latitude": 45.497372122950125,
+        "longitude": -73.57833750751425
+      }
+    ]
   },
   {
     "id": "SGW-K",
@@ -161,7 +805,65 @@
     "address": "2150 Bishop St.",
     "latitude": 45.49758,
     "longitude": -73.57926,
-    "aliases": ["K", "K Annex", "K Building"]
+    "aliases": [
+      "K",
+      "K Annex",
+      "K Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4978508,
+        "longitude": -73.5793152
+      },
+      {
+        "latitude": 45.4978723,
+        "longitude": -73.5793612
+      },
+      {
+        "latitude": 45.497887,
+        "longitude": -73.5793896
+      },
+      {
+        "latitude": 45.4977144,
+        "longitude": -73.5795607
+      },
+      {
+        "latitude": 45.4976342,
+        "longitude": -73.579643
+      },
+      {
+        "latitude": 45.4975958,
+        "longitude": -73.5795611
+      },
+      {
+        "latitude": 45.4976804,
+        "longitude": -73.5794786
+      },
+      {
+        "latitude": 45.497706,
+        "longitude": -73.5795321
+      },
+      {
+        "latitude": 45.4977493,
+        "longitude": -73.5794813
+      },
+      {
+        "latitude": 45.4977435,
+        "longitude": -73.5794647
+      },
+      {
+        "latitude": 45.49777,
+        "longitude": -73.5794334
+      },
+      {
+        "latitude": 45.4977565,
+        "longitude": -73.579405
+      },
+      {
+        "latitude": 45.4978508,
+        "longitude": -73.5793152
+      }
+    ]
   },
   {
     "id": "SGW-LB",
@@ -171,7 +873,129 @@
     "address": "1400 De Maisonneuve Blvd W.",
     "latitude": 45.4978,
     "longitude": -73.57818,
-    "aliases": ["LB", "LB Building", "J.W. McConnell Building"]
+    "aliases": [
+      "LB",
+      "LB Building",
+      "J.W. McConnell Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4966595,
+        "longitude": -73.5785573
+      },
+      {
+        "latitude": 45.4964933,
+        "longitude": -73.5782102
+      },
+      {
+        "latitude": 45.4962682,
+        "longitude": -73.57774
+      },
+      {
+        "latitude": 45.4962438,
+        "longitude": -73.5776884
+      },
+      {
+        "latitude": 45.4964601,
+        "longitude": -73.5774775
+      },
+      {
+        "latitude": 45.4964854,
+        "longitude": -73.5774533
+      },
+      {
+        "latitude": 45.4965695,
+        "longitude": -73.5776244
+      },
+      {
+        "latitude": 45.4965785,
+        "longitude": -73.5776438
+      },
+      {
+        "latitude": 45.4966005,
+        "longitude": -73.5776912
+      },
+      {
+        "latitude": 45.4966303,
+        "longitude": -73.5776683
+      },
+      {
+        "latitude": 45.4966522,
+        "longitude": -73.5776483
+      },
+      {
+        "latitude": 45.496632,
+        "longitude": -73.5776045
+      },
+      {
+        "latitude": 45.4966195,
+        "longitude": -73.5775774
+      },
+      {
+        "latitude": 45.4966092,
+        "longitude": -73.5775555
+      },
+      {
+        "latitude": 45.4968912,
+        "longitude": -73.5772806
+      },
+      {
+        "latitude": 45.4969031,
+        "longitude": -73.5773036
+      },
+      {
+        "latitude": 45.4969457,
+        "longitude": -73.577393
+      },
+      {
+        "latitude": 45.4970355,
+        "longitude": -73.5775784
+      },
+      {
+        "latitude": 45.4971222,
+        "longitude": -73.5777573
+      },
+      {
+        "latitude": 45.49717,
+        "longitude": -73.577856
+      },
+      {
+        "latitude": 45.4972443,
+        "longitude": -73.5780094
+      },
+      {
+        "latitude": 45.4972616,
+        "longitude": -73.578045
+      },
+      {
+        "latitude": 45.4969852,
+        "longitude": -73.578317
+      },
+      {
+        "latitude": 45.4969634,
+        "longitude": -73.5782783
+      },
+      {
+        "latitude": 45.4969052,
+        "longitude": -73.5783211
+      },
+      {
+        "latitude": 45.4969277,
+        "longitude": -73.5783716
+      },
+      {
+        "latitude": 45.496716,
+        "longitude": -73.5785731
+      },
+      {
+        "latitude": 45.4966932,
+        "longitude": -73.578525
+      },
+      {
+        "latitude": 45.4966595,
+        "longitude": -73.5785573
+      }
+    ]
   },
   {
     "id": "SGW-LD",
@@ -181,7 +1005,11 @@
     "address": "1424 Bishop St.",
     "latitude": 45.4985,
     "longitude": -73.57912,
-    "aliases": ["LD", "LD Building"]
+    "aliases": [
+      "LD",
+      "LD Building"
+    ],
+    "polygon": []
   },
   {
     "id": "SGW-LS",
@@ -191,7 +1019,41 @@
     "address": "1535 De Maisonneuve Blvd W.",
     "latitude": 45.49689,
     "longitude": -73.5805,
-    "aliases": ["LS", "LS Building", "Learning Square"]
+    "aliases": [
+      "LS",
+      "LS Building",
+      "Learning Square"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4961716,
+        "longitude": -73.5794628
+      },
+      {
+        "latitude": 45.4963919,
+        "longitude": -73.5792514
+      },
+      {
+        "latitude": 45.496534,
+        "longitude": -73.5795528
+      },
+      {
+        "latitude": 45.4964097,
+        "longitude": -73.579672
+      },
+      {
+        "latitude": 45.4963629,
+        "longitude": -73.5795726
+      },
+      {
+        "latitude": 45.4962668,
+        "longitude": -73.5796648
+      },
+      {
+        "latitude": 45.4961716,
+        "longitude": -73.5794628
+      }
+    ]
   },
   {
     "id": "SGW-M",
@@ -201,7 +1063,53 @@
     "address": "2135 Mackay St.",
     "latitude": 45.49716,
     "longitude": -73.57977,
-    "aliases": ["M", "M Annex", "M Building"]
+    "aliases": [
+      "M",
+      "M Annex",
+      "M Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4974204,
+        "longitude": -73.5797377
+      },
+      {
+        "latitude": 45.4973206,
+        "longitude": -73.5798361
+      },
+      {
+        "latitude": 45.4973116,
+        "longitude": -73.5798209
+      },
+      {
+        "latitude": 45.4973058,
+        "longitude": -73.5798082
+      },
+      {
+        "latitude": 45.4972922,
+        "longitude": -73.579803
+      },
+      {
+        "latitude": 45.4972817,
+        "longitude": -73.579781
+      },
+      {
+        "latitude": 45.4972844,
+        "longitude": -73.5797586
+      },
+      {
+        "latitude": 45.4973882,
+        "longitude": -73.5796579
+      },
+      {
+        "latitude": 45.4974254,
+        "longitude": -73.5797325
+      },
+      {
+        "latitude": 45.4974204,
+        "longitude": -73.5797377
+      }
+    ]
   },
   {
     "id": "SGW-MB",
@@ -211,7 +1119,93 @@
     "address": "1450 Guy St.",
     "latitude": 45.49676,
     "longitude": -73.57879,
-    "aliases": ["MB", "MB Building", "John Molson Building"]
+    "aliases": [
+      "MB",
+      "MB Building",
+      "John Molson Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4949482,
+        "longitude": -73.5787947
+      },
+      {
+        "latitude": 45.4950064,
+        "longitude": -73.5787235
+      },
+      {
+        "latitude": 45.4951687,
+        "longitude": -73.5785025
+      },
+      {
+        "latitude": 45.4952044,
+        "longitude": -73.5784643
+      },
+      {
+        "latitude": 45.4952249,
+        "longitude": -73.5785117
+      },
+      {
+        "latitude": 45.4953768,
+        "longitude": -73.5788545
+      },
+      {
+        "latitude": 45.4954184,
+        "longitude": -73.5789152
+      },
+      {
+        "latitude": 45.495487,
+        "longitude": -73.5790796
+      },
+      {
+        "latitude": 45.4954792,
+        "longitude": -73.5790862
+      },
+      {
+        "latitude": 45.4955248,
+        "longitude": -73.5791931
+      },
+      {
+        "latitude": 45.4955404,
+        "longitude": -73.5792286
+      },
+      {
+        "latitude": 45.4954131,
+        "longitude": -73.579399
+      },
+      {
+        "latitude": 45.4954061,
+        "longitude": -73.5794075
+      },
+      {
+        "latitude": 45.495405,
+        "longitude": -73.5794087
+      },
+      {
+        "latitude": 45.4952737,
+        "longitude": -73.5795675
+      },
+      {
+        "latitude": 45.4952576,
+        "longitude": -73.5795406
+      },
+      {
+        "latitude": 45.4951565,
+        "longitude": -73.5793716
+      },
+      {
+        "latitude": 45.4951179,
+        "longitude": -73.5793059
+      },
+      {
+        "latitude": 45.495187,
+        "longitude": -73.5792261
+      },
+      {
+        "latitude": 45.4949482,
+        "longitude": -73.5787947
+      }
+    ]
   },
   {
     "id": "SGW-MI",
@@ -221,7 +1215,57 @@
     "address": "2130 Bishop St.",
     "latitude": 45.49707,
     "longitude": -73.57903,
-    "aliases": ["MI", "MI Annex", "MI Building"]
+    "aliases": [
+      "MI",
+      "MI Annex",
+      "MI Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4977756,
+        "longitude": -73.5791541
+      },
+      {
+        "latitude": 45.4977976,
+        "longitude": -73.5792006
+      },
+      {
+        "latitude": 45.497816,
+        "longitude": -73.5792401
+      },
+      {
+        "latitude": 45.4977169,
+        "longitude": -73.5793354
+      },
+      {
+        "latitude": 45.4976434,
+        "longitude": -73.5794029
+      },
+      {
+        "latitude": 45.4976312,
+        "longitude": -73.5793776
+      },
+      {
+        "latitude": 45.4976213,
+        "longitude": -73.5793546
+      },
+      {
+        "latitude": 45.4976914,
+        "longitude": -73.5792819
+      },
+      {
+        "latitude": 45.4976783,
+        "longitude": -73.5792544
+      },
+      {
+        "latitude": 45.4977448,
+        "longitude": -73.5791871
+      },
+      {
+        "latitude": 45.4977756,
+        "longitude": -73.5791541
+      }
+    ]
   },
   {
     "id": "SGW-MU",
@@ -231,7 +1275,41 @@
     "address": "2170 Bishop St.",
     "latitude": 45.49809,
     "longitude": -73.58003,
-    "aliases": ["MU", "MU Annex", "MU Building"]
+    "aliases": [
+      "MU",
+      "MU Annex",
+      "MU Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4979241,
+        "longitude": -73.5794655
+      },
+      {
+        "latitude": 45.4979399,
+        "longitude": -73.5794938
+      },
+      {
+        "latitude": 45.4979605,
+        "longitude": -73.5795368
+      },
+      {
+        "latitude": 45.4977466,
+        "longitude": -73.579754
+      },
+      {
+        "latitude": 45.4977075,
+        "longitude": -73.5796772
+      },
+      {
+        "latitude": 45.4977507,
+        "longitude": -73.5796322
+      },
+      {
+        "latitude": 45.4979241,
+        "longitude": -73.5794655
+      }
+    ]
   },
   {
     "id": "SGW-P",
@@ -241,7 +1319,37 @@
     "address": "2020 Mackay St.",
     "latitude": 45.49607,
     "longitude": -73.57902,
-    "aliases": ["P", "P Annex", "P Building"]
+    "aliases": [
+      "P",
+      "P Annex",
+      "P Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.496684,
+        "longitude": -73.5790979
+      },
+      {
+        "latitude": 45.4967207,
+        "longitude": -73.5791744
+      },
+      {
+        "latitude": 45.4967172,
+        "longitude": -73.5791776
+      },
+      {
+        "latitude": 45.496621,
+        "longitude": -73.5792669
+      },
+      {
+        "latitude": 45.4965857,
+        "longitude": -73.5791899
+      },
+      {
+        "latitude": 45.496684,
+        "longitude": -73.5790979
+      }
+    ]
   },
   {
     "id": "SGW-PR",
@@ -251,7 +1359,85 @@
     "address": "2100 Mackay St.",
     "latitude": 45.49678,
     "longitude": -73.57965,
-    "aliases": ["PR", "PR Annex", "PR Building"]
+    "aliases": [
+      "PR",
+      "PR Annex",
+      "PR Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4969999,
+        "longitude": -73.5797534
+      },
+      {
+        "latitude": 45.4970082,
+        "longitude": -73.5797457
+      },
+      {
+        "latitude": 45.4970309,
+        "longitude": -73.579795
+      },
+      {
+        "latitude": 45.4970326,
+        "longitude": -73.5798276
+      },
+      {
+        "latitude": 45.4969316,
+        "longitude": -73.5799272
+      },
+      {
+        "latitude": 45.4969346,
+        "longitude": -73.579949
+      },
+      {
+        "latitude": 45.4969279,
+        "longitude": -73.5799345
+      },
+      {
+        "latitude": 45.4968886,
+        "longitude": -73.5799699
+      },
+      {
+        "latitude": 45.4968946,
+        "longitude": -73.5799898
+      },
+      {
+        "latitude": 45.4968248,
+        "longitude": -73.5800496
+      },
+      {
+        "latitude": 45.4967823,
+        "longitude": -73.5799532
+      },
+      {
+        "latitude": 45.4968411,
+        "longitude": -73.5798979
+      },
+      {
+        "latitude": 45.4968489,
+        "longitude": -73.5798908
+      },
+      {
+        "latitude": 45.4968741,
+        "longitude": -73.5799469
+      },
+      {
+        "latitude": 45.4969163,
+        "longitude": -73.5799082
+      },
+      {
+        "latitude": 45.4968917,
+        "longitude": -73.5798536
+      },
+      {
+        "latitude": 45.4969027,
+        "longitude": -73.5798436
+      },
+      {
+        "latitude": 45.4969999,
+        "longitude": -73.5797534
+      }
+    ]
   },
   {
     "id": "SGW-Q",
@@ -261,7 +1447,12 @@
     "address": "2010 Mackay St.",
     "latitude": 45.496,
     "longitude": -73.57893,
-    "aliases": ["Q", "Q Annex", "Q Building"]
+    "aliases": [
+      "Q",
+      "Q Annex",
+      "Q Building"
+    ],
+    "polygon": []
   },
   {
     "id": "SGW-R",
@@ -271,7 +1462,33 @@
     "address": "2050 Mackay St.",
     "latitude": 45.4963,
     "longitude": -73.57922,
-    "aliases": ["R", "R Annex", "R Building"]
+    "aliases": [
+      "R",
+      "R Annex",
+      "R Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4967012,
+        "longitude": -73.5794243
+      },
+      {
+        "latitude": 45.4968027,
+        "longitude": -73.5793309
+      },
+      {
+        "latitude": 45.4968443,
+        "longitude": -73.5794153
+      },
+      {
+        "latitude": 45.4967406,
+        "longitude": -73.5795156
+      },
+      {
+        "latitude": 45.4967012,
+        "longitude": -73.5794243
+      }
+    ]
   },
   {
     "id": "SGW-RR",
@@ -281,7 +1498,45 @@
     "address": "2040 Mackay St.",
     "latitude": 45.49624,
     "longitude": -73.57914,
-    "aliases": ["RR", "RR Annex", "RR Building"]
+    "aliases": [
+      "RR",
+      "RR Annex",
+      "RR Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4967535,
+        "longitude": -73.5792532
+      },
+      {
+        "latitude": 45.4967635,
+        "longitude": -73.579244
+      },
+      {
+        "latitude": 45.4968027,
+        "longitude": -73.5793309
+      },
+      {
+        "latitude": 45.4967012,
+        "longitude": -73.5794243
+      },
+      {
+        "latitude": 45.4966525,
+        "longitude": -73.5794691
+      },
+      {
+        "latitude": 45.496613,
+        "longitude": -73.5793816
+      },
+      {
+        "latitude": 45.496657,
+        "longitude": -73.5793412
+      },
+      {
+        "latitude": 45.4967535,
+        "longitude": -73.5792532
+      }
+    ]
   },
   {
     "id": "SGW-S",
@@ -291,7 +1546,57 @@
     "address": "2145 Mackay St.",
     "latitude": 45.49729,
     "longitude": -73.57994,
-    "aliases": ["S", "S Annex", "S Building"]
+    "aliases": [
+      "S",
+      "S Annex",
+      "S Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4974912,
+        "longitude": -73.5798023
+      },
+      {
+        "latitude": 45.4973632,
+        "longitude": -73.5799218
+      },
+      {
+        "latitude": 45.4973547,
+        "longitude": -73.5799045
+      },
+      {
+        "latitude": 45.4973455,
+        "longitude": -73.5798855
+      },
+      {
+        "latitude": 45.4973335,
+        "longitude": -73.5798829
+      },
+      {
+        "latitude": 45.497321,
+        "longitude": -73.5798567
+      },
+      {
+        "latitude": 45.4973206,
+        "longitude": -73.5798361
+      },
+      {
+        "latitude": 45.4974204,
+        "longitude": -73.5797377
+      },
+      {
+        "latitude": 45.4974321,
+        "longitude": -73.5797603
+      },
+      {
+        "latitude": 45.4974585,
+        "longitude": -73.5797346
+      },
+      {
+        "latitude": 45.4974912,
+        "longitude": -73.5798023
+      }
+    ]
   },
   {
     "id": "SGW-SB",
@@ -301,7 +1606,12 @@
     "address": "1590 Dr. Penfield",
     "latitude": 45.49897,
     "longitude": -73.58604,
-    "aliases": ["SB", "SB Building", "Samuel Bronfman Building"]
+    "aliases": [
+      "SB",
+      "SB Building",
+      "Samuel Bronfman Building"
+    ],
+    "polygon": []
   },
   {
     "id": "SGW-T",
@@ -311,7 +1621,33 @@
     "address": "2030 Mackay St.",
     "latitude": 45.49616,
     "longitude": -73.57909,
-    "aliases": ["T", "T Annex", "T Building"]
+    "aliases": [
+      "T",
+      "T Annex",
+      "T Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4967172,
+        "longitude": -73.5791776
+      },
+      {
+        "latitude": 45.4967535,
+        "longitude": -73.5792532
+      },
+      {
+        "latitude": 45.496657,
+        "longitude": -73.5793412
+      },
+      {
+        "latitude": 45.496621,
+        "longitude": -73.5792669
+      },
+      {
+        "latitude": 45.4967172,
+        "longitude": -73.5791776
+      }
+    ]
   },
   {
     "id": "SGW-TD",
@@ -321,7 +1657,61 @@
     "address": "1410 Guy St.",
     "latitude": 45.4969,
     "longitude": -73.57979,
-    "aliases": ["TD", "TD Building", "Toronto-Dominion Building"]
+    "aliases": [
+      "TD",
+      "TD Building",
+      "Toronto-Dominion Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4951729,
+        "longitude": -73.5783952
+      },
+      {
+        "latitude": 45.4951046,
+        "longitude": -73.5784763
+      },
+      {
+        "latitude": 45.4950277,
+        "longitude": -73.5783336
+      },
+      {
+        "latitude": 45.4950446,
+        "longitude": -73.5783148
+      },
+      {
+        "latitude": 45.4950258,
+        "longitude": -73.5782746
+      },
+      {
+        "latitude": 45.495006,
+        "longitude": -73.5783014
+      },
+      {
+        "latitude": 45.4949224,
+        "longitude": -73.5781512
+      },
+      {
+        "latitude": 45.494986,
+        "longitude": -73.5780834
+      },
+      {
+        "latitude": 45.4950185,
+        "longitude": -73.5780446
+      },
+      {
+        "latitude": 45.4951387,
+        "longitude": -73.5783164
+      },
+      {
+        "latitude": 45.495163,
+        "longitude": -73.5783712
+      },
+      {
+        "latitude": 45.4951729,
+        "longitude": -73.5783952
+      }
+    ]
   },
   {
     "id": "SGW-V",
@@ -331,7 +1721,45 @@
     "address": "2110 Mackay St.",
     "latitude": 45.49686,
     "longitude": -73.57975,
-    "aliases": ["V", "V Annex", "V Building"]
+    "aliases": [
+      "V",
+      "V Annex",
+      "V Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4970326,
+        "longitude": -73.5798276
+      },
+      {
+        "latitude": 45.4970504,
+        "longitude": -73.579812
+      },
+      {
+        "latitude": 45.4970779,
+        "longitude": -73.5798721
+      },
+      {
+        "latitude": 45.4970896,
+        "longitude": -73.5798984
+      },
+      {
+        "latitude": 45.4970717,
+        "longitude": -73.5799152
+      },
+      {
+        "latitude": 45.4969695,
+        "longitude": -73.5800161
+      },
+      {
+        "latitude": 45.4969316,
+        "longitude": -73.5799272
+      },
+      {
+        "latitude": 45.4970326,
+        "longitude": -73.5798276
+      }
+    ]
   },
   {
     "id": "SGW-VA",
@@ -341,7 +1769,49 @@
     "address": "1395 René-Lévesque Blvd W.",
     "latitude": 45.49669,
     "longitude": -73.5809,
-    "aliases": ["VA", "VA Building", "Visual Arts Building"]
+    "aliases": [
+      "VA",
+      "VA Building",
+      "Visual Arts Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4941615,
+        "longitude": -73.5796402
+      },
+      {
+        "latitude": 45.4939635,
+        "longitude": -73.5793327
+      },
+      {
+        "latitude": 45.4939729,
+        "longitude": -73.5792952
+      },
+      {
+        "latitude": 45.4939832,
+        "longitude": -73.5792697
+      },
+      {
+        "latitude": 45.494002,
+        "longitude": -73.5792348
+      },
+      {
+        "latitude": 45.4940152,
+        "longitude": -73.5792201
+      },
+      {
+        "latitude": 45.4942577,
+        "longitude": -73.5789277
+      },
+      {
+        "latitude": 45.4944711,
+        "longitude": -73.5792777
+      },
+      {
+        "latitude": 45.4941615,
+        "longitude": -73.5796402
+      }
+    ]
   },
   {
     "id": "SGW-X",
@@ -351,7 +1821,33 @@
     "address": "2080 Mackay St.",
     "latitude": 45.49646,
     "longitude": -73.57949,
-    "aliases": ["X", "X Annex", "X Building"]
+    "aliases": [
+      "X",
+      "X Annex",
+      "X Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4969271,
+        "longitude": -73.5795884
+      },
+      {
+        "latitude": 45.4969613,
+        "longitude": -73.5796672
+      },
+      {
+        "latitude": 45.4968645,
+        "longitude": -73.5797555
+      },
+      {
+        "latitude": 45.4968297,
+        "longitude": -73.5796809
+      },
+      {
+        "latitude": 45.4969271,
+        "longitude": -73.5795884
+      }
+    ]
   },
   {
     "id": "SGW-Z",
@@ -361,6 +1857,60 @@
     "address": "2090 Mackay St.",
     "latitude": 45.49656,
     "longitude": -73.57959,
-    "aliases": ["Z", "Z Annex", "Z Building"]
+    "aliases": [
+      "Z",
+      "Z Annex",
+      "Z Building"
+    ],
+    "polygon": [
+      {
+        "latitude": 45.4968645,
+        "longitude": -73.5797555
+      },
+      {
+        "latitude": 45.4969613,
+        "longitude": -73.5796672
+      },
+      {
+        "latitude": 45.4969999,
+        "longitude": -73.5797534
+      },
+      {
+        "latitude": 45.4969027,
+        "longitude": -73.5798436
+      },
+      {
+        "latitude": 45.4968899,
+        "longitude": -73.5798153
+      },
+      {
+        "latitude": 45.4968711,
+        "longitude": -73.5798326
+      },
+      {
+        "latitude": 45.4968827,
+        "longitude": -73.5798585
+      },
+      {
+        "latitude": 45.4968489,
+        "longitude": -73.5798908
+      },
+      {
+        "latitude": 45.4968411,
+        "longitude": -73.5798979
+      },
+      {
+        "latitude": 45.4968151,
+        "longitude": -73.5798399
+      },
+      {
+        "latitude": 45.496877,
+        "longitude": -73.5797833
+      },
+      {
+        "latitude": 45.4968645,
+        "longitude": -73.5797555
+      }
+    ]
   }
 ]
