@@ -1,3 +1,5 @@
+/* eslint-env jest */
+/* global jest */
 import "@testing-library/jest-native/extend-expect";
 
 // Mock expo-router
@@ -36,6 +38,7 @@ globalThis.__animateToRegionMock = jest.fn();
 
 jest.mock("react-native-maps", () => {
   const React = require("react");
+  const PropTypes = require("prop-types");
   const { View } = require("react-native");
 
   const MockMapView = React.forwardRef((props, ref) => {
@@ -43,12 +46,32 @@ jest.mock("react-native-maps", () => {
       animateToRegion: globalThis.__animateToRegionMock,
     }));
 
-    return React.createElement(View, props);
+    // IMPORTANT: render children so <Polygon /> etc appear in the tree
+    return React.createElement(View, props, props.children);
   });
+
+  MockMapView.displayName = "MockMapView";
+  MockMapView.propTypes = {
+    children: PropTypes.node,
+  };
+
+  const MockPolygon = (props) =>
+    React.createElement(View, props, props.children);
+  MockPolygon.propTypes = {
+    children: PropTypes.node,
+  };
+
+  const MockMarker = (props) =>
+    React.createElement(View, props, props.children);
+  MockMarker.propTypes = {
+    children: PropTypes.node,
+  };
 
   return {
     __esModule: true,
     default: MockMapView,
     PROVIDER_GOOGLE: "google",
+    Polygon: MockPolygon,
+    Marker: MockMarker,
   };
 });
