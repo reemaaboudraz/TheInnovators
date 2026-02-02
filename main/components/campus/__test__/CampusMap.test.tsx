@@ -21,6 +21,17 @@ jest.mock("@/components/Buildings/SGW/SGWBuildings", () => ({
         { latitude: 45.4975, longitude: -73.5792 },
       ],
     },
+    {
+      id: "sgw-no-poly",
+      code: "NP",
+      name: "No Polygon Building",
+      address: "Some address",
+      latitude: 45.4978,
+      longitude: -73.5795,
+      campus: "SGW",
+      aliases: ["nop", "no polygon"],
+      polygon: [], // <-- important
+    },
   ],
 }));
 
@@ -251,5 +262,15 @@ describe("CampusMap - building shapes (Polygon/Marker)", () => {
 
     fireEvent.press(getByTestId("mapView"));
     expect(getByTestId(markerId).props.tracksViewChanges).toBe(false);
+  });
+
+  describe("CampusMap - polygon optional branch coverage", () => {
+    it("renders a building even when polygon is empty (no Polygon)", () => {
+      const { getByTestId } = render(<CampusMap />);
+
+      // marker testID from your react-native-maps mock:
+      // `marker-${latitude}-${longitude}`
+      expect(getByTestId("marker-45.4978--73.5795")).toBeTruthy();
+    });
   });
 });
