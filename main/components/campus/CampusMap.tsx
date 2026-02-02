@@ -40,7 +40,10 @@ const SGW_REGION: Region = {
 // Start at SGW (still renders Loyola buildings in the background)
 const INITIAL_REGION: Region = SGW_REGION;
 
-const CAMPUS_COLORS = {
+const CAMPUS_COLORS: Record<
+  Campus,
+  { stroke: string; fill: string; fillSelected: string }
+> = {
   SGW: {
     stroke: "#912338",
     fill: "rgba(145, 35, 56, 0.30)",
@@ -69,20 +72,24 @@ export default function CampusMap() {
     const q = query.trim().toLowerCase();
     if (!q) return [];
 
-    return ALL_BUILDINGS.filter(
-      (b) =>
-        b.code.toLowerCase().includes(q) ||
-        b.name.toLowerCase().includes(q) ||
-        b.address.toLowerCase().includes(q) ||
-        b.aliases.some((a) => a.toLowerCase().includes(q)),
-    ).slice(0, 6);
+    return ALL_BUILDINGS.filter((b) => {
+      const code = b.code?.toLowerCase() ?? "";
+      const name = b.name?.toLowerCase() ?? "";
+      const address = b.address?.toLowerCase() ?? "";
+      const aliases = b.aliases ?? [];
+
+      return (
+        code.includes(q) ||
+        name.includes(q) ||
+        address.includes(q) ||
+        aliases.some((a) => a.toLowerCase().includes(q))
+      );
+    }).slice(0, 6);
   }, [query, ALL_BUILDINGS]);
 
   const onPickBuilding = (b: Building) => {
     setSelected(b);
     setQuery(`${b.code} - ${b.name}`);
-
-    // Keep this: used for BrandBar color + future features
     setFocusedCampus(b.campus);
 
     mapRef.current?.animateToRegion(
@@ -97,7 +104,7 @@ export default function CampusMap() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="campusMap-root">
       <StatusBar style="dark" translucent backgroundColor="transparent" />
 
       <MapView
@@ -155,13 +162,12 @@ export default function CampusMap() {
         })}
       </MapView>
 
-      {/* Top UI */}
-      <View style={styles.topOverlay}>
-        {/* Search bar */}
-        <View style={styles.searchBar}>
+      <View style={styles.topOverlay} testID="topOverlay">
+        <View style={styles.searchBar} testID="searchBar">
           <Text style={styles.searchIcon}>⌕</Text>
 
           <TextInput
+            testID="searchInput"
             value={query}
             onChangeText={(t) => {
               setQuery(t);
@@ -176,6 +182,7 @@ export default function CampusMap() {
 
           {query.length > 0 && (
             <Pressable
+              testID="clearSearch"
               onPress={() => {
                 setQuery("");
                 setSelected(null);
@@ -188,12 +195,12 @@ export default function CampusMap() {
           )}
         </View>
 
-        {/* Suggestions */}
         {suggestions.length > 0 && (
-          <View style={styles.suggestions}>
+          <View style={styles.suggestions} testID="suggestions">
             {suggestions.map((b) => (
               <Pressable
                 key={`${b.campus}-${b.id}`}
+                testID={`suggestion-${b.campus}-${b.id}`}
                 onPress={() => onPickBuilding(b)}
                 style={styles.suggestionRow}
               >

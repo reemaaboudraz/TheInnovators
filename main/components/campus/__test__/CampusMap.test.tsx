@@ -96,7 +96,6 @@ jest.mock("react-native-maps", () => {
       animateToRegion: mockAnimateToRegion,
     }));
 
-    // IMPORTANT: always provide testID="mapView" if component didn't provide one
     return ReactActual.createElement(
       View,
       { ...props, testID: props.testID || "mapView" },
@@ -159,13 +158,13 @@ describe("CampusMap - initial region", () => {
 
 describe("CampusMap - search bar", () => {
   it("updates text and clears input", () => {
-    const { getByPlaceholderText, getByText } = render(<CampusMap />);
+    const { getByPlaceholderText, getByTestId } = render(<CampusMap />);
 
     const input = getByPlaceholderText("Where to next?");
     fireEvent.changeText(input, "hall");
     expect(getByPlaceholderText("Where to next?").props.value).toBe("hall");
 
-    fireEvent.press(getByText("✕"));
+    fireEvent.press(getByTestId("clearSearch"));
     expect(getByPlaceholderText("Where to next?").props.value).toBe("");
   });
 });
@@ -182,12 +181,14 @@ describe("CampusMap - suggestions", () => {
   });
 
   it("selecting a suggestion animates map and updates the input", async () => {
-    const { getByPlaceholderText, findByText } = render(<CampusMap />);
+    const { getByPlaceholderText, getByTestId, findByText } = render(
+      <CampusMap />,
+    );
 
     fireEvent.changeText(getByPlaceholderText("Where to next?"), "admin");
+    await findByText(/AD — Administration Building/i);
 
-    const rowTitle = await findByText(/AD — Administration Building/i);
-    fireEvent.press(rowTitle);
+    fireEvent.press(getByTestId("suggestion-LOY-loy-ad"));
 
     expect(mockAnimateToRegion).toHaveBeenCalledTimes(1);
     expect(mockAnimateToRegion).toHaveBeenCalledWith(
@@ -210,8 +211,6 @@ describe("CampusMap - building shapes (Polygon/Marker)", () => {
   it("pressing a Polygon selects it (strokeWidth/fillColor change) + animates", () => {
     const { getByTestId } = render(<CampusMap />);
 
-    // NOTE: negative longitude produces double dash in testID:
-    // polygon-45.4581--73.6401
     const polygonId = "polygon-45.4581--73.6401";
     const before = getByTestId(polygonId);
 
