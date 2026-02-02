@@ -7,18 +7,14 @@ import {
   Platform,
   StyleSheet,
 } from "react-native";
-import MapView, {
-  Marker,
-  Polygon,
-  PROVIDER_GOOGLE,
-  Region,
-} from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE, Region } from "react-native-maps";
 import { StatusBar } from "expo-status-bar";
 
 import { SGW_BUILDINGS } from "@/components/Buildings/SGW/SGWBuildings";
 import { LOYOLA_BUILDINGS } from "@/components/Buildings/Loyola/LoyolaBuildings";
 import type { Building, Campus } from "@/components/Buildings/types";
 
+import BuildingShapesLayer from "@/components/campus/BuildingShapesLayer";
 import BrandBar from "@/components/layout/BrandBar";
 import { styles } from "@/components/Styles/mapStyle";
 
@@ -39,22 +35,6 @@ const SGW_REGION: Region = {
 
 // Start at SGW (still renders Loyola buildings in the background)
 const INITIAL_REGION: Region = SGW_REGION;
-
-const CAMPUS_COLORS: Record<
-  Campus,
-  { stroke: string; fill: string; fillSelected: string }
-> = {
-  SGW: {
-    stroke: "#912338",
-    fill: "rgba(145, 35, 56, 0.30)",
-    fillSelected: "rgba(145, 35, 56, 0.55)",
-  },
-  LOY: {
-    stroke: "#E0B100",
-    fill: "rgba(224, 177, 0, 0.30)",
-    fillSelected: "rgba(224, 177, 0, 0.55)",
-  },
-};
 
 export default function CampusMap() {
   const [focusedCampus, setFocusedCampus] = useState<Campus>("SGW");
@@ -120,48 +100,14 @@ export default function CampusMap() {
         rotateEnabled={false}
         onPress={() => setSelected(null)}
       >
-        {ALL_BUILDINGS.map((b) => {
-          const isSelected = selected?.id === b.id;
-          const colors = CAMPUS_COLORS[b.campus];
-
-          return (
-            <React.Fragment key={`${b.campus}-${b.id}`}>
-              {b.polygon?.length ? (
-                <Polygon
-                  coordinates={b.polygon}
-                  tappable
-                  onPress={() => onPickBuilding(b)}
-                  strokeColor={colors.stroke}
-                  strokeWidth={isSelected ? 3 : 2}
-                  fillColor={isSelected ? colors.fillSelected : colors.fill}
-                />
-              ) : null}
-
-              <Marker
-                coordinate={{ latitude: b.latitude, longitude: b.longitude }}
-                onPress={() => onPickBuilding(b)}
-                tracksViewChanges={isSelected}
-              >
-                <View
-                  style={[
-                    labelStyles.codeCircle,
-                    {
-                      backgroundColor:
-                        b.campus === "SGW"
-                          ? "rgba(145,35,56,0.95)"
-                          : "rgba(224,177,0,0.95)",
-                      borderColor: b.campus === "SGW" ? "#6f1a2a" : "#8C5F0A",
-                    },
-                  ]}
-                >
-                  <Text style={labelStyles.codeText}>{b.code}</Text>
-                </View>
-              </Marker>
-            </React.Fragment>
-          );
-        })}
+        <BuildingShapesLayer
+          buildings={ALL_BUILDINGS}
+          selectedBuildingId={selected?.id ?? null}
+          onPickBuilding={onPickBuilding}
+        />
       </MapView>
 
+      {/* search UI unchanged */}
       <View style={styles.topOverlay} testID="topOverlay">
         <View style={styles.searchBar} testID="searchBar">
           <Text style={styles.searchIcon}>⌕</Text>
@@ -221,20 +167,3 @@ export default function CampusMap() {
     </View>
   );
 }
-
-const labelStyles = StyleSheet.create({
-  codeCircle: {
-    minWidth: 26,
-    height: 26,
-    paddingHorizontal: 6,
-    borderRadius: 13,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1.5,
-  },
-  codeText: {
-    fontWeight: "900",
-    fontSize: 12,
-    color: "white",
-  },
-});
