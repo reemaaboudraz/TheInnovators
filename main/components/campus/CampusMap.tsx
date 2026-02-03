@@ -27,14 +27,14 @@ import BuildingShapesLayer from "@/components/campus/BuildingShapesLayer";
 import BrandBar from "@/components/layout/BrandBar";
 import { styles } from "@/components/Styles/mapStyle";
 
-const SGW_REGION: Region = {
+export const SGW_REGION: Region = {
   latitude: 45.4973,
   longitude: -73.5794,
   latitudeDelta: 0.006,
   longitudeDelta: 0.006,
 };
 
-const LOY_REGION: Region = {
+export const LOY_REGION: Region = {
   latitude: 45.457984,
   longitude: -73.639834,
   latitudeDelta: 0.006,

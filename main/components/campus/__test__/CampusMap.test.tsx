@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent } from "@testing-library/react-native";
+import { render, fireEvent, act } from "@testing-library/react-native";
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
 
 const mockAnimateToRegion = jest.fn();
@@ -279,5 +279,182 @@ describe("CampusMap - building shapes (Polygon/Marker)", () => {
       // `marker-${latitude}-${longitude}`
       expect(getByTestId("marker-45.4978--73.5795")).toBeTruthy();
     });
+  });
+});
+
+describe("CampusMap - campus toggle", () => {
+  it("renders the campus toggle with SGW and Loyola buttons", () => {
+    const { getByTestId } = render(<CampusMap />);
+
+    expect(getByTestId("campusToggle")).toBeTruthy();
+    expect(getByTestId("campusToggle-SGW")).toBeTruthy();
+    expect(getByTestId("campusToggle-Loyola")).toBeTruthy();
+  });
+
+  it("pressing Loyola button switches to Loyola campus and animates map", () => {
+    const { getByTestId } = render(<CampusMap />);
+
+    // Trigger onLayout to set toggle width
+    act(() => {
+      fireEvent(getByTestId("campusToggle"), "layout", {
+        nativeEvent: { layout: { width: 300 } },
+      });
+    });
+
+    // Press Loyola button
+    fireEvent.press(getByTestId("campusToggle-Loyola"));
+
+    // Run timers for animation
+    act(() => {
+      jest.runAllTimers();
+    });
+
+    // Verify map animates to Loyola region
+    expect(mockAnimateToRegion).toHaveBeenCalledWith(
+      {
+        latitude: 45.457984,
+        longitude: -73.639834,
+        latitudeDelta: 0.006,
+        longitudeDelta: 0.006,
+      },
+      500,
+    );
+  });
+
+  it("pressing SGW button when on Loyola switches back to SGW", () => {
+    const { getByTestId } = render(<CampusMap />);
+
+    // Trigger onLayout
+    act(() => {
+      fireEvent(getByTestId("campusToggle"), "layout", {
+        nativeEvent: { layout: { width: 300 } },
+      });
+    });
+
+    // First switch to Loyola
+    fireEvent.press(getByTestId("campusToggle-Loyola"));
+    act(() => {
+      jest.runAllTimers();
+    });
+
+    mockAnimateToRegion.mockClear();
+
+    // Then switch back to SGW
+    fireEvent.press(getByTestId("campusToggle-SGW"));
+    act(() => {
+      jest.runAllTimers();
+    });
+
+    // Verify map animates to SGW region
+    expect(mockAnimateToRegion).toHaveBeenCalledWith(
+      {
+        latitude: 45.4973,
+        longitude: -73.5794,
+        latitudeDelta: 0.006,
+        longitudeDelta: 0.006,
+      },
+      500,
+    );
+  });
+
+  it("pressing same campus button does not trigger animation", () => {
+    const { getByTestId } = render(<CampusMap />);
+
+    // SGW is already selected by default
+    fireEvent.press(getByTestId("campusToggle-SGW"));
+    act(() => {
+      jest.runAllTimers();
+    });
+
+    // Should not animate since we're already on SGW
+    expect(mockAnimateToRegion).not.toHaveBeenCalled();
+  });
+
+  it("swipe gesture to right switches to Loyola", () => {
+    const { getByTestId } = render(<CampusMap />);
+
+    // Trigger onLayout to set toggle width
+    act(() => {
+      fireEvent(getByTestId("campusToggle"), "layout", {
+        nativeEvent: { layout: { width: 300 } },
+      });
+    });
+
+    // Simulate swipe right gesture
+    fireEvent(getByTestId("campusToggle"), "responderRelease", {
+      nativeEvent: {},
+      gestureState: { dx: 200 },
+    });
+
+    act(() => {
+      jest.runAllTimers();
+    });
+
+    // Verify map animates to Loyola
+    expect(mockAnimateToRegion).toHaveBeenCalledWith(
+      {
+        latitude: 45.457984,
+        longitude: -73.639834,
+        latitudeDelta: 0.006,
+        longitudeDelta: 0.006,
+      },
+      500,
+    );
+  });
+
+  it("swipe gesture to left switches to SGW when on Loyola", () => {
+    const { getByTestId } = render(<CampusMap />);
+
+    // Trigger onLayout
+    act(() => {
+      fireEvent(getByTestId("campusToggle"), "layout", {
+        nativeEvent: { layout: { width: 300 } },
+      });
+    });
+
+    // First switch to Loyola
+    fireEvent.press(getByTestId("campusToggle-Loyola"));
+    act(() => {
+      jest.runAllTimers();
+    });
+
+    mockAnimateToRegion.mockClear();
+
+    // Simulate swipe left gesture
+    fireEvent(getByTestId("campusToggle"), "responderRelease", {
+      nativeEvent: {},
+      gestureState: { dx: -200 },
+    });
+
+    act(() => {
+      jest.runAllTimers();
+    });
+
+    // Verify map animates to SGW
+    expect(mockAnimateToRegion).toHaveBeenCalledWith(
+      {
+        latitude: 45.4973,
+        longitude: -73.5794,
+        latitudeDelta: 0.006,
+        longitudeDelta: 0.006,
+      },
+      500,
+    );
+  });
+
+  it("BrandBar color changes based on selected campus", () => {
+    const { getByTestId } = render(<CampusMap />);
+
+    // Initially on SGW - should be burgundy
+    expect(getByTestId("brandbar").props.backgroundColor).toBe("#912338");
+
+    // Switch to Loyola
+    fireEvent.press(getByTestId("campusToggle-Loyola"));
+    act(() => {
+      jest.runAllTimers();
+    });
+
+    // Should now be yellow
+    expect(getByTestId("brandbar").props.backgroundColor).toBe("#e3ac20");
   });
 });
