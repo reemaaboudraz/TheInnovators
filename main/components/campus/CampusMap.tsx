@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,9 @@ import {
   Pressable,
   Platform,
   StyleSheet,
+  Animated,
+  PanResponder,
+  Dimensions,
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Region } from "react-native-maps";
 import { StatusBar } from "expo-status-bar";
@@ -25,13 +28,12 @@ const SGW_REGION: Region = {
   longitudeDelta: 0.006,
 };
 
-// Activate the comment block for the Loyola map coordinates when implementing the toggle button
-// const LOY_REGION: Region = {
-//     latitude: 45.457984,
-//     longitude: -73.639834,
-//     latitudeDelta: 0.006,
-//     longitudeDelta: 0.006,
-// };
+const LOY_REGION: Region = {
+  latitude: 45.457984,
+  longitude: -73.639834,
+  latitudeDelta: 0.006,
+  longitudeDelta: 0.006,
+};
 
 // Start at SGW (still renders Loyola buildings in the background)
 const INITIAL_REGION: Region = SGW_REGION;
@@ -42,6 +44,67 @@ export default function CampusMap() {
   const [selected, setSelected] = useState<Building | null>(null);
 
   const mapRef = useRef<MapView>(null);
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const toggleWidth = useRef(0);
+  const focusedCampusRef = useRef<Campus>(focusedCampus);
+
+  useEffect(() => {
+    focusedCampusRef.current = focusedCampus;
+  }, [focusedCampus]);
+
+  const animateToPosition = useCallback(
+    (toValue: number) => {
+      Animated.spring(slideAnim, {
+        toValue,
+        useNativeDriver: false,
+        tension: 60,
+        friction: 10,
+      }).start();
+    },
+    [slideAnim]
+  );
+
+  const switchToCampus = (campus: Campus) => {
+    if (campus === focusedCampusRef.current) return;
+    setFocusedCampus(campus);
+    setSelected(null);
+    const region = campus === "SGW" ? SGW_REGION : LOY_REGION;
+    mapRef.current?.animateToRegion(region, 500);
+  };
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, gestureState) =>
+        Math.abs(gestureState.dx) > 10,
+      onPanResponderMove: (_, gestureState) => {
+        const width = toggleWidth.current || Dimensions.get("window").width - 28;
+        const halfWidth = width / 2;
+        const currentValue = focusedCampusRef.current === "SGW" ? 0 : 1;
+        const newValue = currentValue + gestureState.dx / halfWidth;
+        const clampedValue = Math.max(0, Math.min(1, newValue));
+        slideAnim.setValue(clampedValue);
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        const width = toggleWidth.current || Dimensions.get("window").width - 28;
+        const halfWidth = width / 2;
+        const currentValue = focusedCampusRef.current === "SGW" ? 0 : 1;
+        const finalValue = currentValue + gestureState.dx / halfWidth;
+
+        if (finalValue > 0.5) {
+          switchToCampus("LOY");
+          animateToPosition(1);
+        } else {
+          switchToCampus("SGW");
+          animateToPosition(0);
+        }
+      },
+    })
+  ).current;
+
+  useEffect(() => {
+    animateToPosition(focusedCampus === "SGW" ? 0 : 1);
+  }, [focusedCampus, animateToPosition]);
 
   const ALL_BUILDINGS = useMemo(
     () => [...SGW_BUILDINGS, ...LOYOLA_BUILDINGS],
@@ -83,6 +146,7 @@ export default function CampusMap() {
     );
   };
 
+
   return (
     <View style={styles.container} testID="campusMap-root">
       <StatusBar style="dark" translucent backgroundColor="transparent" />
@@ -109,6 +173,66 @@ export default function CampusMap() {
 
       {/* search UI unchanged */}
       <View style={styles.topOverlay} testID="topOverlay">
+        {/* Campus Toggle Slider */}
+        <View
+          style={styles.campusToggleContainer}
+          testID="campusToggle"
+          onLayout={(e) => {
+            toggleWidth.current = e.nativeEvent.layout.width;
+          }}
+          {...panResponder.panHandlers}
+        >
+          <Animated.View
+            style={[
+              styles.campusToggleSlider,
+              {
+                left: slideAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ["2%", "52%"],
+                }),
+                backgroundColor: slideAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ["#862633", "#e3ac20"],
+                }),
+              },
+            ]}
+          />
+          <Pressable
+            testID="campusToggle-SGW"
+            onPress={() => switchToCampus("SGW")}
+            style={styles.campusToggleButton}
+            accessibilityRole="button"
+            accessibilityLabel="Switch to SGW campus"
+            accessibilityState={{ selected: focusedCampus === "SGW" }}
+          >
+            <Text
+              style={[
+                styles.campusToggleText,
+                focusedCampus === "SGW" && styles.campusToggleTextActive,
+              ]}
+            >
+              SGW
+            </Text>
+          </Pressable>
+          <Pressable
+            testID="campusToggle-Loyola"
+            onPress={() => switchToCampus("LOY")}
+            style={styles.campusToggleButton}
+            accessibilityRole="button"
+            accessibilityLabel="Switch to Loyola campus"
+            accessibilityState={{ selected: focusedCampus === "LOY" }}
+          >
+            <Text
+              style={[
+                styles.campusToggleText,
+                focusedCampus === "LOY" && styles.campusToggleTextActive,
+              ]}
+            >
+              Loyola
+            </Text>
+          </Pressable>
+        </View>
+
         <View style={styles.searchBar} testID="searchBar">
           <Text style={styles.searchIcon}>⌕</Text>
 
