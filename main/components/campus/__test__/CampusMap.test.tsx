@@ -1,6 +1,13 @@
 import React from "react";
 import { render, fireEvent, act } from "@testing-library/react-native";
-import { describe, it, expect, beforeEach, jest, afterEach } from "@jest/globals";
+import {
+  describe,
+  it,
+  expect,
+  beforeEach,
+  jest,
+  afterEach,
+} from "@jest/globals";
 
 const mockAnimateToRegion = jest.fn();
 
