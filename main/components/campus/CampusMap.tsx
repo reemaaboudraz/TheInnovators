@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   View,
   Text,
@@ -61,7 +67,7 @@ export default function CampusMap() {
         friction: 10,
       }).start();
     },
-    [slideAnim]
+    [slideAnim],
   );
 
   const switchToCampus = (campus: Campus) => {
@@ -78,7 +84,8 @@ export default function CampusMap() {
       onMoveShouldSetPanResponder: (_, gestureState) =>
         Math.abs(gestureState.dx) > 10,
       onPanResponderMove: (_, gestureState) => {
-        const width = toggleWidth.current || Dimensions.get("window").width - 28;
+        const width =
+          toggleWidth.current || Dimensions.get("window").width - 28;
         const halfWidth = width / 2;
         const currentValue = focusedCampusRef.current === "SGW" ? 0 : 1;
         const newValue = currentValue + gestureState.dx / halfWidth;
@@ -86,7 +93,8 @@ export default function CampusMap() {
         slideAnim.setValue(clampedValue);
       },
       onPanResponderRelease: (_, gestureState) => {
-        const width = toggleWidth.current || Dimensions.get("window").width - 28;
+        const width =
+          toggleWidth.current || Dimensions.get("window").width - 28;
         const halfWidth = width / 2;
         const currentValue = focusedCampusRef.current === "SGW" ? 0 : 1;
         const finalValue = currentValue + gestureState.dx / halfWidth;
@@ -99,7 +107,7 @@ export default function CampusMap() {
           animateToPosition(0);
         }
       },
-    })
+    }),
   ).current;
 
   useEffect(() => {
