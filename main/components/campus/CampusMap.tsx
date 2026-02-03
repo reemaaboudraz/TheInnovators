@@ -199,7 +199,7 @@ export default function CampusMap() {
                 }),
                 backgroundColor: slideAnim.interpolate({
                   inputRange: [0, 1],
-                  outputRange: ["#862633", "#e3ac20"],
+                  outputRange: ["#912338", "#e3ac20"],
                 }),
               },
             ]}
