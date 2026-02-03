@@ -27,14 +27,14 @@ import BuildingShapesLayer from "@/components/campus/BuildingShapesLayer";
 import BrandBar from "@/components/layout/BrandBar";
 import { styles } from "@/components/Styles/mapStyle";
 
-const SGW_REGION: Region = {
+export const SGW_REGION: Region = {
   latitude: 45.4973,
   longitude: -73.5794,
   latitudeDelta: 0.006,
   longitudeDelta: 0.006,
 };
 
-const LOY_REGION: Region = {
+export const LOY_REGION: Region = {
   latitude: 45.457984,
   longitude: -73.639834,
   latitudeDelta: 0.006,
@@ -43,6 +43,31 @@ const LOY_REGION: Region = {
 
 // Start at SGW (still renders Loyola buildings in the background)
 const INITIAL_REGION: Region = SGW_REGION;
+
+// Exported for testing
+export function calculatePanValue(
+  currentCampus: Campus,
+  dx: number,
+  toggleWidth: number,
+): number {
+  const width = toggleWidth || Dimensions.get("window").width - 28;
+  const halfWidth = width / 2;
+  const currentValue = currentCampus === "SGW" ? 0 : 1;
+  const newValue = currentValue + dx / halfWidth;
+  return Math.max(0, Math.min(1, newValue));
+}
+
+export function determineCampusFromPan(
+  currentCampus: Campus,
+  dx: number,
+  toggleWidth: number,
+): Campus {
+  const width = toggleWidth || Dimensions.get("window").width - 28;
+  const halfWidth = width / 2;
+  const currentValue = currentCampus === "SGW" ? 0 : 1;
+  const finalValue = currentValue + dx / halfWidth;
+  return finalValue > 0.5 ? "LOY" : "SGW";
+}
 
 export default function CampusMap() {
   const [focusedCampus, setFocusedCampus] = useState<Campus>("SGW");
@@ -84,22 +109,21 @@ export default function CampusMap() {
       onMoveShouldSetPanResponder: (_, gestureState) =>
         Math.abs(gestureState.dx) > 10,
       onPanResponderMove: (_, gestureState) => {
-        const width =
-          toggleWidth.current || Dimensions.get("window").width - 28;
-        const halfWidth = width / 2;
-        const currentValue = focusedCampusRef.current === "SGW" ? 0 : 1;
-        const newValue = currentValue + gestureState.dx / halfWidth;
-        const clampedValue = Math.max(0, Math.min(1, newValue));
+        const clampedValue = calculatePanValue(
+          focusedCampusRef.current,
+          gestureState.dx,
+          toggleWidth.current,
+        );
         slideAnim.setValue(clampedValue);
       },
       onPanResponderRelease: (_, gestureState) => {
-        const width =
-          toggleWidth.current || Dimensions.get("window").width - 28;
-        const halfWidth = width / 2;
-        const currentValue = focusedCampusRef.current === "SGW" ? 0 : 1;
-        const finalValue = currentValue + gestureState.dx / halfWidth;
+        const targetCampus = determineCampusFromPan(
+          focusedCampusRef.current,
+          gestureState.dx,
+          toggleWidth.current,
+        );
 
-        if (finalValue > 0.5) {
+        if (targetCampus === "LOY") {
           switchToCampus("LOY");
           animateToPosition(1);
         } else {

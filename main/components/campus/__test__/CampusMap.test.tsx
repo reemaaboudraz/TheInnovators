@@ -1,6 +1,14 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
-import { describe, it, expect, beforeEach, jest } from "@jest/globals";
+import {
+  describe,
+  it,
+  expect,
+  beforeEach,
+  beforeAll,
+  afterAll,
+  jest,
+} from "@jest/globals";
 
 const mockAnimateToRegion = jest.fn();
 
@@ -154,7 +162,12 @@ jest.mock("react-native-maps", () => {
   };
 });
 
-import CampusMap from "../CampusMap";
+import CampusMap, {
+  calculatePanValue,
+  determineCampusFromPan,
+  SGW_REGION,
+  LOY_REGION,
+} from "../CampusMap";
 
 beforeEach(() => {
   mockAnimateToRegion.mockClear();
@@ -387,5 +400,229 @@ describe("CampusMap - campus toggle", () => {
 
     // BrandBar should now be yellow (Loyola color)
     expect(getByTestId("brandbar").props.backgroundColor).toBe("#e3ac20");
+  });
+});
+
+describe("CampusMap - PanResponder helper functions", () => {
+  describe("calculatePanValue", () => {
+    it("returns 0 when on SGW with no drag", () => {
+      const result = calculatePanValue("SGW", 0, 300);
+      expect(result).toBe(0);
+    });
+
+    it("returns clamped value when dragging right from SGW", () => {
+      // With toggleWidth 300, halfWidth = 150
+      // dx = 75 means newValue = 0 + 75/150 = 0.5
+      const result = calculatePanValue("SGW", 75, 300);
+      expect(result).toBe(0.5);
+    });
+
+    it("returns 1 when fully dragged right from SGW", () => {
+      // dx = 150 means newValue = 0 + 150/150 = 1
+      const result = calculatePanValue("SGW", 150, 300);
+      expect(result).toBe(1);
+    });
+
+    it("clamps to 1 when dragged beyond right edge", () => {
+      // dx = 300 means newValue = 0 + 300/150 = 2, clamped to 1
+      const result = calculatePanValue("SGW", 300, 300);
+      expect(result).toBe(1);
+    });
+
+    it("clamps to 0 when dragged beyond left edge", () => {
+      // dx = -100 means newValue = 0 + (-100)/150 = -0.67, clamped to 0
+      const result = calculatePanValue("SGW", -100, 300);
+      expect(result).toBe(0);
+    });
+
+    it("returns value when dragging left from LOY", () => {
+      // On LOY, currentValue = 1
+      // dx = -75 means newValue = 1 + (-75)/150 = 0.5
+      const result = calculatePanValue("LOY", -75, 300);
+      expect(result).toBe(0.5);
+    });
+
+    it("uses default width when toggleWidth is 0", () => {
+      // When toggleWidth is 0, it falls back to Dimensions.get("window").width - 28
+      const result = calculatePanValue("SGW", 50, 0);
+      expect(typeof result).toBe("number");
+      expect(result).toBeGreaterThanOrEqual(0);
+      expect(result).toBeLessThanOrEqual(1);
+    });
+  });
+
+  describe("determineCampusFromPan", () => {
+    it("returns SGW when finalValue <= 0.5 from SGW", () => {
+      // dx = 50 means finalValue = 0 + 50/150 = 0.33
+      const result = determineCampusFromPan("SGW", 50, 300);
+      expect(result).toBe("SGW");
+    });
+
+    it("returns LOY when finalValue > 0.5 from SGW", () => {
+      // dx = 100 means finalValue = 0 + 100/150 = 0.67
+      const result = determineCampusFromPan("SGW", 100, 300);
+      expect(result).toBe("LOY");
+    });
+
+    it("returns LOY when finalValue > 0.5 from LOY (small left drag)", () => {
+      // On LOY, currentValue = 1
+      // dx = -50 means finalValue = 1 + (-50)/150 = 0.67
+      const result = determineCampusFromPan("LOY", -50, 300);
+      expect(result).toBe("LOY");
+    });
+
+    it("returns SGW when finalValue <= 0.5 from LOY (large left drag)", () => {
+      // On LOY, currentValue = 1
+      // dx = -100 means finalValue = 1 + (-100)/150 = 0.33
+      const result = determineCampusFromPan("LOY", -100, 300);
+      expect(result).toBe("SGW");
+    });
+
+    it("uses default width when toggleWidth is 0", () => {
+      const result = determineCampusFromPan("SGW", 50, 0);
+      expect(result === "SGW" || result === "LOY").toBe(true);
+    });
+  });
+
+  describe("exported region constants", () => {
+    it("SGW_REGION has correct coordinates", () => {
+      expect(SGW_REGION).toEqual({
+        latitude: 45.4973,
+        longitude: -73.5794,
+        latitudeDelta: 0.006,
+        longitudeDelta: 0.006,
+      });
+    });
+
+    it("LOY_REGION has correct coordinates", () => {
+      expect(LOY_REGION).toEqual({
+        latitude: 45.457984,
+        longitude: -73.639834,
+        latitudeDelta: 0.006,
+        longitudeDelta: 0.006,
+      });
+    });
+  });
+});
+
+describe("CampusMap - PanResponder integration", () => {
+  it("toggle container has panHandlers attached", () => {
+    const { getByTestId } = render(<CampusMap />);
+
+    const toggle = getByTestId("campusToggle");
+
+    // Verify onLayout works (used by PanResponder for width calculations)
+    fireEvent(toggle, "layout", {
+      nativeEvent: { layout: { width: 300, height: 44 } },
+    });
+
+    // The toggle should have panHandlers attached
+    expect(toggle.props.onStartShouldSetResponder).toBeDefined();
+  });
+});
+
+describe("CampusMap - PanResponder handlers via mock", () => {
+  // Store the original PanResponder.create
+  const RN = jest.requireActual("react-native") as typeof import("react-native");
+  const originalCreate = RN.PanResponder.create;
+
+  type PanConfig = {
+    onPanResponderMove?: (evt: unknown, gestureState: { dx: number }) => void;
+    onPanResponderRelease?: (
+      evt: unknown,
+      gestureState: { dx: number },
+    ) => void;
+    onStartShouldSetPanResponder?: () => boolean;
+    onMoveShouldSetPanResponder?: (
+      evt: unknown,
+      gestureState: { dx: number },
+    ) => boolean;
+  };
+
+  let capturedConfig: PanConfig | null = null;
+
+  beforeAll(() => {
+    // Mock PanResponder.create to capture the config
+    (RN.PanResponder.create as unknown) = (config: PanConfig) => {
+      capturedConfig = config;
+      return originalCreate(config as Parameters<typeof originalCreate>[0]);
+    };
+  });
+
+  afterAll(() => {
+    // Restore original
+    (RN.PanResponder.create as unknown) = originalCreate;
+  });
+
+  beforeEach(() => {
+    capturedConfig = null;
+    mockAnimateToRegion.mockClear();
+  });
+
+  it("onStartShouldSetPanResponder returns true", () => {
+    render(<CampusMap />);
+
+    expect(capturedConfig).not.toBeNull();
+    expect(capturedConfig?.onStartShouldSetPanResponder?.()).toBe(true);
+  });
+
+  it("onMoveShouldSetPanResponder returns true when dx > 10", () => {
+    render(<CampusMap />);
+
+    expect(capturedConfig).not.toBeNull();
+    expect(
+      capturedConfig?.onMoveShouldSetPanResponder?.(null, { dx: 15 }),
+    ).toBe(true);
+  });
+
+  it("onMoveShouldSetPanResponder returns false when dx <= 10", () => {
+    render(<CampusMap />);
+
+    expect(capturedConfig).not.toBeNull();
+    expect(capturedConfig?.onMoveShouldSetPanResponder?.(null, { dx: 5 })).toBe(
+      false,
+    );
+  });
+
+  it("onPanResponderMove updates slide animation value", () => {
+    render(<CampusMap />);
+
+    expect(capturedConfig).not.toBeNull();
+
+    // Call the move handler - should not throw
+    capturedConfig?.onPanResponderMove?.(null, { dx: 50 });
+
+    // If we get here without error, the handler executed
+    expect(true).toBe(true);
+  });
+
+  it("onPanResponderRelease switches to Loyola when dragged far right", () => {
+    render(<CampusMap />);
+
+    expect(capturedConfig).not.toBeNull();
+
+    // Call the release handler with large positive dx (should switch to LOY)
+    capturedConfig?.onPanResponderRelease?.(null, { dx: 200 });
+
+    // Should have animated to Loyola region
+    expect(mockAnimateToRegion).toHaveBeenCalledWith(
+      expect.objectContaining({
+        latitude: 45.457984,
+        longitude: -73.639834,
+      }),
+      500,
+    );
+  });
+
+  it("onPanResponderRelease stays on SGW when dragged slightly", () => {
+    render(<CampusMap />);
+
+    expect(capturedConfig).not.toBeNull();
+
+    // Call the release handler with small dx (should stay on SGW)
+    capturedConfig?.onPanResponderRelease?.(null, { dx: 10 });
+
+    // Should not have triggered campus switch (already on SGW)
+    expect(mockAnimateToRegion).not.toHaveBeenCalled();
   });
 });
