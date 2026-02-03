@@ -91,6 +91,13 @@ jest.mock("@/components/Styles/mapStyle", () => {
       suggestionRow: {},
       suggestionTitle: {},
       suggestionSub: {},
+      campusToggleContainer: {},
+      campusToggleButton: {},
+      campusToggleButtonLeft: {},
+      campusToggleButtonRight: {},
+      campusToggleSlider: {},
+      campusToggleText: {},
+      campusToggleTextActive: {},
     }),
   };
 });

@@ -146,7 +146,6 @@ export default function CampusMap() {
     );
   };
 
-
   return (
     <View style={styles.container} testID="campusMap-root">
       <StatusBar style="dark" translucent backgroundColor="transparent" />
