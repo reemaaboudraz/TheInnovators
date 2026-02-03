@@ -523,7 +523,9 @@ describe("CampusMap - PanResponder integration", () => {
 
 describe("CampusMap - PanResponder handlers via mock", () => {
   // Store the original PanResponder.create
-  const RN = jest.requireActual("react-native") as typeof import("react-native");
+  const RN = jest.requireActual(
+    "react-native",
+  ) as typeof import("react-native");
   const originalCreate = RN.PanResponder.create;
 
   type PanConfig = {
