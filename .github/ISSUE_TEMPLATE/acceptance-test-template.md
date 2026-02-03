@@ -11,7 +11,7 @@ This is the acceptance test for issue #
 
 ### User Flow Acceptance Test
 
-**Scenario: **
+**Scenario:**
 
 Given 
 When 
