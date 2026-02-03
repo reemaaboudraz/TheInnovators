@@ -2,12 +2,6 @@
 /* global jest */
 import "@testing-library/jest-native/extend-expect";
 
-// Use fake timers for animations
-jest.useFakeTimers();
-
-// Mock NativeAnimatedHelper to prevent animation issues in tests
-jest.mock("react-native/Libraries/Animated/NativeAnimatedHelper");
-
 // Mock expo-router
 jest.mock("expo-router", () => ({
   router: {
