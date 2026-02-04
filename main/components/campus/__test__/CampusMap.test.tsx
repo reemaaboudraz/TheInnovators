@@ -10,6 +10,7 @@ import {
   jest,
 } from "@jest/globals";
 
+
 const mockAnimateToRegion = jest.fn();
 
 jest.mock("@/components/Buildings/SGW/SGWBuildings", () => ({
