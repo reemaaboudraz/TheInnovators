@@ -15,23 +15,29 @@ import { LOYOLA_BUILDINGS } from "@/components/Buildings/Loyola/LoyolaBuildings"
 import type { Building, Campus } from "@/components/Buildings/types";
 
 import BuildingShapesLayer from "@/components/campus/BuildingShapesLayer";
+import ToggleButton from "@/components/campus/ToggleButton";
 import BrandBar from "@/components/layout/BrandBar";
 import { styles } from "@/components/Styles/mapStyle";
 
-const SGW_REGION: Region = {
+// Re-export for backwards compatibility with tests
+export {
+  calculatePanValue,
+  determineCampusFromPan,
+} from "@/components/campus/ToggleButton";
+
+export const SGW_REGION: Region = {
   latitude: 45.4973,
   longitude: -73.5794,
   latitudeDelta: 0.006,
   longitudeDelta: 0.006,
 };
 
-// Activate the comment block for the Loyola map coordinates when implementing the toggle button
-// const LOY_REGION: Region = {
-//     latitude: 45.457984,
-//     longitude: -73.639834,
-//     latitudeDelta: 0.006,
-//     longitudeDelta: 0.006,
-// };
+export const LOY_REGION: Region = {
+  latitude: 45.457984,
+  longitude: -73.639834,
+  latitudeDelta: 0.006,
+  longitudeDelta: 0.006,
+};
 
 // Start at SGW (still renders Loyola buildings in the background)
 const INITIAL_REGION: Region = SGW_REGION;
@@ -42,6 +48,13 @@ export default function CampusMap() {
   const [selected, setSelected] = useState<Building | null>(null);
 
   const mapRef = useRef<MapView>(null);
+
+  const handleCampusChange = (campus: Campus) => {
+    setFocusedCampus(campus);
+    setSelected(null);
+    const region = campus === "SGW" ? SGW_REGION : LOY_REGION;
+    mapRef.current?.animateToRegion(region, 500);
+  };
 
   const ALL_BUILDINGS = useMemo(
     () => [...SGW_BUILDINGS, ...LOYOLA_BUILDINGS],
@@ -107,8 +120,12 @@ export default function CampusMap() {
         />
       </MapView>
 
-      {/* search UI unchanged */}
       <View style={styles.topOverlay} testID="topOverlay">
+        <ToggleButton
+          focusedCampus={focusedCampus}
+          onCampusChange={handleCampusChange}
+        />
+
         <View style={styles.searchBar} testID="searchBar">
           <Text style={styles.searchIcon}>⌕</Text>
 
