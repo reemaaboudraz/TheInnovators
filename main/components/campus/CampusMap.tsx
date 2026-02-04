@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -12,9 +6,6 @@ import {
   Pressable,
   Platform,
   StyleSheet,
-  Animated,
-  PanResponder,
-  Dimensions,
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Region } from "react-native-maps";
 import { StatusBar } from "expo-status-bar";
@@ -24,8 +15,15 @@ import { LOYOLA_BUILDINGS } from "@/components/Buildings/Loyola/LoyolaBuildings"
 import type { Building, Campus } from "@/components/Buildings/types";
 
 import BuildingShapesLayer from "@/components/campus/BuildingShapesLayer";
+import ToggleButton from "@/components/campus/ToggleButton";
 import BrandBar from "@/components/layout/BrandBar";
 import { styles } from "@/components/Styles/mapStyle";
+
+// Re-export for backwards compatibility with tests
+export {
+  calculatePanValue,
+  determineCampusFromPan,
+} from "@/components/campus/ToggleButton";
 
 export const SGW_REGION: Region = {
   latitude: 45.4973,
@@ -44,99 +42,19 @@ export const LOY_REGION: Region = {
 // Start at SGW (still renders Loyola buildings in the background)
 const INITIAL_REGION: Region = SGW_REGION;
 
-// Exported for testing
-export function calculatePanValue(
-  currentCampus: Campus,
-  dx: number,
-  toggleWidth: number,
-): number {
-  const width = toggleWidth || Dimensions.get("window").width - 28;
-  const halfWidth = width / 2;
-  const currentValue = currentCampus === "SGW" ? 0 : 1;
-  const newValue = currentValue + dx / halfWidth;
-  return Math.max(0, Math.min(1, newValue));
-}
-
-export function determineCampusFromPan(
-  currentCampus: Campus,
-  dx: number,
-  toggleWidth: number,
-): Campus {
-  const width = toggleWidth || Dimensions.get("window").width - 28;
-  const halfWidth = width / 2;
-  const currentValue = currentCampus === "SGW" ? 0 : 1;
-  const finalValue = currentValue + dx / halfWidth;
-  return finalValue > 0.5 ? "LOY" : "SGW";
-}
-
 export default function CampusMap() {
   const [focusedCampus, setFocusedCampus] = useState<Campus>("SGW");
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Building | null>(null);
 
   const mapRef = useRef<MapView>(null);
-  const slideAnim = useRef(new Animated.Value(0)).current;
-  const toggleWidth = useRef(0);
-  const focusedCampusRef = useRef<Campus>(focusedCampus);
 
-  useEffect(() => {
-    focusedCampusRef.current = focusedCampus;
-  }, [focusedCampus]);
-
-  const animateToPosition = useCallback(
-    (toValue: number) => {
-      Animated.spring(slideAnim, {
-        toValue,
-        useNativeDriver: false,
-        tension: 60,
-        friction: 10,
-      }).start();
-    },
-    [slideAnim],
-  );
-
-  const switchToCampus = (campus: Campus) => {
-    if (campus === focusedCampusRef.current) return;
+  const handleCampusChange = (campus: Campus) => {
     setFocusedCampus(campus);
     setSelected(null);
     const region = campus === "SGW" ? SGW_REGION : LOY_REGION;
     mapRef.current?.animateToRegion(region, 500);
   };
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: (_, gestureState) =>
-        Math.abs(gestureState.dx) > 10,
-      onPanResponderMove: (_, gestureState) => {
-        const clampedValue = calculatePanValue(
-          focusedCampusRef.current,
-          gestureState.dx,
-          toggleWidth.current,
-        );
-        slideAnim.setValue(clampedValue);
-      },
-      onPanResponderRelease: (_, gestureState) => {
-        const targetCampus = determineCampusFromPan(
-          focusedCampusRef.current,
-          gestureState.dx,
-          toggleWidth.current,
-        );
-
-        if (targetCampus === "LOY") {
-          switchToCampus("LOY");
-          animateToPosition(1);
-        } else {
-          switchToCampus("SGW");
-          animateToPosition(0);
-        }
-      },
-    }),
-  ).current;
-
-  useEffect(() => {
-    animateToPosition(focusedCampus === "SGW" ? 0 : 1);
-  }, [focusedCampus, animateToPosition]);
 
   const ALL_BUILDINGS = useMemo(
     () => [...SGW_BUILDINGS, ...LOYOLA_BUILDINGS],
@@ -202,67 +120,11 @@ export default function CampusMap() {
         />
       </MapView>
 
-      {/* search UI unchanged */}
       <View style={styles.topOverlay} testID="topOverlay">
-        {/* Campus Toggle Slider */}
-        <View
-          style={styles.campusToggleContainer}
-          testID="campusToggle"
-          onLayout={(e) => {
-            toggleWidth.current = e.nativeEvent.layout.width;
-          }}
-          {...panResponder.panHandlers}
-        >
-          <Animated.View
-            style={[
-              styles.campusToggleSlider,
-              {
-                left: slideAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: ["2%", "52%"],
-                }),
-                backgroundColor: slideAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: ["#912338", "#e3ac20"],
-                }),
-              },
-            ]}
-          />
-          <Pressable
-            testID="campusToggle-SGW"
-            onPress={() => switchToCampus("SGW")}
-            style={styles.campusToggleButton}
-            accessibilityRole="button"
-            accessibilityLabel="Switch to SGW campus"
-            accessibilityState={{ selected: focusedCampus === "SGW" }}
-          >
-            <Text
-              style={[
-                styles.campusToggleText,
-                focusedCampus === "SGW" && styles.campusToggleTextActive,
-              ]}
-            >
-              SGW
-            </Text>
-          </Pressable>
-          <Pressable
-            testID="campusToggle-Loyola"
-            onPress={() => switchToCampus("LOY")}
-            style={styles.campusToggleButton}
-            accessibilityRole="button"
-            accessibilityLabel="Switch to Loyola campus"
-            accessibilityState={{ selected: focusedCampus === "LOY" }}
-          >
-            <Text
-              style={[
-                styles.campusToggleText,
-                focusedCampus === "LOY" && styles.campusToggleTextActive,
-              ]}
-            >
-              Loyola
-            </Text>
-          </Pressable>
-        </View>
+        <ToggleButton
+          focusedCampus={focusedCampus}
+          onCampusChange={handleCampusChange}
+        />
 
         <View style={styles.searchBar} testID="searchBar">
           <Text style={styles.searchIcon}>⌕</Text>

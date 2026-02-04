@@ -198,6 +198,23 @@ describe("CampusMap - search bar", () => {
     fireEvent.press(getByTestId("clearSearch"));
     expect(getByPlaceholderText("Where to next?").props.value).toBe("");
   });
+
+  it("clears selected building when typing in search bar", async () => {
+    const { getByPlaceholderText, getByTestId, findByText } = render(
+      <CampusMap />,
+    );
+
+    // First select a building
+    fireEvent.changeText(getByPlaceholderText("Where to next?"), "hall");
+    await findByText(/H — Henry F\. Hall Building/i);
+    fireEvent.press(getByTestId("suggestion-SGW-sgw-h"));
+
+    // Now type something new - this should clear the selected building
+    fireEvent.changeText(getByPlaceholderText("Where to next?"), "admin");
+
+    // The input should show the new text
+    expect(getByPlaceholderText("Where to next?").props.value).toBe("admin");
+  });
 });
 
 describe("CampusMap - suggestions", () => {
