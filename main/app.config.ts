@@ -4,7 +4,17 @@ export default {
   expo: {
     name: "TheInnovators",
     slug: "theinnovators",
+
+    ios: {
+      bundleIdentifier: "com.theinnovators.campusguide",
+      supportsTablet: true,
+      googleServicesFile: "./GoogleService-Info.plist",
+    },
+
     android: {
+      package: "com.theinnovators.campusguide",
+      googleServicesFile: "./google-services.json",
+
       adaptiveIcon: {
         backgroundColor: "#E6F4FE",
         foregroundImage: "./assets/images/android-icon-foreground.png",
@@ -19,6 +29,9 @@ export default {
         },
       },
     },
+
+    plugins: ["@react-native-google-signin/google-signin"],
+
     extra: {
       firebaseApiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
       firebaseAuthDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -28,6 +41,8 @@ export default {
         process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
       firebaseAppId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
       googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
+      googleWebClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+      googleIosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
     },
   },
 };
