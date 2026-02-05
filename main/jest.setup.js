@@ -111,5 +111,3 @@ jest.mock("@gorhom/bottom-sheet", () => {
     BottomSheetScrollView,
   };
 });
-
-
