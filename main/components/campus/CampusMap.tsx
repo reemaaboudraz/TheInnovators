@@ -205,13 +205,12 @@ export default function CampusMap() {
 
       {/* TEMP: show popup for ANY selected building */}
       {selected && (
-  <BuildingPopup
-    building={selected}
-    campusTheme={focusedCampus}
-    onClose={() => setSelected(null)}
-  />
-)}
-
+        <BuildingPopup
+          building={selected}
+          campusTheme={focusedCampus}
+          onClose={() => setSelected(null)}
+        />
+      )}
 
       <BrandBar
         testID="brandbar"

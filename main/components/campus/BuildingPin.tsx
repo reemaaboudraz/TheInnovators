@@ -37,7 +37,7 @@ export default function BuildingPin({ code, campus, size = 44 }: Props) {
           style={[
             styles.code,
             {
-              fontSize: Math.round(size * 0.30), // ⬅️ slightly bigger text
+              fontSize: Math.round(size * 0.3), // ⬅️ slightly bigger text
             },
           ]}
           numberOfLines={1}
