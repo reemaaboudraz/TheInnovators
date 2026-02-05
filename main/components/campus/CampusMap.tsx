@@ -1,4 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
+import BuildingPopup from "@/components/campus/BuildingPopup";
 import {
   View,
   Text,
@@ -39,7 +40,6 @@ export const LOY_REGION: Region = {
   longitudeDelta: 0.006,
 };
 
-// Start at SGW (still renders Loyola buildings in the background)
 const INITIAL_REGION: Region = SGW_REGION;
 
 export default function CampusMap() {
@@ -81,6 +81,8 @@ export default function CampusMap() {
   }, [query, ALL_BUILDINGS]);
 
   const onPickBuilding = (b: Building) => {
+    console.log("PICKED BUILDING:", b.code, b.name, b.id);
+
     setSelected(b);
     setQuery(`${b.code} - ${b.name}`);
     setFocusedCampus(b.campus);
@@ -111,7 +113,11 @@ export default function CampusMap() {
         showsCompass={false}
         toolbarEnabled={false}
         rotateEnabled={false}
-        onPress={() => setSelected(null)}
+        // Important: avoid clearing selection on every tap (can cancel polygon taps)
+        onPress={() => {
+          // Only clear if something is currently selected (prevents fighting with building taps)
+          if (selected) setSelected(null);
+        }}
       >
         <BuildingShapesLayer
           buildings={ALL_BUILDINGS}
@@ -176,6 +182,36 @@ export default function CampusMap() {
           </View>
         )}
       </View>
+
+      {/* DEBUG: show what is selected */}
+      {selected && (
+        <View
+          style={{
+            position: "absolute",
+            top: 110,
+            left: 16,
+            right: 16,
+            padding: 10,
+            borderRadius: 12,
+            backgroundColor: "rgba(255,255,255,0.9)",
+          }}
+          pointerEvents="none"
+        >
+          <Text style={{ fontWeight: "700" }}>
+            Selected: {selected.code} ({selected.campus})
+          </Text>
+        </View>
+      )}
+
+      {/* TEMP: show popup for ANY selected building */}
+      {selected && (
+  <BuildingPopup
+    building={selected}
+    campusTheme={focusedCampus}
+    onClose={() => setSelected(null)}
+  />
+)}
+
 
       <BrandBar
         testID="brandbar"
