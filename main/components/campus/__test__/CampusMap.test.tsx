@@ -67,6 +67,16 @@ jest.mock("expo-status-bar", () => ({
   StatusBar: () => null,
 }));
 
+jest.mock("expo-location", () => ({
+  requestForegroundPermissionsAsync: jest.fn(() =>
+    Promise.resolve({ status: "granted" }),
+  ),
+  getCurrentPositionAsync: jest.fn(() =>
+    Promise.resolve({ coords: { latitude: 45.5, longitude: -73.6 } }),
+  ),
+  Accuracy: { Balanced: 3 },
+}));
+
 jest.mock("@/components/layout/BrandBar", () => {
   const ReactActual = jest.requireActual("react") as typeof React;
   const RN = jest.requireActual(
@@ -643,5 +653,20 @@ describe("CampusMap - PanResponder handlers via mock", () => {
 
     // Should not have triggered campus switch (already on SGW)
     expect(mockAnimateToRegion).not.toHaveBeenCalled();
+  });
+});
+
+describe("CampusMap - Current Location Button", () => {
+  it("renders the current location button", () => {
+    const { getByTestId } = render(<CampusMap />);
+
+    expect(getByTestId("currentLocationButton")).toBeTruthy();
+  });
+
+  it("initially has showsUserLocation disabled", () => {
+    const { getByTestId } = render(<CampusMap />);
+
+    const map = getByTestId("mapView");
+    expect(map.props.showsUserLocation).toBe(false);
   });
 });
