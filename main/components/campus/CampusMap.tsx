@@ -13,7 +13,10 @@ import { StatusBar } from "expo-status-bar";
 import { SGW_BUILDINGS } from "@/components/Buildings/SGW/SGWBuildings";
 import { LOYOLA_BUILDINGS } from "@/components/Buildings/Loyola/LoyolaBuildings";
 import type { Building, Campus } from "@/components/Buildings/types";
-import { regionFromPolygon, paddingForZoomCategory } from "@/components/Buildings/mapZoom";
+import {
+  regionFromPolygon,
+  paddingForZoomCategory,
+} from "@/components/Buildings/mapZoom";
 import BuildingShapesLayer from "@/components/campus/BuildingShapesLayer";
 import ToggleButton from "@/components/campus/ToggleButton";
 import CurrentLocationButton, {
@@ -117,24 +120,29 @@ export default function CampusMap() {
     }).slice(0, 6);
   }, [query, ALL_BUILDINGS]);
 
-    const onPickBuilding = (b: Building) => {
-        setSelected(b);
-        setQuery(`${b.code} - ${b.name}`);
-        setFocusedCampus(b.campus);
+  const onPickBuilding = (b: Building) => {
+    setSelected(b);
+    setQuery(`${b.code} - ${b.name}`);
+    setFocusedCampus(b.campus);
 
-        const padding = paddingForZoomCategory(b.zoomCategory);
+    const padding = paddingForZoomCategory(b.zoomCategory);
 
-        if (b.polygon?.length) {
-            const region = regionFromPolygon(b.polygon, padding);
-            mapRef.current?.animateToRegion(region, 600);
-            return;
-        }
+    if (b.polygon?.length) {
+      const region = regionFromPolygon(b.polygon, padding);
+      mapRef.current?.animateToRegion(region, 600);
+      return;
+    }
 
-        mapRef.current?.animateToRegion(
-            { latitude: b.latitude, longitude: b.longitude, latitudeDelta: 0.0025, longitudeDelta: 0.0025 },
-            600,
-        );
-    };
+    mapRef.current?.animateToRegion(
+      {
+        latitude: b.latitude,
+        longitude: b.longitude,
+        latitudeDelta: 0.0025,
+        longitudeDelta: 0.0025,
+      },
+      600,
+    );
+  };
 
   return (
     <View style={styles.container} testID="campusMap-root">
