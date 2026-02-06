@@ -13,7 +13,7 @@ import { StatusBar } from "expo-status-bar";
 import { SGW_BUILDINGS } from "@/components/Buildings/SGW/SGWBuildings";
 import { LOYOLA_BUILDINGS } from "@/components/Buildings/Loyola/LoyolaBuildings";
 import type { Building, Campus } from "@/components/Buildings/types";
-
+import type { LatLng } from "@/components/Buildings/types";
 import BuildingShapesLayer from "@/components/campus/BuildingShapesLayer";
 import ToggleButton from "@/components/campus/ToggleButton";
 import CurrentLocationButton, {
@@ -117,21 +117,55 @@ export default function CampusMap() {
     }).slice(0, 6);
   }, [query, ALL_BUILDINGS]);
 
-  const onPickBuilding = (b: Building) => {
-    setSelected(b);
-    setQuery(`${b.code} - ${b.name}`);
-    setFocusedCampus(b.campus);
+  // helper function...
+    function regionFromPolygon(poly: LatLng[], paddingFactor = 1.35): Region {
+        let minLat = poly[0].latitude;
+        let maxLat = poly[0].latitude;
+        let minLng = poly[0].longitude;
+        let maxLng = poly[0].longitude;
 
-    mapRef.current?.animateToRegion(
-      {
-        latitude: b.latitude,
-        longitude: b.longitude,
-        latitudeDelta: 0.0025,
-        longitudeDelta: 0.0025,
-      },
-      600,
-    );
-  };
+        for (const p of poly) {
+            minLat = Math.min(minLat, p.latitude);
+            maxLat = Math.max(maxLat, p.latitude);
+            minLng = Math.min(minLng, p.longitude);
+            maxLng = Math.max(maxLng, p.longitude);
+        }
+
+        const latitude = (minLat + maxLat) / 2;
+        const longitude = (minLng + maxLng) / 2;
+
+        const latDelta = Math.max((maxLat - minLat) * paddingFactor, 0.0006);
+        const lngDelta = Math.max((maxLng - minLng) * paddingFactor, 0.0006);
+
+        return { latitude, longitude, latitudeDelta: latDelta, longitudeDelta: lngDelta };
+    }
+
+    const onPickBuilding = (b: Building) => {
+        setSelected(b);
+        setQuery(`${b.code} - ${b.name}`);
+        setFocusedCampus(b.campus);
+
+        const cat = b.zoomCategory ?? 1;
+
+        // You can tune these numbers easily
+        const padding =
+            cat === 1 ? 2.2 : // big: zoom out a bit (close to “default map feel”)
+                cat === 2 ? 1.7 : // medium: closer
+                    1.2;  // small: tighter zoom
+
+        if (b.polygon?.length) {
+            const region = regionFromPolygon(b.polygon, padding);
+            mapRef.current?.animateToRegion(region, 600);
+            return;
+        }
+
+        // fallback if polygon missing
+        mapRef.current?.animateToRegion(
+            { latitude: b.latitude, longitude: b.longitude, latitudeDelta: 0.0025, longitudeDelta: 0.0025 },
+            600,
+        );
+    };
+
 
   return (
     <View style={styles.container} testID="campusMap-root">

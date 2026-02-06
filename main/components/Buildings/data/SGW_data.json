@@ -8,6 +8,7 @@
     "latitude": 45.497826,
     "longitude": -73.5795,
     "aliases": ["B", "B Annex", "B Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.497887, "longitude": -73.5793896 },
       { "latitude": 45.4979102, "longitude": -73.5794406 },
@@ -26,6 +27,7 @@
     "latitude": 45.497467,
     "longitude": -73.5799,
     "aliases": ["CI", "CI Annex", "CI Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4974061, "longitude": -73.5800149 },
       { "latitude": 45.4973958, "longitude": -73.5799938 },
@@ -48,6 +50,7 @@
     "latitude": 45.494204,
     "longitude": -73.5793,
     "aliases": ["CL", "CL Annex", "CL Building"],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.4941615, "longitude": -73.5796402 },
       { "latitude": 45.4939635, "longitude": -73.5793327 },
@@ -69,6 +72,7 @@
     "latitude": 45.49776,
     "longitude": -73.57935,
     "aliases": ["D", "D Annex", "D Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.497816, "longitude": -73.5792401 },
       { "latitude": 45.4978341, "longitude": -73.5792822 },
@@ -90,6 +94,7 @@
     "latitude": 45.49685,
     "longitude": -73.5796,
     "aliases": ["EN", "EN Annex", "EN Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4968834, "longitude": -73.5794977 },
       { "latitude": 45.4968982, "longitude": -73.5794838 },
@@ -114,6 +119,7 @@
     "latitude": 45.4964,
     "longitude": -73.58,
     "aliases": ["ER", "ER Building"],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.4965177, "longitude": -73.5796317 },
       { "latitude": 45.4966784, "longitude": -73.5799683 },
@@ -134,11 +140,8 @@
     "address": "1515 Ste-Catherine St. W.",
     "latitude": 45.4956,
     "longitude": -73.57815,
-    "aliases": [
-      "EV",
-      "EV Building",
-      "Engineering, Computer Science and Visual Arts Integrated Complex"
-    ],
+    "aliases": ["EV", "EV Building", "Engineering, Computer Science and Visual Arts Integrated Complex"],
+    "zoomCategory": 1,
     "polygon": [
       { "latitude": 45.4959332, "longitude": -73.578441 },
       { "latitude": 45.4956265, "longitude": -73.578729 },
@@ -177,6 +180,7 @@
     "latitude": 45.49682,
     "longitude": -73.5795,
     "aliases": ["FA", "FA Annex", "FA Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4967406, "longitude": -73.5795156 },
       { "latitude": 45.4968443, "longitude": -73.5794153 },
@@ -195,6 +199,7 @@
     "latitude": 45.49465,
     "longitude": -73.57763,
     "aliases": ["FB", "FB Building", "Faubourg Building"],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.4946786, "longitude": -73.5780177 },
       { "latitude": 45.4944394, "longitude": -73.5775911 },
@@ -230,6 +235,7 @@
     "latitude": 45.49415,
     "longitude": -73.57835,
     "aliases": ["FG", "FG Building", "Faubourg Ste-Catherine Building"],
+    "zoomCategory": 1,
     "polygon": [
       { "latitude": 45.4938097, "longitude": -73.5790389 },
       { "latitude": 45.4936147, "longitude": -73.5787064 },
@@ -255,6 +261,7 @@
     "latitude": 45.49422,
     "longitude": -73.57785,
     "aliases": ["GA", "GA Annex", "GA Building", "Grey Nuns Annex"],
+    "zoomCategory": 1,
     "polygon": [
       { "latitude": 45.4936289, "longitude": -73.5787043 },
       { "latitude": 45.4935537, "longitude": -73.5785716 },
@@ -281,6 +288,7 @@
     "latitude": 45.49587,
     "longitude": -73.5788,
     "aliases": ["GM", "GM Building", "Guy-De Maisonneuve Building"],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.4959562, "longitude": -73.5784181 },
       { "latitude": 45.4961299, "longitude": -73.5787809 },
@@ -304,6 +312,7 @@
     "latitude": 45.49343,
     "longitude": -73.57676,
     "aliases": ["GN", "GN Building", "Grey Nuns Building"],
+    "zoomCategory": 1,
     "polygon": [
       { "latitude": 45.493393, "longitude": -73.5768906 },
       { "latitude": 45.493095, "longitude": -73.5771769 },
@@ -399,6 +408,7 @@
     "latitude": 45.49661,
     "longitude": -73.5812,
     "aliases": ["GS", "GS Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.496655, "longitude": -73.5814399 },
       { "latitude": 45.4965911, "longitude": -73.5814198 },
@@ -421,6 +431,7 @@
     "latitude": 45.49729,
     "longitude": -73.57898,
     "aliases": ["H", "H Building", "Henry F. Hall Building"],
+    "zoomCategory": 1,
     "polygon": [
       { "latitude": 45.4968261, "longitude": -73.5788241 },
       { "latitude": 45.4970373, "longitude": -73.5786245 },
@@ -446,6 +457,7 @@
     "latitude": 45.4978,
     "longitude": -73.57942,
     "aliases": ["K", "K Annex", "K Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4978508, "longitude": -73.5793152 },
       { "latitude": 45.4978723, "longitude": -73.5793612 },
@@ -471,6 +483,7 @@
     "latitude": 45.4968,
     "longitude": -73.5779,
     "aliases": ["LB", "LB Building", "J.W. McConnell Building"],
+    "zoomCategory": 1,
     "polygon": [
       { "latitude": 45.4966595, "longitude": -73.5785573 },
       { "latitude": 45.4964933, "longitude": -73.5782102 },
@@ -512,6 +525,7 @@
     "latitude": 45.49673,
     "longitude": -73.57726,
     "aliases": ["LD", "LD Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4968552, "longitude": -73.5772077 },
       { "latitude": 45.4966654, "longitude": -73.577382 },
@@ -533,6 +547,7 @@
     "latitude": 45.49635,
     "longitude": -73.5795,
     "aliases": ["LS", "LS Building", "Learning Square"],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.4961716, "longitude": -73.5794628 },
       { "latitude": 45.4963919, "longitude": -73.5792514 },
@@ -552,6 +567,7 @@
     "latitude": 45.49735,
     "longitude": -73.57975,
     "aliases": ["M", "M Annex", "M Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4974204, "longitude": -73.5797377 },
       { "latitude": 45.4973206, "longitude": -73.5798361 },
@@ -574,6 +590,7 @@
     "latitude": 45.49526,
     "longitude": -73.57905,
     "aliases": ["MB", "MB Building", "John Molson Building"],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.4949482, "longitude": -73.5787947 },
       { "latitude": 45.4950064, "longitude": -73.5787235 },
@@ -606,6 +623,7 @@
     "latitude": 45.49773,
     "longitude": -73.57927,
     "aliases": ["MI", "MI Annex", "MI Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4977756, "longitude": -73.5791541 },
       { "latitude": 45.4977976, "longitude": -73.5792006 },
@@ -629,6 +647,7 @@
     "latitude": 45.49789,
     "longitude": -73.57955,
     "aliases": ["MU", "MU Annex", "MU Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4979241, "longitude": -73.5794655 },
       { "latitude": 45.4979399, "longitude": -73.5794938 },
@@ -648,6 +667,7 @@
     "latitude": 45.49666,
     "longitude": -73.57918,
     "aliases": ["P", "P Annex", "P Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.496684, "longitude": -73.5790979 },
       { "latitude": 45.4967207, "longitude": -73.5791744 },
@@ -666,6 +686,7 @@
     "latitude": 45.49697,
     "longitude": -73.57983,
     "aliases": ["PR", "PR Annex", "PR Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4969999, "longitude": -73.5797534 },
       { "latitude": 45.4970082, "longitude": -73.5797457 },
@@ -696,6 +717,7 @@
     "latitude": 45.4966,
     "longitude": -73.57913,
     "aliases": ["Q", "Q Annex", "Q Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.496652, "longitude": -73.579029 },
       { "latitude": 45.496684, "longitude": -73.5790979 },
@@ -714,6 +736,7 @@
     "latitude": 45.49677,
     "longitude": -73.57942,
     "aliases": ["R", "R Annex", "R Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4967012, "longitude": -73.5794243 },
       { "latitude": 45.4968027, "longitude": -73.5793309 },
@@ -731,6 +754,7 @@
     "latitude": 45.49672,
     "longitude": -73.57934,
     "aliases": ["RR", "RR Annex", "RR Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4967535, "longitude": -73.5792532 },
       { "latitude": 45.4967635, "longitude": -73.579244 },
@@ -751,6 +775,7 @@
     "latitude": 45.49739,
     "longitude": -73.57983,
     "aliases": ["S", "S Annex", "S Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4974912, "longitude": -73.5798023 },
       { "latitude": 45.4973632, "longitude": -73.5799218 },
@@ -774,6 +799,7 @@
     "latitude": 45.49659,
     "longitude": -73.58609,
     "aliases": ["SB", "SB Building", "Samuel Bronfman Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4965801, "longitude": -73.5858404 },
       { "latitude": 45.496699, "longitude": -73.5861354 },
@@ -797,6 +823,7 @@
     "latitude": 45.496688,
     "longitude": -73.57926,
     "aliases": ["T", "T Annex", "T Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4967172, "longitude": -73.5791776 },
       { "latitude": 45.4967535, "longitude": -73.5792532 },
@@ -814,6 +841,7 @@
     "latitude": 45.49502,
     "longitude": -73.57819,
     "aliases": ["TD", "TD Building", "Toronto-Dominion Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4951729, "longitude": -73.5783952 },
       { "latitude": 45.4951046, "longitude": -73.5784763 },
@@ -838,6 +866,7 @@
     "latitude": 45.497009,
     "longitude": -73.57993,
     "aliases": ["V", "V Annex", "V Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4970326, "longitude": -73.5798276 },
       { "latitude": 45.4970504, "longitude": -73.579812 },
@@ -858,6 +887,7 @@
     "latitude": 45.49565,
     "longitude": -73.5739,
     "aliases": ["VA", "VA Building", "Visual Arts Building"],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.4961732, "longitude": -73.5737903 },
       { "latitude": 45.4956505, "longitude": -73.5742947 },
@@ -881,6 +911,7 @@
     "latitude": 45.49689,
     "longitude": -73.57968,
     "aliases": ["X", "X Annex", "X Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4969271, "longitude": -73.5795884 },
       { "latitude": 45.4969613, "longitude": -73.5796672 },
@@ -898,6 +929,7 @@
     "latitude": 45.49693,
     "longitude": -73.57975,
     "aliases": ["Z", "Z Annex", "Z Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4968645, "longitude": -73.5797555 },
       { "latitude": 45.4969613, "longitude": -73.5796672 },
