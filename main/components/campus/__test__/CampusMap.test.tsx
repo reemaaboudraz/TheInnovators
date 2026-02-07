@@ -80,10 +80,9 @@ jest.mock("expo-location", () => ({
 }));
 
 // Store the onLocationFound callback for testing
-let mockOnLocationFound: ((location: {
-  latitude: number;
-  longitude: number;
-}) => void) | null = null;
+let mockOnLocationFound:
+  | ((location: { latitude: number; longitude: number }) => void)
+  | null = null;
 
 jest.mock("@/components/campus/CurrentLocationButton", () => {
   const ReactActual = jest.requireActual("react") as typeof React;

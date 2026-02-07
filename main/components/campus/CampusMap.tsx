@@ -87,7 +87,10 @@ export default function CampusMap() {
       (b) =>
         b.polygon?.length &&
         isPointInPolygon(
-          { latitude: userLocation.latitude, longitude: userLocation.longitude },
+          {
+            latitude: userLocation.latitude,
+            longitude: userLocation.longitude,
+          },
           b.polygon,
         ),
     );

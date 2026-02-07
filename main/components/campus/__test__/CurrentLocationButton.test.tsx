@@ -8,7 +8,8 @@ const mockRequestForegroundPermissionsAsync = jest.fn();
 const mockGetCurrentPositionAsync = jest.fn();
 
 jest.mock("expo-location", () => ({
-  requestForegroundPermissionsAsync: () => mockRequestForegroundPermissionsAsync(),
+  requestForegroundPermissionsAsync: () =>
+    mockRequestForegroundPermissionsAsync(),
   getCurrentPositionAsync: () => mockGetCurrentPositionAsync(),
   Accuracy: {
     Balanced: 3,
@@ -138,7 +139,9 @@ describe("CurrentLocationButton", () => {
       resolvePermission = resolve;
     });
 
-    mockRequestForegroundPermissionsAsync.mockReturnValueOnce(permissionPromise);
+    mockRequestForegroundPermissionsAsync.mockReturnValueOnce(
+      permissionPromise,
+    );
 
     const onLocationFound = jest.fn();
     const { getByTestId, getByText } = render(
