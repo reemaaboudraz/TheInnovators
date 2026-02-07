@@ -1,56 +1,64 @@
+/* eslint-disable import/first */
 import React from "react";
+import { View } from "react-native";
 import { render } from "@testing-library/react-native";
 import { describe, it, expect, jest } from "@jest/globals";
 
-// prefix with mock
+// ✅ Jest allows out-of-scope vars if prefixed with "mock"
+const mockReact = React;
+const mockView = View;
+
 const mockUseColorScheme = jest.fn(() => "light");
 
 jest.mock("@/hooks/use-color-scheme", () => ({
   useColorScheme: () => mockUseColorScheme(),
 }));
 
-// Fix RNGestureHandlerModule.install crash
-jest.mock("react-native-gesture-handler", () => {
-  const React = require("react");
-  const { View } = require("react-native");
-  return {
-    __esModule: true,
-    GestureHandlerRootView: ({ children }: any) => (
-      <View testID="ghRoot">{children}</View>
-    ),
-  };
-});
-jest.mock("react-native-gesture-handler/jestSetup", () => ({}));
-
 jest.mock("@react-navigation/native", () => {
-  const React = require("react");
-  const { View } = require("react-native");
+  const ThemeProviderMock = function ThemeProviderMock({ children }: any) {
+    return children;
+  };
+  ThemeProviderMock.displayName = "ThemeProviderMock";
+
   return {
     __esModule: true,
     DarkTheme: { dark: true, colors: { background: "black" } },
     DefaultTheme: { dark: false, colors: { background: "white" } },
-    ThemeProvider: ({ children }: any) => (
-      <View testID="themeProvider">{children}</View>
-    ),
+    ThemeProvider: ThemeProviderMock,
   };
 });
 
-// ✅ IMPORTANT: expo-router Stack must include Stack.Screen
 jest.mock("expo-router", () => {
-  const React = require("react");
-  const { View } = require("react-native");
+  const StackMock: any = function StackMock({ children }: any) {
+    return mockReact.createElement(mockView, { testID: "stack" }, children);
+  };
 
-  const Stack: any = ({ children }: any) => (
-    <View testID="stack">{children}</View>
-  );
+  // ✅ IMPORTANT: RootLayout often uses <Stack.Screen />, so we must mock it too
+  const ScreenMock = function ScreenMock() {
+    return null;
+  };
+  ScreenMock.displayName = "ScreenMock";
+  StackMock.Screen = ScreenMock;
 
-  Stack.Screen = ({ name }: any) => (
-    <View testID={`stack-screen-${name ?? "unknown"}`} />
-  );
+  StackMock.displayName = "StackMock";
 
   return {
     __esModule: true,
-    Stack,
+    Stack: StackMock,
+  };
+});
+
+jest.mock("react-native-gesture-handler", () => {
+  const GestureHandlerRootView = function GestureHandlerRootViewMock({
+    children,
+  }: any) {
+    return children;
+  };
+  GestureHandlerRootView.displayName = "GestureHandlerRootViewMock";
+
+  return {
+    __esModule: true,
+    GestureHandlerRootView,
   };
 });
 

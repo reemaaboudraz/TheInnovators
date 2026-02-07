@@ -1,3 +1,4 @@
+/* eslint-disable import/first */
 import React from "react";
 import { render } from "@testing-library/react-native";
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
@@ -7,12 +8,15 @@ const mockSnapToIndex = jest.fn();
 const mockClose = jest.fn();
 
 jest.mock("@gorhom/bottom-sheet", () => {
-  const React = require("react");
-  const { View, ScrollView } = require("react-native");
+  const ReactActual = jest.requireActual("react") as typeof React;
+  const RN = jest.requireActual(
+    "react-native",
+  ) as typeof import("react-native");
+  const { View, ScrollView } = RN;
 
-  const BottomSheet = React.forwardRef(
+  const BottomSheet = ReactActual.forwardRef(
     ({ children, ...props }: any, ref: any) => {
-      React.useImperativeHandle(ref, () => ({
+      ReactActual.useImperativeHandle(ref, () => ({
         snapToIndex: mockSnapToIndex,
         close: mockClose,
       }));
@@ -24,10 +28,12 @@ jest.mock("@gorhom/bottom-sheet", () => {
       );
     },
   );
+  (BottomSheet as any).displayName = "BottomSheetMock";
 
-  const BottomSheetScrollView = React.forwardRef((props: any, ref: any) => (
-    <ScrollView ref={ref} {...props} />
-  ));
+  const BottomSheetScrollView = ReactActual.forwardRef(
+    (props: any, ref: any) => <ScrollView ref={ref} {...props} />,
+  );
+  (BottomSheetScrollView as any).displayName = "BottomSheetScrollViewMock";
 
   return {
     __esModule: true,
