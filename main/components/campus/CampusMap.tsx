@@ -81,8 +81,6 @@ export default function CampusMap() {
   }, [query, ALL_BUILDINGS]);
 
   const onPickBuilding = (b: Building) => {
-    console.log("PICKED BUILDING:", b.code, b.name, b.id);
-
     setSelected(b);
     setQuery(`${b.code} - ${b.name}`);
     setFocusedCampus(b.campus);
@@ -183,27 +181,7 @@ export default function CampusMap() {
         )}
       </View>
 
-      {/* DEBUG: show what is selected */}
-      {selected && (
-        <View
-          style={{
-            position: "absolute",
-            top: 110,
-            left: 16,
-            right: 16,
-            padding: 10,
-            borderRadius: 12,
-            backgroundColor: "rgba(255,255,255,0.9)",
-          }}
-          pointerEvents="none"
-        >
-          <Text style={{ fontWeight: "700" }}>
-            Selected: {selected.code} ({selected.campus})
-          </Text>
-        </View>
-      )}
-
-      {/* TEMP: show popup for ANY selected building */}
+      {/* Show details popup for selected building */}
       {selected && (
         <BuildingPopup
           building={selected}

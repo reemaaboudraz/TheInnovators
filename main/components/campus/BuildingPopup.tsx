@@ -1,16 +1,22 @@
 import React, { useEffect, useMemo, useRef, useCallback } from "react";
-import { View, Text, Pressable, StyleSheet, Image } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  Image,
+  useWindowDimensions,
+} from "react-native";
 import BottomSheet, {
   BottomSheetScrollView,
   BottomSheetHandleProps,
 } from "@gorhom/bottom-sheet";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { Building, Campus } from "@/components/Buildings/types";
 import { BUILDING_IMAGES } from "@/components/Buildings/details/buildingImages";
-import BuildingPin from "@/components/campus/BuildingPin";
-
-import { BUILDING_DETAILS } from "@/components/Buildings/details/buildingDetails";
 import { BUILDING_ICONS } from "@/components/Buildings/details/buildingIcons";
+import BuildingPin from "@/components/campus/BuildingPin";
 
 type Props = {
   building: Building;
@@ -25,8 +31,8 @@ export default function BuildingPopup({
 }: Readonly<Props>) {
   const sheetRef = useRef<BottomSheet>(null);
 
-  // Keep your current behavior
-  const snapPoints = useMemo(() => ["19%", "75%"], []);
+  const { height: windowHeight } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
 
   const theme =
     campusTheme === "SGW"
@@ -43,6 +49,19 @@ export default function BuildingPopup({
           icon: "#E0B100",
         };
 
+  /**
+   * Key fix:
+   * - Use a pixel max height for the expanded snap point
+   * - Keep space for the status bar / Dynamic Island using insets.top
+   */
+  const snapPoints = useMemo(() => {
+    const collapsed = Math.round(windowHeight * 0.19); // same feel as "19%"
+    const topBuffer = insets.top - 6;
+    const expanded = Math.max(300, windowHeight - topBuffer);
+
+    return [collapsed, expanded];
+  }, [windowHeight, insets.top]);
+
   const expandSheet = useCallback(() => {
     sheetRef.current?.snapToIndex(1);
   }, []);
@@ -56,7 +75,9 @@ export default function BuildingPopup({
   }, [building?.id]);
 
   const thumbSource = BUILDING_IMAGES[building.code];
-  const details = BUILDING_DETAILS[building.code]; // H exists, others = undefined
+
+  // Details are now coming from JSON -> building.details
+  const details = building.details;
 
   const Handle = useCallback(
     (_props: BottomSheetHandleProps) => {
@@ -122,12 +143,13 @@ export default function BuildingPopup({
       enablePanDownToClose
       onClose={onClose}
       handleComponent={Handle}
+      // Key fix: prevent sheet from expanding under the status bar
+      topInset={insets.top - 6}
       backgroundStyle={[
         styles.sheetBackground,
         { borderColor: theme.cardBorder },
       ]}
     >
-      {/* ✅ Small popup header stays as-is */}
       <View style={styles.header}>
         <View style={styles.headerRow}>
           <BuildingPin code={building.code} campus={campusTheme} size={46} />
@@ -159,7 +181,6 @@ export default function BuildingPopup({
         </View>
       </View>
 
-      {/* ✅ Expanded content becomes data-driven */}
       <BottomSheetScrollView
         contentContainerStyle={[styles.content, styles.hiddenAtFirst]}
         showsVerticalScrollIndicator={false}
@@ -173,7 +194,6 @@ export default function BuildingPopup({
           </View>
         ) : (
           <>
-            {/* Building accessibility */}
             <View style={styles.card}>
               <Text style={styles.cardHeader}>Building Accessibility</Text>
               {details.accessibility.map((item) => (
@@ -186,7 +206,6 @@ export default function BuildingPopup({
               ))}
             </View>
 
-            {/* Metro Accessibility */}
             <View style={styles.card}>
               <Text style={styles.cardHeader}>Metro Accessibility</Text>
               <SimpleRow
@@ -196,7 +215,6 @@ export default function BuildingPopup({
               />
             </View>
 
-            {/* Building Connectivity */}
             <View style={styles.card}>
               <Text style={styles.cardHeader}>Building Connectivity</Text>
               <SimpleRow
@@ -206,7 +224,6 @@ export default function BuildingPopup({
               />
             </View>
 
-            {/* Number of Entries */}
             <View style={styles.card}>
               <Text style={styles.cardHeader}>Number of Entries</Text>
               {details.entries.map((e, idx) => (
@@ -219,7 +236,6 @@ export default function BuildingPopup({
               ))}
             </View>
 
-            {/* Other services */}
             <View style={styles.card}>
               <Text style={styles.cardHeader}>Other services</Text>
               {details.otherServices.map((item) => (
@@ -232,7 +248,6 @@ export default function BuildingPopup({
               ))}
             </View>
 
-            {/* Overview */}
             <View style={styles.card}>
               <Text style={styles.cardHeader}>Building Overview</Text>
               {details.overview.map((p, idx) => (
@@ -242,7 +257,6 @@ export default function BuildingPopup({
               ))}
             </View>
 
-            {/* Venues */}
             <View style={styles.card}>
               <Text style={styles.cardHeader}>Venues</Text>
               {details.venues.map((v) => (
@@ -253,7 +267,6 @@ export default function BuildingPopup({
               ))}
             </View>
 
-            {/* Departments */}
             <View style={styles.card}>
               <Text style={styles.cardHeader}>Departments</Text>
               {details.departments.map((d) => (
@@ -264,7 +277,6 @@ export default function BuildingPopup({
               ))}
             </View>
 
-            {/* Services */}
             <View style={styles.card}>
               <Text style={styles.cardHeader}>Services</Text>
               {details.services.map((s) => (
