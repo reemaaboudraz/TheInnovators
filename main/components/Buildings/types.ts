@@ -34,16 +34,16 @@ export type BuildingDetails = {
 };
 
 export type Building = {
-  id: string;
-  campus: Campus;
-  code: string;
-  name: string;
-  address: string;
-  latitude: number;
-  longitude: number;
-  aliases: string[];
-  polygon: LatLng[];
+  id?: string;
+  campus?: Campus;
+  code?: string;
+  name?: string;
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+  aliases?: string[];
+  polygon?: LatLng[];
 
   // extended building info shown in the popup.
-  details?: BuildingDetails;
+  details: BuildingDetails;
 };

@@ -1,4 +1,4 @@
-/* eslint-disable import/first */
+/* eslint-disable import/first, react/display-name, @typescript-eslint/no-require-imports */
 import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
@@ -160,12 +160,58 @@ jest.mock("react-native-maps", () => {
   };
 });
 
+// ✅ Make BottomSheet safe in Jest (prevents native crashes)
+jest.mock("@gorhom/bottom-sheet", () => {
+  const React = require("react");
+  const { View } = require("react-native");
+
+  const BottomSheet = React.forwardRef((props: any, ref: any) => {
+    React.useImperativeHandle(ref, () => ({
+      snapToIndex: jest.fn(),
+      close: jest.fn(),
+    }));
+    return <View testID="bottomSheet">{props.children}</View>;
+  });
+
+  (BottomSheet as any).displayName = "BottomSheet";
+
+  const BottomSheetScrollView = (props: any) => (
+    <View testID="bottomSheetScroll">{props.children}</View>
+  );
+
+  return {
+    __esModule: true,
+    default: BottomSheet,
+    BottomSheetScrollView,
+  };
+});
+
+// ✅ Avoid asset / lookup issues inside BuildingPopup
+jest.mock("@/components/Buildings/details/buildingImages", () => ({
+  BUILDING_IMAGES: {
+    H: 123, // truthy => covers thumbSource branch
+  },
+}));
+
+jest.mock("@/components/Buildings/details/buildingIcons", () => ({
+  BUILDING_ICONS: {
+    metro: 1,
+    connectedBuildings: 2,
+    entry: 3,
+    wifi: 4,
+    elevator: 5,
+  },
+}));
+
 import CampusMap, {
   calculatePanValue,
   determineCampusFromPan,
   SGW_REGION,
   LOY_REGION,
 } from "../CampusMap";
+
+import BuildingPopup from "@/components/campus/BuildingPopup";
+import BuildingPin from "@/components/campus/BuildingPin";
 
 beforeEach(() => {
   mockAnimateToRegion.mockClear();
@@ -465,6 +511,117 @@ describe("CampusMap - PanResponder helper functions (re-exported)", () => {
         latitudeDelta: 0.006,
         longitudeDelta: 0.006,
       });
+    });
+  });
+
+  describe("BuildingPin", () => {
+    it("uses default size=44 and SGW branch", () => {
+      const { getByText, UNSAFE_getAllByType } = render(
+        <BuildingPin code="H" campus="SGW" />,
+      );
+
+      getByText("H");
+
+      const { View, StyleSheet } = require("react-native");
+      const views = UNSAFE_getAllByType(View);
+
+      const flat = StyleSheet.flatten(views[0].props.style);
+      expect(flat).toMatchObject({ width: 44, height: 55 });
+    });
+
+    it("uses custom size and LOY branch", () => {
+      const { getByText, UNSAFE_getAllByType } = render(
+        <BuildingPin code="AD" campus="LOY" size={60} />,
+      );
+
+      getByText("AD");
+
+      const { View, StyleSheet } = require("react-native");
+      const views = UNSAFE_getAllByType(View);
+
+      const flat = StyleSheet.flatten(views[0].props.style);
+      expect(flat).toMatchObject({ width: 60, height: 75 });
+    });
+  });
+
+  describe("BuildingPopup", () => {
+    const baseBuilding = {
+      id: "sgw-h",
+      campus: "SGW",
+      code: "H",
+      name: "Henry F. Hall",
+      address: "1455 De Maisonneuve",
+      latitude: 45.1,
+      longitude: -73.1,
+    };
+
+    it("renders fallback branch when details are missing", () => {
+      const onClose = jest.fn();
+
+      const { getByText } = render(
+        <BuildingPopup
+          building={{ ...baseBuilding, details: undefined } as any}
+          campusTheme="SGW"
+          onClose={onClose}
+        />,
+      );
+
+      // ✅ Covers `!details ? (...) : (...)` branch
+      getByText("Details coming soon");
+      getByText("We’ll add the expanded info for this building next.");
+    });
+
+    it("renders details branch including maps + conditional description", () => {
+      const onClose = jest.fn();
+
+      const buildingWithDetails = {
+        ...baseBuilding,
+        details: {
+          accessibility: [
+            { icon: "elevator", title: "Elevator", description: "" }, // covers !!description false
+            { icon: "wifi", title: "Wi-Fi", description: "Available" }, // covers !!description true
+          ],
+          metro: { title: "Metro nearby", description: "Guy-Concordia" },
+          connectivity: {
+            title: "Connected",
+            description: "Underground links",
+          },
+          entries: [
+            { title: "Main entrance", description: "Front door" },
+            { title: "Side entrance", description: "Accessible ramp" },
+          ],
+          otherServices: [
+            { icon: "wifi", title: "Printing", description: "2nd floor" },
+          ],
+          overview: ["Paragraph 1", "Paragraph 2"],
+          venues: ["Cafeteria", "Study rooms"],
+          departments: ["Computer Science", "Engineering"],
+          services: ["Security", "Information desk"],
+        },
+      };
+
+      const { getByText } = render(
+        <BuildingPopup
+          building={buildingWithDetails as any}
+          campusTheme="LOY"
+          onClose={onClose}
+        />,
+      );
+
+      // ✅ covers the mapped sections highlighted red in Sonar
+      getByText("Building Accessibility");
+      getByText("Elevator");
+      getByText("Wi-Fi");
+      getByText("Available");
+
+      getByText("Venues");
+      getByText("Cafeteria");
+
+      getByText("Departments");
+      getByText("Engineering");
+
+      getByText("Services");
+      getByText("Information desk");
     });
   });
 });

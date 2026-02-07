@@ -1,85 +1,103 @@
-/* eslint-disable import/first */
 import React from "react";
-import { render } from "@testing-library/react-native";
-import { describe, it, expect, beforeEach, jest } from "@jest/globals";
+import { render, fireEvent } from "@testing-library/react-native";
+import BuildingPopup from "@/components/campus/BuildingPopup";
 
-// ✅ must be prefixed with "mock" so jest allows it inside jest.mock factory
-const mockSnapToIndex = jest.fn();
-const mockClose = jest.fn();
-
-jest.mock("@gorhom/bottom-sheet", () => {
-  const ReactActual = jest.requireActual("react") as typeof React;
-  const RN = jest.requireActual(
-    "react-native",
-  ) as typeof import("react-native");
-  const { View, ScrollView } = RN;
-
-  const BottomSheet = ReactActual.forwardRef(
-    ({ children, ...props }: any, ref: any) => {
-      ReactActual.useImperativeHandle(ref, () => ({
-        snapToIndex: mockSnapToIndex,
-        close: mockClose,
-      }));
-
-      return (
-        <View testID="bottomSheet" {...props}>
-          {children}
-        </View>
-      );
-    },
-  );
-  (BottomSheet as any).displayName = "BottomSheetMock";
-
-  const BottomSheetScrollView = ReactActual.forwardRef(
-    (props: any, ref: any) => <ScrollView ref={ref} {...props} />,
-  );
-  (BottomSheetScrollView as any).displayName = "BottomSheetScrollViewMock";
-
-  return {
-    __esModule: true,
-    default: BottomSheet,
-    BottomSheetScrollView,
-  };
-});
-
-// ✅ Safe area hook mock so you don't need SafeAreaProvider in this file
+// Safe-area mock (stable snapPoints)
 jest.mock("react-native-safe-area-context", () => ({
-  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+  useSafeAreaInsets: () => ({ top: 10, bottom: 0, left: 0, right: 0 }),
 }));
 
-// If BuildingPopup uses Dimensions / useWindowDimensions, this helps stability
-jest.mock("react-native/Libraries/Utilities/useWindowDimensions", () => ({
-  __esModule: true,
-  default: () => ({ width: 390, height: 844, scale: 3, fontScale: 1 }),
+// Avoid requiring real asset files
+jest.mock("@/components/Buildings/details/buildingImages", () => ({
+  BUILDING_IMAGES: {
+    H: 123, // truthy -> triggers thumbSource branch
+  },
 }));
 
-import BuildingPopup from "../BuildingPopup";
+jest.mock("@/components/Buildings/details/buildingIcons", () => ({
+  BUILDING_ICONS: {
+    metro: 1,
+    connectedBuildings: 2,
+    entry: 3,
+    wifi: 4,
+    elevator: 5,
+  },
+}));
 
 describe("BuildingPopup", () => {
-  beforeEach(() => {
-    mockSnapToIndex.mockClear();
-    mockClose.mockClear();
-  });
+  const baseBuilding = {
+    id: "sgw-h",
+    campus: "SGW",
+    code: "H",
+    name: "Henry F. Hall",
+    address: "1455 De Maisonneuve",
+    latitude: 45.1,
+    longitude: -73.1,
+  };
 
-  it("renders without crashing", () => {
-    const building: any = {
-      id: "sgw-h",
-      code: "H",
-      name: "Henry F. Hall Building",
-      address: "1455 De Maisonneuve Blvd W",
-      campus: "SGW",
-      latitude: 45.49729,
-      longitude: -73.57898,
-    };
+  it("renders the fallback UI when details are missing", () => {
+    const onClose = jest.fn();
 
-    const { getByTestId } = render(
+    const { getByText, getByTestId } = render(
       <BuildingPopup
-        building={building}
+        building={{ ...baseBuilding, details: undefined } as any}
         campusTheme="SGW"
-        onClose={jest.fn()}
+        onClose={onClose}
       />,
     );
 
-    expect(getByTestId("bottomSheet")).toBeTruthy();
+    // Fallback branch
+    getByText("Details coming soon");
+    getByText("We’ll add the expanded info for this building next.");
+  });
+
+  it("renders detailed sections when details exist (covers maps + conditional description)", () => {
+    const onClose = jest.fn();
+
+    const buildingWithDetails = {
+      ...baseBuilding,
+      details: {
+        accessibility: [
+          { icon: "elevator", title: "Elevator", description: "" }, // covers !!description false
+          { icon: "wifi", title: "Wi-Fi", description: "Available" }, // covers !!description true
+        ],
+        metro: { title: "Metro nearby", description: "Guy-Concordia" },
+        connectivity: { title: "Connected", description: "Underground links" },
+        entries: [
+          { title: "Main entrance", description: "Front door" },
+          { title: "Side entrance", description: "Accessible ramp" },
+        ],
+        otherServices: [
+          { icon: "wifi", title: "Printing", description: "2nd floor" },
+        ],
+        overview: ["Paragraph 1", "Paragraph 2"],
+        venues: ["Cafeteria", "Study rooms"],
+        departments: ["Computer Science", "Engineering"],
+        services: ["Security", "Information desk"],
+      },
+    };
+
+    const { getByText } = render(
+      <BuildingPopup
+        building={buildingWithDetails as any}
+        campusTheme="LOY"
+        onClose={onClose}
+      />,
+    );
+
+    // Section headers + mapped items
+    getByText("Building Accessibility");
+    getByText("Elevator");
+    getByText("Wi-Fi");
+    getByText("Available");
+
+    getByText("Venues");
+    getByText("Cafeteria");
+
+    getByText("Departments");
+    getByText("Engineering");
+
+    getByText("Services");
+    getByText("Information desk");
   });
 });

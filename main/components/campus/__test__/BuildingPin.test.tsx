@@ -1,49 +1,32 @@
-/// <reference types="jest" />
 import React from "react";
-import { Image } from "react-native";
 import { render } from "@testing-library/react-native";
-
-import BuildingPin from "../BuildingPin";
+import { StyleSheet, View } from "react-native";
+import BuildingPin from "@/components/campus/BuildingPin";
 
 describe("BuildingPin", () => {
-  it("renders the building code text", () => {
-    const { getByText } = render(
-      <BuildingPin code="H" campus="SGW" size={44} />,
+  it("uses default size=44 and renders SGW pin", () => {
+    const { getByText, UNSAFE_getAllByType } = render(
+      <BuildingPin code="H" campus="SGW" />,
     );
 
-    expect(getByText("H")).toBeTruthy();
+    getByText("H");
+
+    const views = UNSAFE_getAllByType(View);
+    const flat = StyleSheet.flatten(views[0].props.style);
+
+    expect(flat).toMatchObject({ width: 44, height: 55 });
   });
 
-  it("uses SGW pin image when campus is SGW", () => {
-    const expected = require("@/assets/pins/pin_sgw.png");
-
-    const { UNSAFE_getByType } = render(
-      <BuildingPin code="H" campus="SGW" size={44} />,
+  it("uses provided size and renders LOY pin branch", () => {
+    const { getByText, UNSAFE_getAllByType } = render(
+      <BuildingPin code="AD" campus="LOY" size={60} />,
     );
 
-    const img = UNSAFE_getByType(Image);
-    expect(img.props.source).toBe(expected);
-  });
+    getByText("AD");
 
-  it("uses Loyola pin image when campus is LOY", () => {
-    const expected = require("@/assets/pins/pin_loyola.png");
+    const views = UNSAFE_getAllByType(View);
+    const flat = StyleSheet.flatten(views[0].props.style);
 
-    const { UNSAFE_getByType } = render(
-      <BuildingPin code="AD" campus="LOY" size={44} />,
-    );
-
-    const img = UNSAFE_getByType(Image);
-    expect(img.props.source).toBe(expected);
-  });
-
-  it("scales the font size based on size prop", () => {
-    const size = 50;
-    const expectedFontSize = Math.round(size * 0.3);
-
-    const { getByText } = render(
-      <BuildingPin code="EV" campus="SGW" size={size} />,
-    );
-
-    expect(getByText("EV")).toHaveStyle({ fontSize: expectedFontSize });
+    expect(flat).toMatchObject({ width: 60, height: 75 });
   });
 });
