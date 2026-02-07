@@ -10,18 +10,20 @@ jest.mock("@gorhom/bottom-sheet", () => {
   const React = require("react");
   const { View, ScrollView } = require("react-native");
 
-  const BottomSheet = React.forwardRef(({ children, ...props }: any, ref: any) => {
-    React.useImperativeHandle(ref, () => ({
-      snapToIndex: mockSnapToIndex,
-      close: mockClose,
-    }));
+  const BottomSheet = React.forwardRef(
+    ({ children, ...props }: any, ref: any) => {
+      React.useImperativeHandle(ref, () => ({
+        snapToIndex: mockSnapToIndex,
+        close: mockClose,
+      }));
 
-    return (
-      <View testID="bottomSheet" {...props}>
-        {children}
-      </View>
-    );
-  });
+      return (
+        <View testID="bottomSheet" {...props}>
+          {children}
+        </View>
+      );
+    },
+  );
 
   const BottomSheetScrollView = React.forwardRef((props: any, ref: any) => (
     <ScrollView ref={ref} {...props} />
@@ -65,7 +67,11 @@ describe("BuildingPopup", () => {
     };
 
     const { getByTestId } = render(
-      <BuildingPopup building={building} campusTheme="SGW" onClose={jest.fn()} />
+      <BuildingPopup
+        building={building}
+        campusTheme="SGW"
+        onClose={jest.fn()}
+      />,
     );
 
     expect(getByTestId("bottomSheet")).toBeTruthy();

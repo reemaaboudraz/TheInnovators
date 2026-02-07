@@ -9,7 +9,6 @@ jest.mock("react-native-safe-area-context", () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 
-
 jest.mock("@/components/Buildings/SGW/SGWBuildings", () => ({
   SGW_BUILDINGS: [
     {
@@ -67,7 +66,9 @@ jest.mock("expo-status-bar", () => ({
 
 jest.mock("@/components/layout/BrandBar", () => {
   const ReactActual = jest.requireActual("react") as typeof React;
-  const RN = jest.requireActual("react-native") as typeof import("react-native");
+  const RN = jest.requireActual(
+    "react-native",
+  ) as typeof import("react-native");
   const { View } = RN;
 
   return function BrandBarMock(props: any) {
@@ -79,7 +80,9 @@ jest.mock("@/components/layout/BrandBar", () => {
 });
 
 jest.mock("@/components/Styles/mapStyle", () => {
-  const RN = jest.requireActual("react-native") as typeof import("react-native");
+  const RN = jest.requireActual(
+    "react-native",
+  ) as typeof import("react-native");
   return {
     styles: RN.StyleSheet.create({
       container: { flex: 1 },
@@ -106,7 +109,9 @@ jest.mock("@/components/Styles/mapStyle", () => {
 
 jest.mock("react-native-maps", () => {
   const ReactActual = jest.requireActual("react") as typeof React;
-  const RN = jest.requireActual("react-native") as typeof import("react-native");
+  const RN = jest.requireActual(
+    "react-native",
+  ) as typeof import("react-native");
   const { View } = RN;
 
   const MockMapView = ReactActual.forwardRef((props: any, ref: any) => {
@@ -123,14 +128,24 @@ jest.mock("react-native-maps", () => {
 
   const MockPolygon = (props: any) => {
     const first = props.coordinates?.[0];
-    const tid = first ? `polygon-${first.latitude}-${first.longitude}` : "polygon";
-    return ReactActual.createElement(View, { ...props, testID: tid }, props.children);
+    const tid = first
+      ? `polygon-${first.latitude}-${first.longitude}`
+      : "polygon";
+    return ReactActual.createElement(
+      View,
+      { ...props, testID: tid },
+      props.children,
+    );
   };
 
   const MockMarker = (props: any) => {
     const c = props.coordinate;
     const tid = c ? `marker-${c.latitude}-${c.longitude}` : "marker";
-    return ReactActual.createElement(View, { ...props, testID: tid }, props.children);
+    return ReactActual.createElement(
+      View,
+      { ...props, testID: tid },
+      props.children,
+    );
   };
 
   (MockMapView as any).displayName = "MockMapView";
@@ -182,7 +197,9 @@ describe("CampusMap - search bar", () => {
   });
 
   it("clears selected building when typing in search bar", async () => {
-    const { getByPlaceholderText, getByTestId, findByText } = render(<CampusMap />);
+    const { getByPlaceholderText, getByTestId, findByText } = render(
+      <CampusMap />,
+    );
 
     fireEvent.changeText(getByPlaceholderText("Where to next?"), "hall");
     await findByText(/H — Henry F\. Hall Building/i);
@@ -205,7 +222,9 @@ describe("CampusMap - suggestions", () => {
   });
 
   it("selecting a suggestion animates map and updates the input", async () => {
-    const { getByPlaceholderText, getByTestId, findByText } = render(<CampusMap />);
+    const { getByPlaceholderText, getByTestId, findByText } = render(
+      <CampusMap />,
+    );
 
     fireEvent.changeText(getByPlaceholderText("Where to next?"), "admin");
     await findByText(/AD — Administration Building/i);
@@ -348,7 +367,9 @@ describe("CampusMap - campus toggle", () => {
   });
 
   it("selecting building via suggestion updates focused campus to Loyola", async () => {
-    const { getByPlaceholderText, getByTestId, findByText } = render(<CampusMap />);
+    const { getByPlaceholderText, getByTestId, findByText } = render(
+      <CampusMap />,
+    );
 
     fireEvent.changeText(getByPlaceholderText("Where to next?"), "admin");
     await findByText(/AD — Administration Building/i);
