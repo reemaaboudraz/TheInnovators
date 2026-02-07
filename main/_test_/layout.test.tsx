@@ -62,7 +62,7 @@ jest.mock("react-native-gesture-handler", () => {
   };
 });
 
-import Layout from "../_layout";
+import Layout from "../app/_layout";
 
 describe("Root layout", () => {
   it("renders", () => {
