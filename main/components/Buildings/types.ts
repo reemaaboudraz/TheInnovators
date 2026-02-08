@@ -22,27 +22,27 @@ export type BuildingDetailIconItem = {
 };
 
 export type BuildingDetails = {
-  accessibility: BuildingDetailIconItem[];
-  metro: { title: string; description: string };
-  connectivity: { title: string; description: string };
+  accessibility?: BuildingDetailIconItem[];
+  metro?: { title: string; description: string };
+  connectivity?: { title: string; description: string };
   entries: { title: string; description: string }[];
-  otherServices: BuildingDetailIconItem[];
+  otherServices?: BuildingDetailIconItem[];
   overview: string[];
-  venues: string[];
-  departments: string[];
-  services: string[];
+  venues?: string[];
+  departments?: string[];
+  services?: string[];
 };
 
 export type Building = {
-  id?: string;
-  campus?: Campus;
-  code?: string;
-  name?: string;
-  address?: string;
-  latitude?: number;
-  longitude?: number;
-  aliases?: string[];
-  polygon?: LatLng[];
+  id: string;
+  campus: Campus;
+  code: string;
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  aliases: string[];
+  polygon: LatLng[];
 
   // extended building info shown in the popup.
   details: BuildingDetails;
