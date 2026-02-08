@@ -44,6 +44,8 @@ app-example
 # generated native folders
 /ios
 /android
+# Android local config (machine-specific)
+android/local.properties
 
 # vscode editor-specific settings
 .vscode/
