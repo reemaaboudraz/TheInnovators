@@ -16,47 +16,52 @@ This repository will evolve as we rapidly iterate, ship new features, and contin
 
 ## Contributors
 
-| Name | Student ID |
-|------|-----------|
-| Reema Aboudraz| 40253549 |
-| Rania Maoukout | 40249281 |
-| Lyne Seddaoui | 40252125 |
-| Samaya Anwar | 40248167 |
-| Rami Al Najem | 40242034 |
-| Fouad Meida | 40249310 |
-| Akshey Visuvalingam | 40270505 |
-| Malak Sefrioui| 40252907 |
-| Uroosa Lakhani| 40227274 |
-| Vinuya Sivakolunthu| 40278252 |
-| Yash Nathani | 4024853 |
+| Name                | Student ID |
+| ------------------- | ---------- |
+| Reema Aboudraz      | 40253549   |
+| Rania Maoukout      | 40249281   |
+| Lyne Seddaoui       | 40252125   |
+| Samaya Anwar        | 40248167   |
+| Rami Al Najem       | 40242034   |
+| Fouad Meida         | 40249310   |
+| Akshey Visuvalingam | 40270505   |
+| Malak Sefrioui      | 40252907   |
+| Uroosa Lakhani      | 40227274   |
+| Vinuya Sivakolunthu | 40278252   |
+| Yash Nathani        | 4024853    |
 
 ---
 
 ## Tech Stack
 
 ### Frontend / Mobile
+
 - **React Native** — Cross-platform mobile development (iOS & Android)
 
 ### Backend
+
 - **Firebase** — Authentication, Firestore database, real-time sync, offline persistence
 
 ### Services & APIs
-- **Google Maps API** — Interactive campus maps  
-- **Google Directions API** — Indoor & outdoor routing  
-- **Google Places API** — Location search and points of interest  
-- **Google Geocoding API** — Address and coordinate resolution  
+
+- **Google Maps API** — Interactive campus maps
+- **Google Directions API** — Indoor & outdoor routing
+- **Google Places API** — Location search and points of interest
+- **Google Geocoding API** — Address and coordinate resolution
 
 ### Testing
-- **Jest** — Unit and API testing  
-- **React Native Testing Library** — Component testing  
-- **Detox** — End-to-end (E2E) testing for iOS & Android  
-- Automated test execution in CI/CD pipelines  
+
+- **Jest** — Unit and API testing
+- **React Native Testing Library** — Component testing
+- **Detox** — End-to-end (E2E) testing for iOS & Android
+- Automated test execution in CI/CD pipelines
 
 ### CI/CD
-- **GitHub Actions**  
-  - Automated builds  
-  - Continuous integration testing  
-  - Frontend & backend deployment pipelines  
+
+- **GitHub Actions**
+  - Automated builds
+  - Continuous integration testing
+  - Frontend & backend deployment pipelines
 
 ---
 
@@ -88,13 +93,14 @@ EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
 EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
 EXPO_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 ```
+
 #### Notes
 
-- Do not commit `.env` files to GitHub  
-- Add `.env` to `.gitignore`  
-- Share keys securely within the team  
----
+- Do not commit `.env` files to GitHub
+- Add `.env` to `.gitignore`
+- Share keys securely within the team
 
+---
 
 ### Clone the Repository
 
@@ -102,7 +108,9 @@ EXPO_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 git clone https://github.com/The-Innovators-390/TheInnovators.git
 cd TheInnovators
 ```
+
 ### Run the Project
+
 Install dependencies and start the development server:
 
 ```bash

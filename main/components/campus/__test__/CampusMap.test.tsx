@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent } from "@testing-library/react-native";
+import { render, fireEvent, act } from "@testing-library/react-native";
 import {
   describe,
   it,
@@ -23,10 +23,12 @@ jest.mock("@/components/Buildings/SGW/SGWBuildings", () => ({
       longitude: -73.57898,
       campus: "SGW",
       aliases: ["hall", "henry hall"],
+      // Square polygon that properly contains the center point
       polygon: [
-        { latitude: 45.4973, longitude: -73.579 },
-        { latitude: 45.4974, longitude: -73.5791 },
-        { latitude: 45.4975, longitude: -73.5792 },
+        { latitude: 45.497, longitude: -73.58 },
+        { latitude: 45.497, longitude: -73.578 },
+        { latitude: 45.498, longitude: -73.578 },
+        { latitude: 45.498, longitude: -73.58 },
       ],
     },
     {
@@ -66,6 +68,46 @@ jest.mock("@/components/Buildings/Loyola/LoyolaBuildings", () => ({
 jest.mock("expo-status-bar", () => ({
   StatusBar: () => null,
 }));
+
+jest.mock("expo-location", () => ({
+  requestForegroundPermissionsAsync: jest.fn(() =>
+    Promise.resolve({ status: "granted" }),
+  ),
+  getCurrentPositionAsync: jest.fn(() =>
+    Promise.resolve({ coords: { latitude: 45.5, longitude: -73.6 } }),
+  ),
+  Accuracy: { Balanced: 3 },
+}));
+
+// Store the onLocationFound callback for testing
+let mockOnLocationFound:
+  | ((location: { latitude: number; longitude: number }) => void)
+  | null = null;
+
+jest.mock("@/components/campus/CurrentLocationButton", () => {
+  const ReactActual = jest.requireActual("react") as typeof React;
+  const RN = jest.requireActual(
+    "react-native",
+  ) as typeof import("react-native");
+  const { Pressable, Text } = RN;
+
+  return {
+    __esModule: true,
+    default: function MockCurrentLocationButton(props: {
+      onLocationFound: (location: {
+        latitude: number;
+        longitude: number;
+      }) => void;
+    }) {
+      mockOnLocationFound = props.onLocationFound;
+      return ReactActual.createElement(
+        Pressable,
+        { testID: "currentLocationButton" },
+        ReactActual.createElement(Text, null, "◎"),
+      );
+    },
+  };
+});
 
 jest.mock("@/components/layout/BrandBar", () => {
   const ReactActual = jest.requireActual("react") as typeof React;
@@ -643,5 +685,83 @@ describe("CampusMap - PanResponder handlers via mock", () => {
 
     // Should not have triggered campus switch (already on SGW)
     expect(mockAnimateToRegion).not.toHaveBeenCalled();
+  });
+});
+
+describe("CampusMap - Current Location Button", () => {
+  it("renders the current location button", () => {
+    const { getByTestId } = render(<CampusMap />);
+
+    expect(getByTestId("currentLocationButton")).toBeTruthy();
+  });
+
+  it("initially has showsUserLocation disabled", () => {
+    const { getByTestId } = render(<CampusMap />);
+
+    const map = getByTestId("mapView");
+    expect(map.props.showsUserLocation).toBe(false);
+  });
+});
+
+describe("CampusMap - User Location Features", () => {
+  beforeEach(() => {
+    mockOnLocationFound = null;
+    mockAnimateToRegion.mockClear();
+  });
+
+  it("handleLocationFound animates map to user location", () => {
+    render(<CampusMap />);
+
+    expect(mockOnLocationFound).not.toBeNull();
+
+    // Call with location outside any building, wrapped in act
+    act(() => {
+      mockOnLocationFound!({ latitude: 45.5, longitude: -73.6 });
+    });
+
+    expect(mockAnimateToRegion).toHaveBeenCalledWith(
+      expect.objectContaining({
+        latitude: 45.5,
+        longitude: -73.6,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      }),
+      500,
+    );
+  });
+
+  it("shows user location marker when user is outside buildings", () => {
+    const { queryByTestId } = render(<CampusMap />);
+
+    expect(mockOnLocationFound).not.toBeNull();
+
+    // Call with location far from any building polygon, wrapped in act
+    act(() => {
+      mockOnLocationFound!({ latitude: 45.5, longitude: -73.6 });
+    });
+
+    // The userLocationMarker should appear (the mock creates testID from coordinates)
+    expect(queryByTestId("marker-45.5--73.6")).toBeTruthy();
+  });
+
+  it("highlights building in blue when user is inside a building polygon", () => {
+    const { getByTestId, queryByTestId } = render(<CampusMap />);
+
+    expect(mockOnLocationFound).not.toBeNull();
+
+    // Call with location inside the H building polygon, wrapped in act
+    // The H building polygon is: lat 45.497-45.498, lng -73.58 to -73.578
+    act(() => {
+      mockOnLocationFound!({ latitude: 45.4975, longitude: -73.579 });
+    });
+
+    // The userLocationMarker should NOT appear since user is inside a building
+    expect(queryByTestId("userLocationMarker")).toBeNull();
+
+    // The H building polygon should have the user location styling
+    const hPolygon = getByTestId("polygon-45.497--73.58");
+    expect(hPolygon.props.fillColor).toBe("rgba(97, 151, 251, 0.35)");
+    expect(hPolygon.props.strokeColor).toBe("#4A90D9");
+    expect(hPolygon.props.strokeWidth).toBe(3);
   });
 });

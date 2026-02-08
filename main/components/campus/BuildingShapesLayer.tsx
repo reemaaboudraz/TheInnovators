@@ -33,7 +33,13 @@ const CAMPUS_COLORS: Record<
 type Props = {
   buildings: Building[];
   selectedBuildingId: string | null;
+  userLocationBuildingId: string | null;
   onPickBuilding: (b: Building) => void;
+};
+
+const USER_LOCATION_COLOR = {
+  stroke: "#4A90D9",
+  fill: "rgba(97, 151, 251, 0.35)",
 };
 
 /**
@@ -44,13 +50,29 @@ type Props = {
 export default function BuildingShapesLayer({
   buildings,
   selectedBuildingId,
+  userLocationBuildingId,
   onPickBuilding,
 }: Readonly<Props>) {
   return (
     <>
       {buildings.map((b) => {
         const isSelected = selectedBuildingId === b.id;
+        const isUserLocation = userLocationBuildingId === b.id;
         const colors = CAMPUS_COLORS[b.campus];
+
+        // Determine fill and stroke colors based on state
+        let fillColor = colors.fill;
+        let strokeColor = colors.stroke;
+        let strokeWidth = 2;
+
+        if (isUserLocation) {
+          fillColor = USER_LOCATION_COLOR.fill;
+          strokeColor = USER_LOCATION_COLOR.stroke;
+          strokeWidth = 3;
+        } else if (isSelected) {
+          fillColor = colors.fillSelected;
+          strokeWidth = 3;
+        }
 
         return (
           <React.Fragment key={`${b.campus}-${b.id}`}>
@@ -59,9 +81,9 @@ export default function BuildingShapesLayer({
                 coordinates={b.polygon}
                 tappable
                 onPress={() => onPickBuilding(b)}
-                strokeColor={colors.stroke}
-                strokeWidth={isSelected ? 3 : 2}
-                fillColor={isSelected ? colors.fillSelected : colors.fill}
+                strokeColor={strokeColor}
+                strokeWidth={strokeWidth}
+                fillColor={fillColor}
               />
             ) : null}
 

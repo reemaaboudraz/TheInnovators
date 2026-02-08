@@ -7,7 +7,7 @@ import {
   Platform,
   StyleSheet,
 } from "react-native";
-import MapView, { PROVIDER_GOOGLE, Region } from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE, Region, Marker } from "react-native-maps";
 import { StatusBar } from "expo-status-bar";
 
 import { SGW_BUILDINGS } from "@/components/Buildings/SGW/SGWBuildings";
@@ -16,6 +16,10 @@ import type { Building, Campus } from "@/components/Buildings/types";
 
 import BuildingShapesLayer from "@/components/campus/BuildingShapesLayer";
 import ToggleButton from "@/components/campus/ToggleButton";
+import CurrentLocationButton, {
+  UserLocation,
+} from "@/components/campus/CurrentLocationButton";
+import { isPointInPolygon } from "@/components/campus/pointInPolygon";
 import BrandBar from "@/components/layout/BrandBar";
 import { styles } from "@/components/Styles/mapStyle";
 
@@ -46,8 +50,22 @@ export default function CampusMap() {
   const [focusedCampus, setFocusedCampus] = useState<Campus>("SGW");
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Building | null>(null);
+  const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
 
   const mapRef = useRef<MapView>(null);
+
+  const handleLocationFound = (location: UserLocation) => {
+    setUserLocation(location);
+    mapRef.current?.animateToRegion(
+      {
+        latitude: location.latitude,
+        longitude: location.longitude,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      },
+      500,
+    );
+  };
 
   const handleCampusChange = (campus: Campus) => {
     setFocusedCampus(campus);
@@ -60,6 +78,25 @@ export default function CampusMap() {
     () => [...SGW_BUILDINGS, ...LOYOLA_BUILDINGS],
     [],
   );
+
+  // Find which building the user is currently inside
+  const userLocationBuildingId = useMemo(() => {
+    if (!userLocation) return null;
+
+    const building = ALL_BUILDINGS.find(
+      (b) =>
+        b.polygon?.length &&
+        isPointInPolygon(
+          {
+            latitude: userLocation.latitude,
+            longitude: userLocation.longitude,
+          },
+          b.polygon,
+        ),
+    );
+
+    return building?.id ?? null;
+  }, [userLocation, ALL_BUILDINGS]);
 
   const suggestions = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -116,8 +153,23 @@ export default function CampusMap() {
         <BuildingShapesLayer
           buildings={ALL_BUILDINGS}
           selectedBuildingId={selected?.id ?? null}
+          userLocationBuildingId={userLocationBuildingId}
           onPickBuilding={onPickBuilding}
         />
+        {userLocation && !userLocationBuildingId && (
+          <Marker
+            testID="userLocationMarker"
+            coordinate={{
+              latitude: userLocation.latitude,
+              longitude: userLocation.longitude,
+            }}
+            anchor={{ x: 0.5, y: 0.5 }}
+          >
+            <View style={locationMarkerStyles.container}>
+              <View style={locationMarkerStyles.marker} />
+            </View>
+          </Marker>
+        )}
       </MapView>
 
       <View style={styles.topOverlay} testID="topOverlay">
@@ -177,6 +229,8 @@ export default function CampusMap() {
         )}
       </View>
 
+      <CurrentLocationButton onLocationFound={handleLocationFound} />
+
       <BrandBar
         testID="brandbar"
         backgroundColor={focusedCampus === "SGW" ? "#912338" : "#e3ac20"}
@@ -184,3 +238,23 @@ export default function CampusMap() {
     </View>
   );
 }
+
+const locationMarkerStyles = StyleSheet.create({
+  container: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  marker: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    backgroundColor: "#6197FB",
+    borderWidth: 3,
+    borderColor: "#FFFFFF",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+});
