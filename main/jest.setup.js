@@ -75,3 +75,39 @@ jest.mock("react-native-maps", () => {
     Marker: MockMarker,
   };
 });
+// ---- Test mocks for Reanimated + Bottom Sheet ----
+jest.mock("react-native-reanimated", () => {
+  const Reanimated = require("react-native-reanimated/mock");
+
+  // Workaround for: "Cannot read properties of undefined (reading 'call')"
+  Reanimated.default.call = () => {};
+
+  return Reanimated;
+});
+
+jest.mock("@gorhom/bottom-sheet", () => {
+  const React = require("react");
+  const { View, ScrollView } = require("react-native");
+
+  const BottomSheet = React.forwardRef((props, ref) => {
+    React.useImperativeHandle(ref, () => ({
+      snapToIndex: jest.fn(),
+      expand: jest.fn(),
+      close: jest.fn(),
+      collapse: jest.fn(),
+      forceClose: jest.fn(),
+    }));
+
+    return <View {...props} />;
+  });
+
+  const BottomSheetScrollView = React.forwardRef((props, ref) => {
+    return <ScrollView ref={ref} {...props} />;
+  });
+
+  return {
+    __esModule: true,
+    default: BottomSheet,
+    BottomSheetScrollView,
+  };
+});
