@@ -813,14 +813,38 @@ describe("BuildingPopup", () => {
  * So we only assert the CURRENT real behavior here (to keep tests green).
  * CurrentLocationButton is already tested in its own test file.
  */
-describe("CampusMap - Current Location integration (should not render here)", () => {
-  it("does not render currentLocationButton inside CampusMap", () => {
-    const { queryByTestId } = render(<CampusMap />);
-    expect(queryByTestId("currentLocationButton")).toBeNull();
+/**
+ * CampusMap now renders CurrentLocationButton and wires onLocationFound.
+ * So we assert the real behavior.
+ */
+describe("CampusMap - Current Location integration", () => {
+  it("renders currentLocationButton inside CampusMap", () => {
+    const { getByTestId } = render(<CampusMap />);
+    expect(getByTestId("currentLocationButton")).toBeTruthy();
   });
 
-  it("does not wire onLocationFound callback from CampusMap", () => {
+  it("wires onLocationFound callback from CampusMap", () => {
     render(<CampusMap />);
-    expect(mockOnLocationFound).toBeNull();
+    expect(typeof mockOnLocationFound).toBe("function");
+  });
+
+  it("calling onLocationFound animates to user location region", () => {
+    render(<CampusMap />);
+
+    expect(typeof mockOnLocationFound).toBe("function");
+
+    act(() => {
+      mockOnLocationFound!({ latitude: 45.5, longitude: -73.6 });
+    });
+
+    expect(mockAnimateToRegion).toHaveBeenCalledWith(
+      {
+        latitude: 45.5,
+        longitude: -73.6,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      },
+      500,
+    );
   });
 });

@@ -244,6 +244,8 @@ export default function CampusMap() {
         )}
       </View>
 
+      <CurrentLocationButton onLocationFound={handleLocationFound} />
+
       {/* Show details popup for selected building */}
       {selected && (
         <BuildingPopup
