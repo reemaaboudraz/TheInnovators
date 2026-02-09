@@ -15,6 +15,5 @@ export type Building = {
   longitude: number;
   aliases: string[];
   polygon: LatLng[];
-
-  // use it later for coloring
+  zoomCategory: 1 | 2 | 3; // 1=big, 2=medium, 3=small
 };

@@ -13,7 +13,10 @@ import { StatusBar } from "expo-status-bar";
 import { SGW_BUILDINGS } from "@/components/Buildings/SGW/SGWBuildings";
 import { LOYOLA_BUILDINGS } from "@/components/Buildings/Loyola/LoyolaBuildings";
 import type { Building, Campus } from "@/components/Buildings/types";
-
+import {
+  regionFromPolygon,
+  paddingForZoomCategory,
+} from "@/components/Buildings/mapZoom";
 import BuildingShapesLayer from "@/components/campus/BuildingShapesLayer";
 import ToggleButton from "@/components/campus/ToggleButton";
 import CurrentLocationButton, {
@@ -121,6 +124,14 @@ export default function CampusMap() {
     setSelected(b);
     setQuery(`${b.code} - ${b.name}`);
     setFocusedCampus(b.campus);
+
+    const padding = paddingForZoomCategory(b.zoomCategory);
+
+    if (b.polygon?.length) {
+      const region = regionFromPolygon(b.polygon, padding);
+      mapRef.current?.animateToRegion(region, 600);
+      return;
+    }
 
     mapRef.current?.animateToRegion(
       {
