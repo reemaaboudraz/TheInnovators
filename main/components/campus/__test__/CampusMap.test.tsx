@@ -431,377 +431,378 @@ describe("CampusMap - building shapes (Polygon/Marker)", () => {
   it("renders a building even when polygon is empty (no Polygon)", () => {
     const { getByTestId } = render(<CampusMap />);
     expect(getByTestId("marker-45.4978--73.5795")).toBeTruthy();
-  describe("CampusMap - polygon optional branch coverage", () => {
-    it("renders a building even when polygon is empty (no Polygon)", () => {
-      const { getByTestId } = render(<CampusMap />);
-      expect(getByTestId("marker-45.4978--73.5795")).toBeTruthy();
-    });
-
-    it("selecting a building with empty polygon falls back to fixed deltas (no regionFromPolygon)", () => {
-      const { getByTestId } = render(<CampusMap />);
-
-      const npMarker = getByTestId("marker-45.4978--73.5795");
-      act(() => {
-        fireEvent.press(npMarker);
+    describe("CampusMap - polygon optional branch coverage", () => {
+      it("renders a building even when polygon is empty (no Polygon)", () => {
+        const { getByTestId } = render(<CampusMap />);
+        expect(getByTestId("marker-45.4978--73.5795")).toBeTruthy();
       });
 
-      expect(mockPaddingForZoomCategory).toHaveBeenCalledWith(3);
-      expect(mockRegionFromPolygon).not.toHaveBeenCalled();
+      it("selecting a building with empty polygon falls back to fixed deltas (no regionFromPolygon)", () => {
+        const { getByTestId } = render(<CampusMap />);
+
+        const npMarker = getByTestId("marker-45.4978--73.5795");
+        act(() => {
+          fireEvent.press(npMarker);
+        });
+
+        expect(mockPaddingForZoomCategory).toHaveBeenCalledWith(3);
+        expect(mockRegionFromPolygon).not.toHaveBeenCalled();
+
+        expect(mockAnimateToRegion).toHaveBeenCalledWith(
+          {
+            latitude: 45.4978,
+            longitude: -73.5795,
+            latitudeDelta: 0.0025,
+            longitudeDelta: 0.0025,
+          },
+          600,
+        );
+      });
+    });
+  });
+
+  describe("CampusMap - campus toggle", () => {
+    it("renders the campus toggle with SGW and Loyola buttons", () => {
+      const { getByTestId } = render(<CampusMap />);
+
+      expect(getByTestId("campusToggle")).toBeTruthy();
+      expect(getByTestId("campusToggle-SGW")).toBeTruthy();
+      expect(getByTestId("campusToggle-Loyola")).toBeTruthy();
+    });
+
+    it("pressing Loyola button switches campus and animates to Loyola region", () => {
+      const { getByTestId } = render(<CampusMap />);
+
+      fireEvent.press(getByTestId("campusToggle-Loyola"));
 
       expect(mockAnimateToRegion).toHaveBeenCalledWith(
         {
-          latitude: 45.4978,
-          longitude: -73.5795,
-          latitudeDelta: 0.0025,
-          longitudeDelta: 0.0025,
+          latitude: 45.457984,
+          longitude: -73.639834,
+          latitudeDelta: 0.006,
+          longitudeDelta: 0.006,
         },
-        600,
+        500,
       );
     });
-  });
-});
 
-describe("CampusMap - campus toggle", () => {
-  it("renders the campus toggle with SGW and Loyola buttons", () => {
-    const { getByTestId } = render(<CampusMap />);
+    it("pressing SGW button after Loyola switches back to SGW region", () => {
+      const { getByTestId } = render(<CampusMap />);
 
-    expect(getByTestId("campusToggle")).toBeTruthy();
-    expect(getByTestId("campusToggle-SGW")).toBeTruthy();
-    expect(getByTestId("campusToggle-Loyola")).toBeTruthy();
-  });
+      fireEvent.press(getByTestId("campusToggle-Loyola"));
+      mockAnimateToRegion.mockClear();
 
-  it("pressing Loyola button switches campus and animates to Loyola region", () => {
-    const { getByTestId } = render(<CampusMap />);
+      fireEvent.press(getByTestId("campusToggle-SGW"));
 
-    fireEvent.press(getByTestId("campusToggle-Loyola"));
-
-    expect(mockAnimateToRegion).toHaveBeenCalledWith(
-      {
-        latitude: 45.457984,
-        longitude: -73.639834,
-        latitudeDelta: 0.006,
-        longitudeDelta: 0.006,
-      },
-      500,
-    );
-  });
-
-  it("pressing SGW button after Loyola switches back to SGW region", () => {
-    const { getByTestId } = render(<CampusMap />);
-
-    fireEvent.press(getByTestId("campusToggle-Loyola"));
-    mockAnimateToRegion.mockClear();
-
-    fireEvent.press(getByTestId("campusToggle-SGW"));
-
-    expect(mockAnimateToRegion).toHaveBeenCalledWith(
-      {
-        latitude: 45.4973,
-        longitude: -73.5794,
-        latitudeDelta: 0.006,
-        longitudeDelta: 0.006,
-      },
-      500,
-    );
-  });
-
-  // ✅ FIX: ToggleButton likely blocks redundant calls when already focused.
-  it("pressing same campus button does NOT trigger animation", () => {
-    const { getByTestId } = render(<CampusMap />);
-
-    fireEvent.press(getByTestId("campusToggle-SGW"));
-
-    expect(mockAnimateToRegion).not.toHaveBeenCalled();
-  });
-
-  it("BrandBar backgroundColor updates based on focused campus", () => {
-    const { getByTestId } = render(<CampusMap />);
-
-    expect(getByTestId("brandbar").props.backgroundColor).toBe("#912338");
-
-    fireEvent.press(getByTestId("campusToggle-Loyola"));
-    expect(getByTestId("brandbar").props.backgroundColor).toBe("#e3ac20");
-
-    fireEvent.press(getByTestId("campusToggle-SGW"));
-    expect(getByTestId("brandbar").props.backgroundColor).toBe("#912338");
-  });
-
-  it("selecting building via suggestion updates focused campus to Loyola", async () => {
-    const { getByPlaceholderText, getByTestId, findByText } = render(
-      <CampusMap />,
-    );
-
-    fireEvent.changeText(getByPlaceholderText("Where to next?"), "admin");
-    await findByText(/AD — Administration Building/i);
-
-    fireEvent.press(getByTestId("suggestion-LOY-loy-ad"));
-
-    expect(getByTestId("brandbar").props.backgroundColor).toBe("#e3ac20");
-  });
-});
-
-describe("CampusMap - PanResponder helper functions (re-exported)", () => {
-  describe("calculatePanValue", () => {
-    it("returns 0 when on SGW with no drag", () => {
-      const result = calculatePanValue("SGW", 0, 300);
-      expect(result).toBe(0);
+      expect(mockAnimateToRegion).toHaveBeenCalledWith(
+        {
+          latitude: 45.4973,
+          longitude: -73.5794,
+          latitudeDelta: 0.006,
+          longitudeDelta: 0.006,
+        },
+        500,
+      );
     });
 
-    it("returns clamped value when dragging right from SGW", () => {
-      const result = calculatePanValue("SGW", 75, 300);
-      expect(result).toBe(0.5);
+    // ✅ FIX: ToggleButton likely blocks redundant calls when already focused.
+    it("pressing same campus button does NOT trigger animation", () => {
+      const { getByTestId } = render(<CampusMap />);
+
+      fireEvent.press(getByTestId("campusToggle-SGW"));
+
+      expect(mockAnimateToRegion).not.toHaveBeenCalled();
     });
 
-    it("returns 1 when fully dragged right from SGW", () => {
-      const result = calculatePanValue("SGW", 150, 300);
-      expect(result).toBe(1);
+    it("BrandBar backgroundColor updates based on focused campus", () => {
+      const { getByTestId } = render(<CampusMap />);
+
+      expect(getByTestId("brandbar").props.backgroundColor).toBe("#912338");
+
+      fireEvent.press(getByTestId("campusToggle-Loyola"));
+      expect(getByTestId("brandbar").props.backgroundColor).toBe("#e3ac20");
+
+      fireEvent.press(getByTestId("campusToggle-SGW"));
+      expect(getByTestId("brandbar").props.backgroundColor).toBe("#912338");
     });
 
-    it("clamps to 1 when dragged beyond right edge", () => {
-      const result = calculatePanValue("SGW", 300, 300);
-      expect(result).toBe(1);
-    });
+    it("selecting building via suggestion updates focused campus to Loyola", async () => {
+      const { getByPlaceholderText, getByTestId, findByText } = render(
+        <CampusMap />,
+      );
 
-    it("clamps to 0 when dragged beyond left edge", () => {
-      const result = calculatePanValue("SGW", -100, 300);
-      expect(result).toBe(0);
-    });
+      fireEvent.changeText(getByPlaceholderText("Where to next?"), "admin");
+      await findByText(/AD — Administration Building/i);
 
-    it("returns value when dragging left from LOY", () => {
-      const result = calculatePanValue("LOY", -75, 300);
-      expect(result).toBe(0.5);
-    });
+      fireEvent.press(getByTestId("suggestion-LOY-loy-ad"));
 
-    it("uses default width when toggleWidth is 0", () => {
-      const result = calculatePanValue("SGW", 50, 0);
-      expect(typeof result).toBe("number");
-      expect(result).toBeGreaterThanOrEqual(0);
-      expect(result).toBeLessThanOrEqual(1);
+      expect(getByTestId("brandbar").props.backgroundColor).toBe("#e3ac20");
     });
   });
 
-  describe("determineCampusFromPan", () => {
-    it("returns SGW when finalValue <= 0.5 from SGW", () => {
-      const result = determineCampusFromPan("SGW", 50, 300);
-      expect(result).toBe("SGW");
-    });
+  describe("CampusMap - PanResponder helper functions (re-exported)", () => {
+    describe("calculatePanValue", () => {
+      it("returns 0 when on SGW with no drag", () => {
+        const result = calculatePanValue("SGW", 0, 300);
+        expect(result).toBe(0);
+      });
 
-    it("returns LOY when finalValue > 0.5 from SGW", () => {
-      const result = determineCampusFromPan("SGW", 100, 300);
-      expect(result).toBe("LOY");
-    });
+      it("returns clamped value when dragging right from SGW", () => {
+        const result = calculatePanValue("SGW", 75, 300);
+        expect(result).toBe(0.5);
+      });
 
-    it("returns LOY when finalValue > 0.5 from LOY (small left drag)", () => {
-      const result = determineCampusFromPan("LOY", -50, 300);
-      expect(result).toBe("LOY");
-    });
+      it("returns 1 when fully dragged right from SGW", () => {
+        const result = calculatePanValue("SGW", 150, 300);
+        expect(result).toBe(1);
+      });
 
-    it("returns SGW when finalValue <= 0.5 from LOY (large left drag)", () => {
-      const result = determineCampusFromPan("LOY", -100, 300);
-      expect(result).toBe("SGW");
-    });
+      it("clamps to 1 when dragged beyond right edge", () => {
+        const result = calculatePanValue("SGW", 300, 300);
+        expect(result).toBe(1);
+      });
 
-    it("uses default width when toggleWidth is 0", () => {
-      const result = determineCampusFromPan("SGW", 50, 0);
-      expect(result === "SGW" || result === "LOY").toBe(true);
-    });
-  });
+      it("clamps to 0 when dragged beyond left edge", () => {
+        const result = calculatePanValue("SGW", -100, 300);
+        expect(result).toBe(0);
+      });
 
-  describe("exported region constants", () => {
-    it("SGW_REGION has correct coordinates", () => {
-      expect(SGW_REGION).toEqual({
-        latitude: 45.4973,
-        longitude: -73.5794,
-        latitudeDelta: 0.006,
-        longitudeDelta: 0.006,
+      it("returns value when dragging left from LOY", () => {
+        const result = calculatePanValue("LOY", -75, 300);
+        expect(result).toBe(0.5);
+      });
+
+      it("uses default width when toggleWidth is 0", () => {
+        const result = calculatePanValue("SGW", 50, 0);
+        expect(typeof result).toBe("number");
+        expect(result).toBeGreaterThanOrEqual(0);
+        expect(result).toBeLessThanOrEqual(1);
       });
     });
 
-    it("LOY_REGION has correct coordinates", () => {
-      expect(LOY_REGION).toEqual({
-        latitude: 45.457984,
-        longitude: -73.639834,
-        latitudeDelta: 0.006,
-        longitudeDelta: 0.006,
+    describe("determineCampusFromPan", () => {
+      it("returns SGW when finalValue <= 0.5 from SGW", () => {
+        const result = determineCampusFromPan("SGW", 50, 300);
+        expect(result).toBe("SGW");
+      });
+
+      it("returns LOY when finalValue > 0.5 from SGW", () => {
+        const result = determineCampusFromPan("SGW", 100, 300);
+        expect(result).toBe("LOY");
+      });
+
+      it("returns LOY when finalValue > 0.5 from LOY (small left drag)", () => {
+        const result = determineCampusFromPan("LOY", -50, 300);
+        expect(result).toBe("LOY");
+      });
+
+      it("returns SGW when finalValue <= 0.5 from LOY (large left drag)", () => {
+        const result = determineCampusFromPan("LOY", -100, 300);
+        expect(result).toBe("SGW");
+      });
+
+      it("uses default width when toggleWidth is 0", () => {
+        const result = determineCampusFromPan("SGW", 50, 0);
+        expect(result === "SGW" || result === "LOY").toBe(true);
       });
     });
-  });
 
-  describe("BuildingPin", () => {
-    it("uses default size=44 and SGW branch", () => {
-      const { getByText, UNSAFE_getAllByType } = render(
-        <BuildingPin code="H" campus="SGW" />,
-      );
+    describe("exported region constants", () => {
+      it("SGW_REGION has correct coordinates", () => {
+        expect(SGW_REGION).toEqual({
+          latitude: 45.4973,
+          longitude: -73.5794,
+          latitudeDelta: 0.006,
+          longitudeDelta: 0.006,
+        });
+      });
 
-      getByText("H");
-
-      const { View, StyleSheet } = require("react-native");
-      const views = UNSAFE_getAllByType(View);
-
-      const flat = StyleSheet.flatten(views[0].props.style);
-      expect(flat).toMatchObject({ width: 44, height: 55 });
+      it("LOY_REGION has correct coordinates", () => {
+        expect(LOY_REGION).toEqual({
+          latitude: 45.457984,
+          longitude: -73.639834,
+          latitudeDelta: 0.006,
+          longitudeDelta: 0.006,
+        });
+      });
     });
 
-    it("uses custom size and LOY branch", () => {
-      const { getByText, UNSAFE_getAllByType } = render(
-        <BuildingPin code="AD" campus="LOY" size={60} />,
-      );
+    describe("BuildingPin", () => {
+      it("uses default size=44 and SGW branch", () => {
+        const { getByText, UNSAFE_getAllByType } = render(
+          <BuildingPin code="H" campus="SGW" />,
+        );
 
-      getByText("AD");
+        getByText("H");
 
-      const { View, StyleSheet } = require("react-native");
-      const views = UNSAFE_getAllByType(View);
+        const { View, StyleSheet } = require("react-native");
+        const views = UNSAFE_getAllByType(View);
 
-      const flat = StyleSheet.flatten(views[0].props.style);
-      expect(flat).toMatchObject({ width: 60, height: 75 });
-    });
-  });
+        const flat = StyleSheet.flatten(views[0].props.style);
+        expect(flat).toMatchObject({ width: 44, height: 55 });
+      });
 
-  describe("BuildingPopup", () => {
-    const baseBuilding = {
-      id: "sgw-h",
-      campus: "SGW",
-      code: "H",
-      name: "Henry F. Hall",
-      address: "1455 De Maisonneuve",
-      latitude: 45.1,
-      longitude: -73.1,
-    };
+      it("uses custom size and LOY branch", () => {
+        const { getByText, UNSAFE_getAllByType } = render(
+          <BuildingPin code="AD" campus="LOY" size={60} />,
+        );
 
-    it("renders fallback branch when details are missing", () => {
-      const onClose = jest.fn();
+        getByText("AD");
 
-      const { getByText } = render(
-        <BuildingPopup
-          building={{ ...baseBuilding, details: undefined } as any}
-          campusTheme="SGW"
-          onClose={onClose}
-        />,
-      );
+        const { View, StyleSheet } = require("react-native");
+        const views = UNSAFE_getAllByType(View);
 
-      // ✅ Covers `!details ? (...) : (...)` branch
-      getByText("Details coming soon");
-      getByText("We’ll add the expanded info for this building next.");
+        const flat = StyleSheet.flatten(views[0].props.style);
+        expect(flat).toMatchObject({ width: 60, height: 75 });
+      });
     });
 
-    it("renders details branch including maps + conditional description", () => {
-      const onClose = jest.fn();
-
-      const buildingWithDetails = {
-        ...baseBuilding,
-        details: {
-          accessibility: [
-            { icon: "elevator", title: "Elevator", description: "" }, // covers !!description false
-            { icon: "wifi", title: "Wi-Fi", description: "Available" }, // covers !!description true
-          ],
-          metro: { title: "Metro nearby", description: "Guy-Concordia" },
-          connectivity: {
-            title: "Connected",
-            description: "Underground links",
-          },
-          entries: [
-            { title: "Main entrance", description: "Front door" },
-            { title: "Side entrance", description: "Accessible ramp" },
-          ],
-          otherServices: [
-            { icon: "wifi", title: "Printing", description: "2nd floor" },
-          ],
-          overview: ["Paragraph 1", "Paragraph 2"],
-          venues: ["Cafeteria", "Study rooms"],
-          departments: ["Computer Science", "Engineering"],
-          services: ["Security", "Information desk"],
-        },
+    describe("BuildingPopup", () => {
+      const baseBuilding = {
+        id: "sgw-h",
+        campus: "SGW",
+        code: "H",
+        name: "Henry F. Hall",
+        address: "1455 De Maisonneuve",
+        latitude: 45.1,
+        longitude: -73.1,
       };
 
-      const { getByText } = render(
-        <BuildingPopup
-          building={buildingWithDetails as any}
-          campusTheme="LOY"
-          onClose={onClose}
-        />,
+      it("renders fallback branch when details are missing", () => {
+        const onClose = jest.fn();
+
+        const { getByText } = render(
+          <BuildingPopup
+            building={{ ...baseBuilding, details: undefined } as any}
+            campusTheme="SGW"
+            onClose={onClose}
+          />,
+        );
+
+        // ✅ Covers `!details ? (...) : (...)` branch
+        getByText("Details coming soon");
+        getByText("We’ll add the expanded info for this building next.");
+      });
+
+      it("renders details branch including maps + conditional description", () => {
+        const onClose = jest.fn();
+
+        const buildingWithDetails = {
+          ...baseBuilding,
+          details: {
+            accessibility: [
+              { icon: "elevator", title: "Elevator", description: "" }, // covers !!description false
+              { icon: "wifi", title: "Wi-Fi", description: "Available" }, // covers !!description true
+            ],
+            metro: { title: "Metro nearby", description: "Guy-Concordia" },
+            connectivity: {
+              title: "Connected",
+              description: "Underground links",
+            },
+            entries: [
+              { title: "Main entrance", description: "Front door" },
+              { title: "Side entrance", description: "Accessible ramp" },
+            ],
+            otherServices: [
+              { icon: "wifi", title: "Printing", description: "2nd floor" },
+            ],
+            overview: ["Paragraph 1", "Paragraph 2"],
+            venues: ["Cafeteria", "Study rooms"],
+            departments: ["Computer Science", "Engineering"],
+            services: ["Security", "Information desk"],
+          },
+        };
+
+        const { getByText } = render(
+          <BuildingPopup
+            building={buildingWithDetails as any}
+            campusTheme="LOY"
+            onClose={onClose}
+          />,
+        );
+
+        // ✅ covers the mapped sections highlighted red in Sonar
+        getByText("Building Accessibility");
+        getByText("Elevator");
+        getByText("Wi-Fi");
+        getByText("Available");
+
+        getByText("Venues");
+        getByText("Cafeteria");
+
+        getByText("Departments");
+        getByText("Engineering");
+
+        getByText("Services");
+        getByText("Information desk");
+      });
+    });
+  });
+
+  describe("CampusMap - Current Location Button", () => {
+    it("renders the current location button", () => {
+      const { getByTestId } = render(<CampusMap />);
+      expect(getByTestId("currentLocationButton")).toBeTruthy();
+    });
+
+    it("initially has showsUserLocation disabled", () => {
+      const { getByTestId } = render(<CampusMap />);
+      const map = getByTestId("mapView");
+      expect(map.props.showsUserLocation).toBe(false);
+    });
+  });
+
+  describe("CampusMap - User Location Features", () => {
+    beforeEach(() => {
+      mockOnLocationFound = null;
+      mockAnimateToRegion.mockClear();
+    });
+
+    it("handleLocationFound animates map to user location", () => {
+      render(<CampusMap />);
+      expect(mockOnLocationFound).not.toBeNull();
+
+      act(() => {
+        mockOnLocationFound!({ latitude: 45.5, longitude: -73.6 });
+      });
+
+      expect(mockAnimateToRegion).toHaveBeenCalledWith(
+        expect.objectContaining({
+          latitude: 45.5,
+          longitude: -73.6,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        }),
+        500,
       );
-
-      // ✅ covers the mapped sections highlighted red in Sonar
-      getByText("Building Accessibility");
-      getByText("Elevator");
-      getByText("Wi-Fi");
-      getByText("Available");
-
-      getByText("Venues");
-      getByText("Cafeteria");
-
-      getByText("Departments");
-      getByText("Engineering");
-
-      getByText("Services");
-      getByText("Information desk");
-    });
-  });
-});
-
-describe("CampusMap - Current Location Button", () => {
-  it("renders the current location button", () => {
-    const { getByTestId } = render(<CampusMap />);
-    expect(getByTestId("currentLocationButton")).toBeTruthy();
-  });
-
-  it("initially has showsUserLocation disabled", () => {
-    const { getByTestId } = render(<CampusMap />);
-    const map = getByTestId("mapView");
-    expect(map.props.showsUserLocation).toBe(false);
-  });
-});
-
-describe("CampusMap - User Location Features", () => {
-  beforeEach(() => {
-    mockOnLocationFound = null;
-    mockAnimateToRegion.mockClear();
-  });
-
-  it("handleLocationFound animates map to user location", () => {
-    render(<CampusMap />);
-    expect(mockOnLocationFound).not.toBeNull();
-
-    act(() => {
-      mockOnLocationFound!({ latitude: 45.5, longitude: -73.6 });
     });
 
-    expect(mockAnimateToRegion).toHaveBeenCalledWith(
-      expect.objectContaining({
-        latitude: 45.5,
-        longitude: -73.6,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
-      }),
-      500,
-    );
-  });
+    it("shows user location marker when user is outside buildings", () => {
+      const { queryByTestId } = render(<CampusMap />);
+      expect(mockOnLocationFound).not.toBeNull();
 
-  it("shows user location marker when user is outside buildings", () => {
-    const { queryByTestId } = render(<CampusMap />);
-    expect(mockOnLocationFound).not.toBeNull();
+      act(() => {
+        mockOnLocationFound!({ latitude: 45.5, longitude: -73.6 });
+      });
 
-    act(() => {
-      mockOnLocationFound!({ latitude: 45.5, longitude: -73.6 });
+      expect(queryByTestId("marker-45.5--73.6")).toBeTruthy();
     });
 
-    expect(queryByTestId("marker-45.5--73.6")).toBeTruthy();
-  });
+    it("highlights building in blue when user is inside a building polygon", () => {
+      const { getByTestId, queryByTestId } = render(<CampusMap />);
+      expect(mockOnLocationFound).not.toBeNull();
 
-  it("highlights building in blue when user is inside a building polygon", () => {
-    const { getByTestId, queryByTestId } = render(<CampusMap />);
-    expect(mockOnLocationFound).not.toBeNull();
+      // inside H polygon: lat 45.497-45.498, lng -73.58 to -73.578
+      act(() => {
+        mockOnLocationFound!({ latitude: 45.4975, longitude: -73.579 });
+      });
 
-    // inside H polygon: lat 45.497-45.498, lng -73.58 to -73.578
-    act(() => {
-      mockOnLocationFound!({ latitude: 45.4975, longitude: -73.579 });
+      expect(queryByTestId("userLocationMarker")).toBeNull();
+
+      const hPolygon = getByTestId("polygon-45.497--73.58");
+      expect(hPolygon.props.fillColor).toBe("rgba(97, 151, 251, 0.35)");
+      expect(hPolygon.props.strokeColor).toBe("#4A90D9");
+      expect(hPolygon.props.strokeWidth).toBe(3);
     });
-
-    expect(queryByTestId("userLocationMarker")).toBeNull();
-
-    const hPolygon = getByTestId("polygon-45.497--73.58");
-    expect(hPolygon.props.fillColor).toBe("rgba(97, 151, 251, 0.35)");
-    expect(hPolygon.props.strokeColor).toBe("#4A90D9");
-    expect(hPolygon.props.strokeWidth).toBe(3);
   });
 });
