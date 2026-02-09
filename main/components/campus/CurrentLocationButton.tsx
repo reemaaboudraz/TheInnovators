@@ -50,7 +50,7 @@ export default function CurrentLocationButton({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       });
-    } catch (error) {
+    } catch {
       setStatus("idle");
       Alert.alert(
         "Location Error",
