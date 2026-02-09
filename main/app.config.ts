@@ -4,6 +4,9 @@ export default {
   expo: {
     name: "TheInnovators",
     slug: "theinnovators",
+    ios: {
+      bundleIdentifier: "com.theinnovators.app",
+    },
     android: {
       adaptiveIcon: {
         backgroundColor: "#E6F4FE",
