@@ -1,5 +1,4 @@
 import React, { useMemo, useRef, useState } from "react";
-import BuildingPopup from "@/components/campus/BuildingPopup";
 import {
   View,
   Text,
@@ -47,6 +46,7 @@ export const LOY_REGION: Region = {
   longitudeDelta: 0.006,
 };
 
+// Start at SGW (still renders Loyola buildings in the background)
 const INITIAL_REGION: Region = SGW_REGION;
 
 export default function CampusMap() {
@@ -159,11 +159,7 @@ export default function CampusMap() {
         showsCompass={false}
         toolbarEnabled={false}
         rotateEnabled={false}
-        // Important: avoid clearing selection on every tap (can cancel polygon taps)
-        onPress={() => {
-          // Only clear if something is currently selected (prevents fighting with building taps)
-          if (selected) setSelected(null);
-        }}
+        onPress={() => setSelected(null)}
       >
         <BuildingShapesLayer
           buildings={ALL_BUILDINGS}
