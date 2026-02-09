@@ -20,11 +20,14 @@ jest.mock("@/components/Buildings/SGW/SGWBuildings", () => ({
       latitude: 45.49729,
       longitude: -73.57898,
       campus: "SGW",
+      zoomCategory: 2,
       aliases: ["hall", "henry hall"],
+      // Square polygon that properly contains the center point
       polygon: [
-        { latitude: 45.4973, longitude: -73.579 },
-        { latitude: 45.4974, longitude: -73.5791 },
-        { latitude: 45.4975, longitude: -73.5792 },
+        { latitude: 45.497, longitude: -73.58 },
+        { latitude: 45.497, longitude: -73.578 },
+        { latitude: 45.498, longitude: -73.578 },
+        { latitude: 45.498, longitude: -73.58 },
       ],
     },
     {
@@ -35,6 +38,7 @@ jest.mock("@/components/Buildings/SGW/SGWBuildings", () => ({
       latitude: 45.4978,
       longitude: -73.5795,
       campus: "SGW",
+      zoomCategory: 3,
       aliases: ["nop", "no polygon"],
       polygon: [],
     },
@@ -51,6 +55,7 @@ jest.mock("@/components/Buildings/Loyola/LoyolaBuildings", () => ({
       latitude: 45.458,
       longitude: -73.64,
       campus: "LOY",
+      zoomCategory: 1,
       aliases: ["admin", "administration"],
       polygon: [
         { latitude: 45.4581, longitude: -73.6401 },
@@ -61,9 +66,68 @@ jest.mock("@/components/Buildings/Loyola/LoyolaBuildings", () => ({
   ],
 }));
 
-jest.mock("expo-status-bar", () => ({
-  StatusBar: () => null,
+// -------------------- mapZoom (deterministic) --------------------
+const mockPaddingForZoomCategory = jest.fn<(cat: 1 | 2 | 3) => number>(
+  (_cat) => 1.35,
+);
+
+const mockRegionFromPolygon = jest.fn<
+  (polygon: any, padding: number) => Region
+>((_polygon, _padding) => ({
+  latitude: 10,
+  longitude: 20,
+  latitudeDelta: 0.001,
+  longitudeDelta: 0.001,
 }));
+
+jest.mock("@/components/Buildings/mapZoom", () => ({
+  paddingForZoomCategory: (cat: 1 | 2 | 3) => mockPaddingForZoomCategory(cat),
+  regionFromPolygon: (polygon: any, padding: number) =>
+    mockRegionFromPolygon(polygon, padding),
+}));
+
+// -------------------- UI Mocks --------------------
+jest.mock("expo-status-bar", () => ({ StatusBar: () => null }));
+
+jest.mock("expo-location", () => ({
+  requestForegroundPermissionsAsync: jest.fn(() =>
+    Promise.resolve({ status: "granted" }),
+  ),
+  getCurrentPositionAsync: jest.fn(() =>
+    Promise.resolve({ coords: { latitude: 45.5, longitude: -73.6 } }),
+  ),
+  Accuracy: { Balanced: 3 },
+}));
+
+// Store the onLocationFound callback for testing
+let mockOnLocationFound:
+  | ((location: { latitude: number; longitude: number }) => void)
+  | null = null;
+
+jest.mock("@/components/campus/CurrentLocationButton", () => {
+  const ReactActual = jest.requireActual("react") as typeof React;
+  const RN = jest.requireActual(
+    "react-native",
+  ) as typeof import("react-native");
+  const { Pressable, Text } = RN;
+
+  return {
+    __esModule: true,
+    default: function MockCurrentLocationButton(props: {
+      onLocationFound: (location: {
+        latitude: number;
+        longitude: number;
+      }) => void;
+    }) {
+      mockOnLocationFound = props.onLocationFound;
+      return ReactActual.createElement(
+        Pressable,
+        { testID: "currentLocationButton" },
+        ReactActual.createElement(Text, null, "◎"),
+      );
+    },
+  };
+});
 
 jest.mock("@/components/layout/BrandBar", () => {
   const ReactActual = jest.requireActual("react") as typeof React;
@@ -108,6 +172,7 @@ jest.mock("@/components/Styles/mapStyle", () => {
   };
 });
 
+// -------------------- react-native-maps mock --------------------
 jest.mock("react-native-maps", () => {
   const ReactActual = jest.requireActual("react") as typeof React;
   const RN = jest.requireActual(
@@ -215,6 +280,8 @@ import BuildingPin from "@/components/campus/BuildingPin";
 
 beforeEach(() => {
   mockAnimateToRegion.mockClear();
+  mockPaddingForZoomCategory.mockClear();
+  mockRegionFromPolygon.mockClear();
 });
 
 describe("CampusMap - initial region", () => {
@@ -236,10 +303,14 @@ describe("CampusMap - search bar", () => {
     const { getByPlaceholderText, getByTestId } = render(<CampusMap />);
 
     const input = getByPlaceholderText("Where to next?");
-    fireEvent.changeText(input, "hall");
+    act(() => {
+      fireEvent.changeText(input, "hall");
+    });
     expect(getByPlaceholderText("Where to next?").props.value).toBe("hall");
 
-    fireEvent.press(getByTestId("clearSearch"));
+    act(() => {
+      fireEvent.press(getByTestId("clearSearch"));
+    });
     expect(getByPlaceholderText("Where to next?").props.value).toBe("");
   });
 
@@ -250,7 +321,6 @@ describe("CampusMap - search bar", () => {
 
     fireEvent.changeText(getByPlaceholderText("Where to next?"), "hall");
     await findByText(/H — Henry F\. Hall Building/i);
-    fireEvent.press(getByTestId("suggestion-SGW-sgw-h"));
 
     fireEvent.changeText(getByPlaceholderText("Where to next?"), "admin");
     expect(getByPlaceholderText("Where to next?").props.value).toBe("admin");
@@ -261,31 +331,43 @@ describe("CampusMap - suggestions", () => {
   it("shows suggestions for SGW + Loyola matches", async () => {
     const { getByPlaceholderText, findByText } = render(<CampusMap />);
 
-    fireEvent.changeText(getByPlaceholderText("Where to next?"), "ad");
+    act(() => {
+      fireEvent.changeText(getByPlaceholderText("Where to next?"), "ad");
+    });
     expect(await findByText(/AD — Administration Building/i)).toBeTruthy();
 
-    fireEvent.changeText(getByPlaceholderText("Where to next?"), "hall");
+    act(() => {
+      fireEvent.changeText(getByPlaceholderText("Where to next?"), "hall");
+    });
     expect(await findByText(/H — Henry F\. Hall Building/i)).toBeTruthy();
   });
 
-  it("selecting a suggestion animates map and updates the input", async () => {
+  it("selecting a suggestion animates map (polygon zoom) and updates the input", async () => {
     const { getByPlaceholderText, getByTestId, findByText } = render(
       <CampusMap />,
     );
 
-    fireEvent.changeText(getByPlaceholderText("Where to next?"), "admin");
+    act(() => {
+      fireEvent.changeText(getByPlaceholderText("Where to next?"), "admin");
+    });
     await findByText(/AD — Administration Building/i);
 
-    fireEvent.press(getByTestId("suggestion-LOY-loy-ad"));
+    act(() => {
+      fireEvent.press(getByTestId("suggestion-LOY-loy-ad"));
+    });
+
+    // ✅ because we mock mapZoom => polygon zoom path is deterministic
+    expect(mockPaddingForZoomCategory).toHaveBeenCalledWith(1);
+    expect(mockRegionFromPolygon).toHaveBeenCalledTimes(1);
 
     expect(mockAnimateToRegion).toHaveBeenCalledTimes(1);
     expect(mockAnimateToRegion).toHaveBeenCalledWith(
-      expect.objectContaining({
-        latitude: 45.458,
-        longitude: -73.64,
-        latitudeDelta: 0.0025,
-        longitudeDelta: 0.0025,
-      }),
+      {
+        latitude: 10,
+        longitude: 20,
+        latitudeDelta: 0.001,
+        longitudeDelta: 0.001,
+      },
       600,
     );
 
@@ -335,16 +417,47 @@ describe("CampusMap - building shapes (Polygon/Marker)", () => {
 
     const markerId = "marker-45.458--73.64";
 
-    fireEvent.press(getByTestId(markerId));
+    act(() => {
+      fireEvent.press(getByTestId(markerId));
+    });
     expect(getByTestId(markerId).props.tracksViewChanges).toBe(true);
 
-    fireEvent.press(getByTestId("mapView"));
+    act(() => {
+      fireEvent.press(getByTestId("mapView"));
+    });
     expect(getByTestId(markerId).props.tracksViewChanges).toBe(false);
   });
 
   it("renders a building even when polygon is empty (no Polygon)", () => {
     const { getByTestId } = render(<CampusMap />);
     expect(getByTestId("marker-45.4978--73.5795")).toBeTruthy();
+  describe("CampusMap - polygon optional branch coverage", () => {
+    it("renders a building even when polygon is empty (no Polygon)", () => {
+      const { getByTestId } = render(<CampusMap />);
+      expect(getByTestId("marker-45.4978--73.5795")).toBeTruthy();
+    });
+
+    it("selecting a building with empty polygon falls back to fixed deltas (no regionFromPolygon)", () => {
+      const { getByTestId } = render(<CampusMap />);
+
+      const npMarker = getByTestId("marker-45.4978--73.5795");
+      act(() => {
+        fireEvent.press(npMarker);
+      });
+
+      expect(mockPaddingForZoomCategory).toHaveBeenCalledWith(3);
+      expect(mockRegionFromPolygon).not.toHaveBeenCalled();
+
+      expect(mockAnimateToRegion).toHaveBeenCalledWith(
+        {
+          latitude: 45.4978,
+          longitude: -73.5795,
+          latitudeDelta: 0.0025,
+          longitudeDelta: 0.0025,
+        },
+        600,
+      );
+    });
   });
 });
 
@@ -623,5 +736,72 @@ describe("CampusMap - PanResponder helper functions (re-exported)", () => {
       getByText("Services");
       getByText("Information desk");
     });
+  });
+});
+
+describe("CampusMap - Current Location Button", () => {
+  it("renders the current location button", () => {
+    const { getByTestId } = render(<CampusMap />);
+    expect(getByTestId("currentLocationButton")).toBeTruthy();
+  });
+
+  it("initially has showsUserLocation disabled", () => {
+    const { getByTestId } = render(<CampusMap />);
+    const map = getByTestId("mapView");
+    expect(map.props.showsUserLocation).toBe(false);
+  });
+});
+
+describe("CampusMap - User Location Features", () => {
+  beforeEach(() => {
+    mockOnLocationFound = null;
+    mockAnimateToRegion.mockClear();
+  });
+
+  it("handleLocationFound animates map to user location", () => {
+    render(<CampusMap />);
+    expect(mockOnLocationFound).not.toBeNull();
+
+    act(() => {
+      mockOnLocationFound!({ latitude: 45.5, longitude: -73.6 });
+    });
+
+    expect(mockAnimateToRegion).toHaveBeenCalledWith(
+      expect.objectContaining({
+        latitude: 45.5,
+        longitude: -73.6,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      }),
+      500,
+    );
+  });
+
+  it("shows user location marker when user is outside buildings", () => {
+    const { queryByTestId } = render(<CampusMap />);
+    expect(mockOnLocationFound).not.toBeNull();
+
+    act(() => {
+      mockOnLocationFound!({ latitude: 45.5, longitude: -73.6 });
+    });
+
+    expect(queryByTestId("marker-45.5--73.6")).toBeTruthy();
+  });
+
+  it("highlights building in blue when user is inside a building polygon", () => {
+    const { getByTestId, queryByTestId } = render(<CampusMap />);
+    expect(mockOnLocationFound).not.toBeNull();
+
+    // inside H polygon: lat 45.497-45.498, lng -73.58 to -73.578
+    act(() => {
+      mockOnLocationFound!({ latitude: 45.4975, longitude: -73.579 });
+    });
+
+    expect(queryByTestId("userLocationMarker")).toBeNull();
+
+    const hPolygon = getByTestId("polygon-45.497--73.58");
+    expect(hPolygon.props.fillColor).toBe("rgba(97, 151, 251, 0.35)");
+    expect(hPolygon.props.strokeColor).toBe("#4A90D9");
+    expect(hPolygon.props.strokeWidth).toBe(3);
   });
 });

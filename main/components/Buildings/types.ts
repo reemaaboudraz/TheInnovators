@@ -46,4 +46,5 @@ export type Building = {
 
   // extended building info shown in the popup.
   details: BuildingDetails;
+  zoomCategory: 1 | 2 | 3; // 1=big, 2=medium, 3=small
 };

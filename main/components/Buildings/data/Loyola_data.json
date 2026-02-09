@@ -8,6 +8,7 @@
     "latitude": 45.457984,
     "longitude": -73.639834,
     "aliases": ["AD", "AD Building", "Administration Building"],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.4581785, "longitude": -73.6394752 },
       { "latitude": 45.4582286, "longitude": -73.6396046 },
@@ -75,6 +76,7 @@
     "latitude": 45.45977,
     "longitude": -73.63917,
     "aliases": ["BB", "BB Building", "BB-BH Annex"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4598208, "longitude": -73.6391704 },
       { "latitude": 45.4597195, "longitude": -73.6392492 },
@@ -92,6 +94,7 @@
     "latitude": 45.45974,
     "longitude": -73.63908,
     "aliases": ["BH", "BB-BH Annex", "BH Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4597913, "longitude": -73.6390959 },
       { "latitude": 45.4596919, "longitude": -73.6391749 },
@@ -109,6 +112,7 @@
     "latitude": 45.458204,
     "longitude": -73.6403,
     "aliases": ["CC", "Central Building", "CC Building"],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.4584607, "longitude": -73.6406749 },
       { "latitude": 45.4584113, "longitude": -73.6407138 },
@@ -150,6 +154,7 @@
       "CJ Building",
       "Communication Studies and Journalism Building"
     ],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.4571693, "longitude": -73.6403939 },
       { "latitude": 45.4574139, "longitude": -73.640207 },
@@ -198,6 +203,7 @@
     "latitude": 45.45771235,
     "longitude": -73.63613056,
     "aliases": ["DO", "Stringer Dome (seasonal)"],
+    "zoomCategory": 1,
     "polygon": [
       { "latitude": 45.4573901, "longitude": -73.6370898 },
       { "latitude": 45.4569856, "longitude": -73.6363629 },
@@ -215,6 +221,7 @@
     "latitude": 45.458493,
     "longitude": -73.639287,
     "aliases": ["FC", "F.C. Smith Building", "FC Building"],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.458338, "longitude": -73.6391598 },
       { "latitude": 45.4584058, "longitude": -73.6391055 },
@@ -262,6 +269,7 @@
       "Centre for Structural and Functional Genomics",
       "GE Building"
     ],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.4571701, "longitude": -73.6405654 },
       { "latitude": 45.4571108, "longitude": -73.6406112 },
@@ -286,6 +294,7 @@
     "latitude": 45.45949,
     "longitude": -73.64122,
     "aliases": ["HA", "Hingston Hall, wing HA", "HA Building"],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.4594105, "longitude": -73.6415744 },
       { "latitude": 45.4593936, "longitude": -73.6415382 },
@@ -311,6 +320,7 @@
     "latitude": 45.459308,
     "longitude": -73.641849,
     "aliases": ["HB", "Hingston Hall, wing HB", "HB Building"],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.4593859, "longitude": -73.6415222 },
       { "latitude": 45.4595722, "longitude": -73.6420023 },
@@ -336,6 +346,7 @@
     "latitude": 45.459663,
     "longitude": -73.64208,
     "aliases": ["HC", "Hingston Hall, wing HC", "HC Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4596423, "longitude": -73.6422651 },
       { "latitude": 45.4595515, "longitude": -73.6420211 },
@@ -357,6 +368,7 @@
     "latitude": 45.45853,
     "longitude": -73.64181,
     "aliases": ["HU", "Applied Science Hub", "HU Building"],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.4584315, "longitude": -73.6421084 },
       { "latitude": 45.4583945, "longitude": -73.6420113 },
@@ -383,6 +395,7 @@
     "latitude": 45.458432,
     "longitude": -73.643235,
     "aliases": ["JR", "Jesuit Residence", "JR Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4583425, "longitude": -73.6432422 },
       { "latitude": 45.4583124, "longitude": -73.6431677 },
@@ -414,6 +427,7 @@
     "latitude": 45.457,
     "longitude": -73.63736,
     "aliases": ["PC", "PERFORM centre", "PC Building"],
+    "zoomCategory": 1,
     "polygon": [
       { "latitude": 45.4572701, "longitude": -73.6376525 },
       { "latitude": 45.4570453, "longitude": -73.6378295 },
@@ -432,6 +446,7 @@
     "latitude": 45.459636,
     "longitude": -73.639758,
     "aliases": ["PS", "Physical Services Building", "PS Building"],
+    "zoomCategory": 1,
     "polygon": [
       { "latitude": 45.4597232, "longitude": -73.6403349 },
       { "latitude": 45.4596544, "longitude": -73.6401562 },
@@ -458,6 +473,7 @@
     "latitude": 45.459308,
     "longitude": -73.638941,
     "aliases": ["PT", "Oscar Peterson Concert Hall", "PT Building"],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.4594954, "longitude": -73.6391321 },
       { "latitude": 45.4593609, "longitude": -73.6392359 },
@@ -479,6 +495,7 @@
     "latitude": 45.458938,
     "longitude": -73.640467,
     "aliases": ["PY", "Psychology Building", "PY Building"],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.458813, "longitude": -73.6408378 },
       { "latitude": 45.4586643, "longitude": -73.6404623 },
@@ -498,6 +515,7 @@
     "latitude": 45.45865769,
     "longitude": -73.64007927,
     "aliases": ["QA", "Quadrangle"],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.4584793, "longitude": -73.640622 },
       { "latitude": 45.4584567, "longitude": -73.6406461 },
@@ -530,6 +548,7 @@
     "latitude": 45.456774,
     "longitude": -73.63761,
     "aliases": ["RA", "Recreation and Athletics Complex", "RA Building"],
+    "zoomCategory": 1,
     "polygon": [
       { "latitude": 45.4566649, "longitude": -73.6369952 },
       { "latitude": 45.4570004, "longitude": -73.6378624 },
@@ -563,6 +582,7 @@
       "Loyola Jesuit Hall and Conference Centre",
       "RF Building"
     ],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.4583412, "longitude": -73.6409057 },
       { "latitude": 45.4583267, "longitude": -73.6408679 },
@@ -595,6 +615,7 @@
     "latitude": 45.45917,
     "longitude": -73.63918,
     "aliases": ["SC", "Student Centre", "SC Building"],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.4592254, "longitude": -73.638934 },
       { "latitude": 45.4593218, "longitude": -73.6392002 },
@@ -623,6 +644,7 @@
     "latitude": 45.45927,
     "longitude": -73.64254,
     "aliases": ["SH", "Solar House", "SH Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4593132, "longitude": -73.6426242 },
       { "latitude": 45.4592216, "longitude": -73.6426235 },
@@ -644,6 +666,7 @@
       "St. Ignatius of Loyola",
       "Saint Ignatius of Loyola catholic church"
     ],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.4575836, "longitude": -73.6423818 },
       { "latitude": 45.4576537, "longitude": -73.642328 },
@@ -690,6 +713,7 @@
     "latitude": 45.457881,
     "longitude": -73.641565,
     "aliases": ["SP", "Richard J. Renaud Science Complex", "SP Building"],
+    "zoomCategory": 1,
     "polygon": [
       { "latitude": 45.4569746, "longitude": -73.6408295 },
       { "latitude": 45.4571441, "longitude": -73.6406987 },
@@ -752,6 +776,7 @@
     "latitude": 45.459992,
     "longitude": -73.640897,
     "aliases": ["TA", "Terrebonne Building", "TA Building"],
+    "zoomCategory": 3,
     "polygon": [
       { "latitude": 45.4600516, "longitude": -73.6408948 },
       { "latitude": 45.4599596, "longitude": -73.6409712 },
@@ -769,6 +794,7 @@
     "latitude": 45.45881,
     "longitude": -73.63861,
     "aliases": ["VE", "Vanier Extension", "VE Building"],
+    "zoomCategory": 2,
     "polygon": [
       { "latitude": 45.4588274, "longitude": -73.639001 },
       { "latitude": 45.458612, "longitude": -73.6384402 },
@@ -786,6 +812,7 @@
     "latitude": 45.45906,
     "longitude": -73.6385,
     "aliases": ["VL", "Vanier Library Building", "VL Building"],
+    "zoomCategory": 1,
     "polygon": [
       { "latitude": 45.4591503, "longitude": -73.6382312 },
       { "latitude": 45.4593198, "longitude": -73.6386664 },

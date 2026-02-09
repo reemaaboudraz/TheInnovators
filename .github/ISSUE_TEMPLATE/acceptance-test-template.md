@@ -3,8 +3,7 @@ name: acceptance-test template
 about: Describe this issue template's purpose here.
 title: AT-
 labels: acceptance-test
-assignees: ''
-
+assignees: ""
 ---
 
 This is the acceptance test for issue #
@@ -13,8 +12,8 @@ This is the acceptance test for issue #
 
 **Scenario:**
 
-Given 
-When 
+Given
+When
 Then
 
 **Acceptance Video Link:**
