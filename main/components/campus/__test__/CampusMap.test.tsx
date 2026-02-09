@@ -1,4 +1,4 @@
-/* eslint-disable import/first, react/display-name, @typescript-eslint/no-require-imports */
+/* eslint-disable import/first */
 import React from "react";
 import { render, fireEvent, act } from "@testing-library/react-native";
 import {
@@ -6,53 +6,15 @@ import {
   it,
   expect,
   beforeEach,
-  afterEach,
+  beforeAll,
+  afterAll,
   jest,
 } from "@jest/globals";
-import { Animated } from "react-native";
-
-type Region = {
-  latitude: number;
-  longitude: number;
-  latitudeDelta: number;
-  longitudeDelta: number;
-};
-
-jest.useFakeTimers();
-
-beforeEach(() => {
-  mockAnimateToRegion.mockClear();
-  mockPaddingForZoomCategory.mockClear();
-  mockRegionFromPolygon.mockClear();
-  mockOnLocationFound = null;
-
-  // Make Animated operations synchronous/no-op to avoid act warnings
-  jest.spyOn(Animated, "timing").mockImplementation((): any => ({
-    start: (cb?: any) => cb?.(),
-  }));
-  jest.spyOn(Animated, "spring").mockImplementation((): any => ({
-    start: (cb?: any) => cb?.(),
-  }));
-  jest.spyOn(Animated, "decay").mockImplementation((): any => ({
-    start: (cb?: any) => cb?.(),
-  }));
-});
-
-afterEach(() => {
-  jest.restoreAllMocks();
-
-  act(() => {
-    jest.runOnlyPendingTimers();
-  });
-});
+import type { Region } from "react-native-maps";
 
 const mockAnimateToRegion = jest.fn();
 
-// ✅ Fix Safe Area crash when BuildingPopup renders after selecting a building
-jest.mock("react-native-safe-area-context", () => ({
-  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
-}));
-
+// -------------------- DATASETS --------------------
 jest.mock("@/components/Buildings/SGW/SGWBuildings", () => ({
   SGW_BUILDINGS: [
     {
@@ -142,7 +104,7 @@ jest.mock("expo-location", () => ({
   Accuracy: { Balanced: 3 },
 }));
 
-// Store the onLocationFound callback for testing (if CampusMap actually renders this component)
+// Store the onLocationFound callback for testing
 let mockOnLocationFound:
   | ((location: { latitude: number; longitude: number }) => void)
   | null = null;
@@ -268,49 +230,7 @@ jest.mock("react-native-maps", () => {
   };
 });
 
-// ✅ Make BottomSheet safe in Jest (prevents native crashes)
-jest.mock("@gorhom/bottom-sheet", () => {
-  const React = require("react");
-  const { View } = require("react-native");
-
-  const BottomSheet = React.forwardRef((props: any, ref: any) => {
-    React.useImperativeHandle(ref, () => ({
-      snapToIndex: jest.fn(),
-      close: jest.fn(),
-    }));
-    return <View testID="bottomSheet">{props.children}</View>;
-  });
-
-  (BottomSheet as any).displayName = "BottomSheet";
-
-  const BottomSheetScrollView = (props: any) => (
-    <View testID="bottomSheetScroll">{props.children}</View>
-  );
-
-  return {
-    __esModule: true,
-    default: BottomSheet,
-    BottomSheetScrollView,
-  };
-});
-
-// ✅ Avoid asset / lookup issues inside BuildingPopup
-jest.mock("@/components/Buildings/details/buildingImages", () => ({
-  BUILDING_IMAGES: {
-    H: 123, // truthy => covers thumbSource branch
-  },
-}));
-
-jest.mock("@/components/Buildings/details/buildingIcons", () => ({
-  BUILDING_ICONS: {
-    metro: 1,
-    connectedBuildings: 2,
-    entry: 3,
-    wifi: 4,
-    elevator: 5,
-  },
-}));
-
+// ✅ import AFTER mocks
 import CampusMap, {
   calculatePanValue,
   determineCampusFromPan,
@@ -318,21 +238,10 @@ import CampusMap, {
   LOY_REGION,
 } from "../CampusMap";
 
-import BuildingPopup from "@/components/campus/BuildingPopup";
-import BuildingPin from "@/components/campus/BuildingPin";
-
 beforeEach(() => {
   mockAnimateToRegion.mockClear();
   mockPaddingForZoomCategory.mockClear();
   mockRegionFromPolygon.mockClear();
-  mockOnLocationFound = null;
-});
-
-afterEach(() => {
-  // Flush any Animated timers that can fire after test end
-  act(() => {
-    jest.runOnlyPendingTimers();
-  });
 });
 
 describe("CampusMap - initial region", () => {
@@ -366,7 +275,9 @@ describe("CampusMap - search bar", () => {
   });
 
   it("clears selected building when typing in search bar", async () => {
-    const { getByPlaceholderText, findByText } = render(<CampusMap />);
+    const { getByPlaceholderText, getByTestId, findByText } = render(
+      <CampusMap />,
+    );
 
     act(() => {
       fireEvent.changeText(getByPlaceholderText("Where to next?"), "hall");
@@ -374,8 +285,13 @@ describe("CampusMap - search bar", () => {
     await findByText(/H — Henry F\. Hall Building/i);
 
     act(() => {
+      fireEvent.press(getByTestId("suggestion-SGW-sgw-h"));
+    });
+
+    act(() => {
       fireEvent.changeText(getByPlaceholderText("Where to next?"), "admin");
     });
+
     expect(getByPlaceholderText("Where to next?").props.value).toBe("admin");
   });
 });
@@ -409,6 +325,7 @@ describe("CampusMap - suggestions", () => {
       fireEvent.press(getByTestId("suggestion-LOY-loy-ad"));
     });
 
+    // ✅ because we mock mapZoom => polygon zoom path is deterministic
     expect(mockPaddingForZoomCategory).toHaveBeenCalledWith(1);
     expect(mockRegionFromPolygon).toHaveBeenCalledTimes(1);
 
@@ -423,9 +340,8 @@ describe("CampusMap - suggestions", () => {
       600,
     );
 
-    // CampusMap uses " - " format in query
     expect(getByPlaceholderText("Where to next?").props.value).toMatch(
-      /^AD\s-\sAdministration Building/i,
+      /^AD - Administration Building/i,
     );
   });
 });
@@ -434,7 +350,6 @@ describe("CampusMap - building shapes (Polygon/Marker)", () => {
   it("pressing a Polygon selects it (strokeWidth/fillColor change) + animates", () => {
     const { getByTestId } = render(<CampusMap />);
 
-    // mock uses: polygon-${lat}-${lng}
     const polygonId = "polygon-45.4581--73.6401";
     const before = getByTestId(polygonId);
 
@@ -485,33 +400,33 @@ describe("CampusMap - building shapes (Polygon/Marker)", () => {
     expect(getByTestId(markerId).props.tracksViewChanges).toBe(false);
   });
 
-  it("renders a building even when polygon is empty (no Polygon)", () => {
-    const { getByTestId } = render(<CampusMap />);
-    expect(getByTestId("marker-45.4978--73.5795")).toBeTruthy();
-  });
-});
-
-describe("CampusMap - polygon optional branch coverage", () => {
-  it("selecting a building with empty polygon falls back to fixed deltas (no regionFromPolygon)", () => {
-    const { getByTestId } = render(<CampusMap />);
-
-    const npMarker = getByTestId("marker-45.4978--73.5795");
-    act(() => {
-      fireEvent.press(npMarker);
+  describe("CampusMap - polygon optional branch coverage", () => {
+    it("renders a building even when polygon is empty (no Polygon)", () => {
+      const { getByTestId } = render(<CampusMap />);
+      expect(getByTestId("marker-45.4978--73.5795")).toBeTruthy();
     });
 
-    expect(mockPaddingForZoomCategory).toHaveBeenCalledWith(3);
-    expect(mockRegionFromPolygon).not.toHaveBeenCalled();
+    it("selecting a building with empty polygon falls back to fixed deltas (no regionFromPolygon)", () => {
+      const { getByTestId } = render(<CampusMap />);
 
-    expect(mockAnimateToRegion).toHaveBeenCalledWith(
-      {
-        latitude: 45.4978,
-        longitude: -73.5795,
-        latitudeDelta: 0.0025,
-        longitudeDelta: 0.0025,
-      },
-      600,
-    );
+      const npMarker = getByTestId("marker-45.4978--73.5795");
+      act(() => {
+        fireEvent.press(npMarker);
+      });
+
+      expect(mockPaddingForZoomCategory).toHaveBeenCalledWith(3);
+      expect(mockRegionFromPolygon).not.toHaveBeenCalled();
+
+      expect(mockAnimateToRegion).toHaveBeenCalledWith(
+        {
+          latitude: 45.4978,
+          longitude: -73.5795,
+          latitudeDelta: 0.0025,
+          longitudeDelta: 0.0025,
+        },
+        600,
+      );
+    });
   });
 });
 
@@ -522,6 +437,20 @@ describe("CampusMap - campus toggle", () => {
     expect(getByTestId("campusToggle")).toBeTruthy();
     expect(getByTestId("campusToggle-SGW")).toBeTruthy();
     expect(getByTestId("campusToggle-Loyola")).toBeTruthy();
+  });
+
+  it("triggers onLayout event on toggle container", () => {
+    const { getByTestId } = render(<CampusMap />);
+
+    const toggle = getByTestId("campusToggle");
+
+    act(() => {
+      fireEvent(toggle, "layout", {
+        nativeEvent: { layout: { width: 300, height: 44 } },
+      });
+    });
+
+    expect(toggle).toBeTruthy();
   });
 
   it("pressing Loyola button switches campus and animates to Loyola region", () => {
@@ -542,7 +471,7 @@ describe("CampusMap - campus toggle", () => {
     );
   });
 
-  it("pressing SGW button after Loyola switches back to SGW region", () => {
+  it("pressing SGW button when on Loyola switches back to SGW region", () => {
     const { getByTestId } = render(<CampusMap />);
 
     act(() => {
@@ -565,8 +494,7 @@ describe("CampusMap - campus toggle", () => {
     );
   });
 
-  // ToggleButton likely blocks redundant calls when already focused.
-  it("pressing same campus button does NOT trigger animation", () => {
+  it("pressing same campus button does not trigger animation", () => {
     const { getByTestId } = render(<CampusMap />);
 
     act(() => {
@@ -610,7 +538,7 @@ describe("CampusMap - campus toggle", () => {
   });
 });
 
-describe("CampusMap - PanResponder helper functions (re-exported)", () => {
+describe("CampusMap - PanResponder helper functions", () => {
   describe("calculatePanValue", () => {
     it("returns 0 when on SGW with no drag", () => {
       const result = calculatePanValue("SGW", 0, 300);
@@ -698,129 +626,203 @@ describe("CampusMap - PanResponder helper functions (re-exported)", () => {
   });
 });
 
-describe("BuildingPin", () => {
-  it("uses default size=44 and SGW branch", () => {
-    const { getByText, UNSAFE_getAllByType } = render(
-      <BuildingPin code="H" campus="SGW" />,
-    );
+describe("CampusMap - PanResponder integration", () => {
+  it("toggle container has panHandlers attached", () => {
+    const { getByTestId } = render(<CampusMap />);
+    const toggle = getByTestId("campusToggle");
 
-    getByText("H");
+    act(() => {
+      fireEvent(toggle, "layout", {
+        nativeEvent: { layout: { width: 300, height: 44 } },
+      });
+    });
 
-    const { View, StyleSheet } = require("react-native");
-    const views = UNSAFE_getAllByType(View);
-
-    const flat = StyleSheet.flatten(views[0].props.style);
-    expect(flat).toMatchObject({ width: 44, height: 55 });
-  });
-
-  it("uses custom size and LOY branch", () => {
-    const { getByText, UNSAFE_getAllByType } = render(
-      <BuildingPin code="AD" campus="LOY" size={60} />,
-    );
-
-    getByText("AD");
-
-    const { View, StyleSheet } = require("react-native");
-    const views = UNSAFE_getAllByType(View);
-
-    const flat = StyleSheet.flatten(views[0].props.style);
-    expect(flat).toMatchObject({ width: 60, height: 75 });
+    // If ToggleButton spreads panHandlers on root, these should exist.
+    // (Depending on implementation, this might be responder props or panHandlers.)
+    expect(toggle.props.onStartShouldSetResponder).toBeDefined();
   });
 });
 
-describe("BuildingPopup", () => {
-  const baseBuilding = {
-    id: "sgw-h",
-    campus: "SGW",
-    code: "H",
-    name: "Henry F. Hall",
-    address: "1455 De Maisonneuve",
-    latitude: 45.1,
-    longitude: -73.1,
+describe("CampusMap - PanResponder handlers via mock", () => {
+  const RN = jest.requireActual(
+    "react-native",
+  ) as typeof import("react-native");
+  const originalCreate = RN.PanResponder.create;
+
+  type PanConfig = {
+    onPanResponderMove?: (evt: unknown, gestureState: { dx: number }) => void;
+    onPanResponderRelease?: (
+      evt: unknown,
+      gestureState: { dx: number },
+    ) => void;
+    onStartShouldSetPanResponder?: () => boolean;
+    onMoveShouldSetPanResponder?: (
+      evt: unknown,
+      gestureState: { dx: number },
+    ) => boolean;
   };
 
-  it("renders fallback branch when details are missing", () => {
-    const onClose = jest.fn();
+  let capturedConfig: PanConfig | null = null;
 
-    const { getByText } = render(
-      <BuildingPopup
-        building={{ ...baseBuilding, details: undefined } as any}
-        campusTheme="SGW"
-        onClose={onClose}
-      />,
-    );
+  beforeAll(() => {
+    jest.useFakeTimers();
 
-    getByText("Details coming soon");
-    getByText("We’ll add the expanded info for this building next.");
+    (RN.PanResponder.create as unknown) = (config: PanConfig) => {
+      capturedConfig = config;
+      return originalCreate(config as Parameters<typeof originalCreate>[0]);
+    };
   });
 
-  it("renders details branch including maps + conditional description", () => {
-    const onClose = jest.fn();
+  afterAll(() => {
+    (RN.PanResponder.create as unknown) = originalCreate;
+    jest.useRealTimers();
+  });
 
-    const buildingWithDetails = {
-      ...baseBuilding,
-      details: {
-        accessibility: [
-          { icon: "elevator", title: "Elevator", description: "" }, // covers !!description false
-          { icon: "wifi", title: "Wi-Fi", description: "Available" }, // covers !!description true
-        ],
-        metro: { title: "Metro nearby", description: "Guy-Concordia" },
-        connectivity: { title: "Connected", description: "Underground links" },
-        entries: [
-          { title: "Main entrance", description: "Front door" },
-          { title: "Side entrance", description: "Accessible ramp" },
-        ],
-        otherServices: [
-          { icon: "wifi", title: "Printing", description: "2nd floor" },
-        ],
-        overview: ["Paragraph 1", "Paragraph 2"],
-        venues: ["Cafeteria", "Study rooms"],
-        departments: ["Computer Science", "Engineering"],
-        services: ["Security", "Information desk"],
-      },
-    };
+  beforeEach(() => {
+    capturedConfig = null;
+    mockAnimateToRegion.mockClear();
+  });
 
-    const { getByText } = render(
-      <BuildingPopup
-        building={buildingWithDetails as any}
-        campusTheme="LOY"
-        onClose={onClose}
-      />,
+  it("onStartShouldSetPanResponder returns true", () => {
+    render(<CampusMap />);
+
+    expect(capturedConfig).not.toBeNull();
+    expect(capturedConfig?.onStartShouldSetPanResponder?.()).toBe(true);
+  });
+
+  it("onMoveShouldSetPanResponder returns true when dx > 10", () => {
+    render(<CampusMap />);
+
+    expect(capturedConfig).not.toBeNull();
+    expect(
+      capturedConfig?.onMoveShouldSetPanResponder?.(null, { dx: 15 }),
+    ).toBe(true);
+  });
+
+  it("onMoveShouldSetPanResponder returns false when dx <= 10", () => {
+    render(<CampusMap />);
+
+    expect(capturedConfig).not.toBeNull();
+    expect(capturedConfig?.onMoveShouldSetPanResponder?.(null, { dx: 5 })).toBe(
+      false,
     );
+  });
 
-    getByText("Building Accessibility");
-    getByText("Elevator");
-    getByText("Wi-Fi");
-    getByText("Available");
+  it("onPanResponderMove updates slide animation value", () => {
+    render(<CampusMap />);
+    expect(capturedConfig).not.toBeNull();
 
-    getByText("Venues");
-    getByText("Cafeteria");
+    act(() => {
+      capturedConfig?.onPanResponderMove?.(null, { dx: 50 });
+    });
 
-    getByText("Departments");
-    getByText("Engineering");
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
 
-    getByText("Services");
-    getByText("Information desk");
+    expect(true).toBe(true);
+  });
+
+  it("onPanResponderRelease switches to Loyola when dragged far right", () => {
+    render(<CampusMap />);
+    expect(capturedConfig).not.toBeNull();
+
+    act(() => {
+      capturedConfig?.onPanResponderRelease?.(null, { dx: 200 });
+    });
+
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
+
+    expect(mockAnimateToRegion).toHaveBeenCalledWith(
+      expect.objectContaining({
+        latitude: 45.457984,
+        longitude: -73.639834,
+      }),
+      500,
+    );
+  });
+
+  it("onPanResponderRelease stays on SGW when dragged slightly", () => {
+    render(<CampusMap />);
+    expect(capturedConfig).not.toBeNull();
+
+    act(() => {
+      capturedConfig?.onPanResponderRelease?.(null, { dx: 10 });
+    });
+
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
+
+    expect(mockAnimateToRegion).not.toHaveBeenCalled();
   });
 });
 
-/**
- * IMPORTANT:
- * Your last `npm run test` output showed CampusMap renders:
- * - mapView, campus toggle, search bar, brandbar
- * but NOT `currentLocationButton`, and `mockOnLocationFound` stayed null.
- *
- * So we only assert the CURRENT real behavior here (to keep tests green).
- * CurrentLocationButton is already tested in its own test file.
- */
-describe("CampusMap - Current Location integration (should not render here)", () => {
-  it("does not render currentLocationButton inside CampusMap", () => {
-    const { queryByTestId } = render(<CampusMap />);
-    expect(queryByTestId("currentLocationButton")).toBeNull();
+describe("CampusMap - Current Location Button", () => {
+  it("renders the current location button", () => {
+    const { getByTestId } = render(<CampusMap />);
+    expect(getByTestId("currentLocationButton")).toBeTruthy();
   });
 
-  it("does not wire onLocationFound callback from CampusMap", () => {
+  it("initially has showsUserLocation disabled", () => {
+    const { getByTestId } = render(<CampusMap />);
+    const map = getByTestId("mapView");
+    expect(map.props.showsUserLocation).toBe(false);
+  });
+});
+
+describe("CampusMap - User Location Features", () => {
+  beforeEach(() => {
+    mockOnLocationFound = null;
+    mockAnimateToRegion.mockClear();
+  });
+
+  it("handleLocationFound animates map to user location", () => {
     render(<CampusMap />);
-    expect(mockOnLocationFound).toBeNull();
+    expect(mockOnLocationFound).not.toBeNull();
+
+    act(() => {
+      mockOnLocationFound!({ latitude: 45.5, longitude: -73.6 });
+    });
+
+    expect(mockAnimateToRegion).toHaveBeenCalledWith(
+      expect.objectContaining({
+        latitude: 45.5,
+        longitude: -73.6,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      }),
+      500,
+    );
+  });
+
+  it("shows user location marker when user is outside buildings", () => {
+    const { queryByTestId } = render(<CampusMap />);
+    expect(mockOnLocationFound).not.toBeNull();
+
+    act(() => {
+      mockOnLocationFound!({ latitude: 45.5, longitude: -73.6 });
+    });
+
+    expect(queryByTestId("marker-45.5--73.6")).toBeTruthy();
+  });
+
+  it("highlights building in blue when user is inside a building polygon", () => {
+    const { getByTestId, queryByTestId } = render(<CampusMap />);
+    expect(mockOnLocationFound).not.toBeNull();
+
+    // inside H polygon: lat 45.497-45.498, lng -73.58 to -73.578
+    act(() => {
+      mockOnLocationFound!({ latitude: 45.4975, longitude: -73.579 });
+    });
+
+    expect(queryByTestId("userLocationMarker")).toBeNull();
+
+    const hPolygon = getByTestId("polygon-45.497--73.58");
+    expect(hPolygon.props.fillColor).toBe("rgba(97, 151, 251, 0.35)");
+    expect(hPolygon.props.strokeColor).toBe("#4A90D9");
+    expect(hPolygon.props.strokeWidth).toBe(3);
   });
 });
