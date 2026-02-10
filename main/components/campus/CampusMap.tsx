@@ -13,16 +13,20 @@ import { StatusBar } from "expo-status-bar";
 import { SGW_BUILDINGS } from "@/components/Buildings/SGW/SGWBuildings";
 import { LOYOLA_BUILDINGS } from "@/components/Buildings/Loyola/LoyolaBuildings";
 import type { Building, Campus } from "@/components/Buildings/types";
+
 import {
   regionFromPolygon,
   paddingForZoomCategory,
 } from "@/components/Buildings/mapZoom";
+import { isPointInPolygon } from "@/components/campus/pointInPolygon";
+
 import BuildingShapesLayer from "@/components/campus/BuildingShapesLayer";
 import ToggleButton from "@/components/campus/ToggleButton";
 import CurrentLocationButton, {
   UserLocation,
 } from "@/components/campus/CurrentLocationButton";
-import { isPointInPolygon } from "@/components/campus/pointInPolygon";
+import BuildingPopup from "@/components/campus/BuildingPopup";
+
 import BrandBar from "@/components/layout/BrandBar";
 import { styles } from "@/components/Styles/mapStyle";
 
@@ -57,6 +61,11 @@ export default function CampusMap() {
 
   const mapRef = useRef<MapView>(null);
 
+  const ALL_BUILDINGS = useMemo(
+    () => [...SGW_BUILDINGS, ...LOYOLA_BUILDINGS],
+    [],
+  );
+
   const handleLocationFound = (location: UserLocation) => {
     setUserLocation(location);
     mapRef.current?.animateToRegion(
@@ -73,14 +82,10 @@ export default function CampusMap() {
   const handleCampusChange = (campus: Campus) => {
     setFocusedCampus(campus);
     setSelected(null);
+
     const region = campus === "SGW" ? SGW_REGION : LOY_REGION;
     mapRef.current?.animateToRegion(region, 500);
   };
-
-  const ALL_BUILDINGS = useMemo(
-    () => [...SGW_BUILDINGS, ...LOYOLA_BUILDINGS],
-    [],
-  );
 
   // Find which building the user is currently inside
   const userLocationBuildingId = useMemo(() => {
@@ -125,9 +130,10 @@ export default function CampusMap() {
     setQuery(`${b.code} - ${b.name}`);
     setFocusedCampus(b.campus);
 
-    const padding = paddingForZoomCategory(b.zoomCategory);
-
+    // Smart zoom if polygon exists + zoomCategory exists
     if (b.polygon?.length) {
+      const z = b.zoomCategory ?? 2; // fallback if any building lacks zoomCategory
+      const padding = paddingForZoomCategory(z);
       const region = regionFromPolygon(b.polygon, padding);
       mapRef.current?.animateToRegion(region, 600);
       return;
@@ -159,7 +165,10 @@ export default function CampusMap() {
         showsCompass={false}
         toolbarEnabled={false}
         rotateEnabled={false}
-        onPress={() => setSelected(null)}
+        // don’t fight building taps: only clear if something is selected
+        onPress={() => {
+          if (selected) setSelected(null);
+        }}
       >
         <BuildingShapesLayer
           buildings={ALL_BUILDINGS}
@@ -167,6 +176,8 @@ export default function CampusMap() {
           userLocationBuildingId={userLocationBuildingId}
           onPickBuilding={onPickBuilding}
         />
+
+        {/* show user marker only if not inside a building */}
         {userLocation && !userLocationBuildingId && (
           <Marker
             testID="userLocationMarker"
@@ -242,6 +253,15 @@ export default function CampusMap() {
 
       <CurrentLocationButton onLocationFound={handleLocationFound} />
 
+      {/* Popup (only show if selected has details or your popup handles missing details safely) */}
+      {selected && (
+        <BuildingPopup
+          building={selected}
+          campusTheme={focusedCampus}
+          onClose={() => setSelected(null)}
+        />
+      )}
+
       <BrandBar
         testID="brandbar"
         backgroundColor={focusedCampus === "SGW" ? "#912338" : "#e3ac20"}
@@ -251,10 +271,7 @@ export default function CampusMap() {
 }
 
 const locationMarkerStyles = StyleSheet.create({
-  container: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  container: { alignItems: "center", justifyContent: "center" },
   marker: {
     width: 20,
     height: 20,

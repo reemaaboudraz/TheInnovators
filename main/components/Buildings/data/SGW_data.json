@@ -16,7 +16,22 @@
       { "latitude": 45.4977507, "longitude": -73.5796322 },
       { "latitude": 45.4977144, "longitude": -73.5795607 },
       { "latitude": 45.497887, "longitude": -73.5793896 }
-    ]
+    ],
+    "details": {
+      "entries": [{ "title": "1 entry on the main floor", "description": "" }],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        }
+      ],
+      "overview": [
+        "Built between 1890 and 1891, this annex features a limestone façade and understated ornamentation around the windows. It was once a private home and even served as a student housing co-op in the 1960s.",
+        "Concordia acquired the annex in 1969, and it now provides offices and shared spaces for student and community services."
+      ],
+      "services": ["Engineering and Computer Science Association"]
+    }
   },
   {
     "id": "SGW-CI",
@@ -39,7 +54,21 @@
       { "latitude": 45.4975407, "longitude": -73.5797543 },
       { "latitude": 45.4975819, "longitude": -73.5798422 },
       { "latitude": 45.4974061, "longitude": -73.5800149 }
-    ]
+    ],
+    "details": {
+      "entries": [{ "title": "1 entry on the main floor", "description": "" }],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        }
+      ],
+      "overview": [
+        "The CI Annex is a Victorian-era building, forming part of a trio of historic homes just north of the Hall Building. Built around 1884, it showcases grey limestone walls, decorative stonework and a distinctive two-storey bay window with angled sides.",
+        "After serving as a private residence and later a restaurant, the building was acquired by the university in 1971.\n\n"
+      ]
+    }
   },
   {
     "id": "SGW-CL",
@@ -61,7 +90,32 @@
       { "latitude": 45.4942577, "longitude": -73.5789277 },
       { "latitude": 45.4944711, "longitude": -73.5792777 },
       { "latitude": 45.4941615, "longitude": -73.5796402 }
-    ]
+    ],
+    "details": {
+      "accessibility": [
+        {
+          "icon": "accessibleEntrance",
+          "title": "Accessible Entrance",
+          "description": "This building has an automated accessible entrance door."
+        },
+        {
+          "icon": "accessibleElevator",
+          "title": "Accessible Building Elevator",
+          "description": "This building entrance is equipped with an accessible elevator."
+        }
+      ],
+      "entries": [{ "title": "1 entry on the main floor", "description": "" }],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        }
+      ],
+      "overview": [
+        "Located on the Sir George Williams Campus, the CL Annex is a dedicated space for learning and academic services. The building is home to classrooms and facilities that support Concordia Continuing Education programs, providing a convenient downtown location for students pursuing professional development and lifelong learning."
+      ]
+    }
   },
   {
     "id": "SGW-D",
@@ -83,7 +137,21 @@
       { "latitude": 45.4977301, "longitude": -73.5793694 },
       { "latitude": 45.4977169, "longitude": -73.5793354 },
       { "latitude": 45.497816, "longitude": -73.5792401 }
-    ]
+    ],
+    "details": {
+      "entries": [{ "title": "1 entry on the main floor", "description": "" }],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        }
+      ],
+      "overview": [
+        "This row house was built in 1891 as a twin to the neighbouring MI Annex, also featuring red Scottish sandstone and Romanesque-inspired detailing.",
+        "After years as a private residence, it was acquired by Concordia in 1971. Its distinct gabled roofline and original bay windows hint at its 19th-century residential roots."
+      ]
+    }
   },
   {
     "id": "SGW-EN",
@@ -108,7 +176,21 @@
       { "latitude": 45.4968073, "longitude": -73.579621 },
       { "latitude": 45.4967907, "longitude": -73.5795851 },
       { "latitude": 45.4968834, "longitude": -73.5794977 }
-    ]
+    ],
+    "details": {
+      "entries": [{ "title": "1 entry on the main floor", "description": "" }],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        }
+      ],
+      "overview": [
+        "This four-storey row house was built in 1940. It has an Art Deco flair, with rounded balconies and decorative concrete framing its windows and doors. Acquired in 1971 by the university, it now houses offices and student services."
+      ],
+      "departments": ["Research Chair on Gambling"]
+    }
   },
   {
     "id": "SGW-ER",
@@ -130,7 +212,50 @@
       { "latitude": 45.4961343, "longitude": -73.5799991 },
       { "latitude": 45.4962949, "longitude": -73.5798436 },
       { "latitude": 45.4965177, "longitude": -73.5796317 }
-    ]
+    ],
+    "details": {
+      "accessibility": [
+        {
+          "icon": "accessibilityRamp",
+          "title": "Accessibility Ramp",
+          "description": "This building entrance is equipped with an accessibility ramp."
+        },
+        {
+          "icon": "accessibleEntrance",
+          "title": "Accessible Entrance",
+          "description": "This building has an automated accessible entrance door."
+        },
+        {
+          "icon": "accessibleElevator",
+          "title": "Accessible Building Elevator",
+          "description": "This building entrance is equipped with an accessible elevator."
+        }
+      ],
+      "metro": {
+        "title": "Guy–Concordia Station",
+        "description": "This campus is directly accessible via the Guy–Concordia metro station, providing convenient underground access to Concordia’s downtown buildings."
+      },
+      "entries": [
+        {
+          "title": "1 entry on Guy St.",
+          "description": "main entrance"
+        }
+      ],
+      "overview": [
+        "Built in 1954, the ER Building is a 14-storey office tower on Concordia’s Sir George Williams Campus. It houses academic departments and research centres and institutes. Concordia occupies space on 11 floors."
+      ],
+      "departments": [
+        "Applied AI Institute",
+        "Centre for Engineering in Society",
+        "Computer Science and Software Engineering",
+        "Creative Arts Therapies",
+        "engAGE: Centre for Research on Aging",
+        "Next-Generation Cities Institute",
+        "Simone de Beauvoir Institute",
+        "Sustainability in the Digital Age",
+        "Urban Studies"
+      ]
+    }
   },
   {
     "id": "SGW-EV",
@@ -173,7 +298,87 @@
       { "latitude": 45.4959029, "longitude": -73.5783135 },
       { "latitude": 45.4958841, "longitude": -73.5783336 },
       { "latitude": 45.4959332, "longitude": -73.578441 }
-    ]
+    ],
+    "details": {
+      "accessibility": [
+        {
+          "icon": "accessibleEntrance",
+          "title": "Accessible Entrance",
+          "description": "This building has an automated accessible entrance door."
+        },
+        {
+          "icon": "accessibleElevator",
+          "title": "Accessible Building Elevator",
+          "description": "This building entrance is equipped with an accessible elevator."
+        }
+      ],
+      "metro": {
+        "title": "Guy–Concordia Station",
+        "description": "This campus is directly accessible via the Guy–Concordia metro station, providing convenient underground access to Concordia’s downtown buildings."
+      },
+      "connectivity": {
+        "title": "Connected Buildings",
+        "description": "This building is internally connected to the JMSB, LB, H and GM buildings, allowing indoor access between facilities without exiting the complex."
+      },
+      "entries": [
+        {
+          "title": "3 entries on the main floor (Ste-Catherine St. W.)",
+          "description": ""
+        },
+        { "title": "2 entries on the main floor (Guy St.)", "description": "" },
+        {
+          "title": "2 entries in the basement from the tunnel",
+          "description": "connecting the metro and other buildings."
+        },
+        {
+          "title": "3 entries in the basement from the JMSB building",
+          "description": ""
+        }
+      ],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        },
+        {
+          "icon": "shuttle",
+          "title": "Shuttle Services Terminal",
+          "description": "It is close to the shuttle services terminal."
+        }
+      ],
+      "overview": [
+        "The Engineering, Computer Science and Visual Arts Integrated Complex (EV Building) opened in September 2005, a striking addition to Montreal’s downtown landscape.",
+        "The 17-storey complex unites the Gina Cody School of Engineering and Computer Science and the Faculty of Fine Arts in a bold, light-filled structure on the Sir George Williams Campus. Its two towers, connected on every floor, were designed to encourage collaboration between disciplines while responding thoughtfully to their urban surroundings.",
+        "The Engineering and Computer Science tower contains over 300 specialized labs, student areas and the faculty Dean's Office, integrating a large part of the faculty in one space.",
+        "The Visual Arts tower houses Studio Arts, Art History and the faculty Dean's Office, with specialized spaces for traditional and digital media. It also boasts an art gallery, a black box theatre and art history amphitheatres.",
+        "The complex also includes a fitness and recreation centre, and an underground tunnel to the Guy-De Maisonneuve (GM) Building and Guy-Concordia metro station."
+      ],
+      "venues": [
+        "Abe and Harriet Gold Atrium",
+        "FOFA Gallery",
+        "Norman D. Hébert, LLD Meeting Room",
+        "York Amphitheatre"
+      ],
+      "departments": [
+        "Art Education",
+        "Art History",
+        "Building, Civil and Environmental Engineering",
+        "Centre for Composites (CONCOM)",
+        "Centre for Pattern Recognition and Machine Intelligence (CENPARMI)",
+        "Centre for Zero Energy Building Studies",
+        "Chemical and Materials Engineering",
+        "Contemporary Dance",
+        "Design and Computation Arts",
+        "Electrical and Computer Engineering",
+        "Faculty of Fine Arts",
+        "Gina Cody School of Engineering and Computer Science",
+        "Mechanical, Industrial and Aerospace Engineering",
+        "Recreation and Athletics",
+        "Studio Arts"
+      ],
+      "services": ["Le Gym", "Zen Den"]
+    }
   },
   {
     "id": "SGW-FA",
@@ -192,7 +397,27 @@
       { "latitude": 45.4967907, "longitude": -73.5795851 },
       { "latitude": 45.4967793, "longitude": -73.579597 },
       { "latitude": 45.4967406, "longitude": -73.5795156 }
-    ]
+    ],
+    "details": {
+      "entries": [{ "title": "1 entry on the main floor", "description": "" }],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        },
+        {
+          "icon": "shuttle",
+          "title": "Shuttle Services Terminal",
+          "description": "It is close to the shuttle services terminal."
+        }
+      ],
+      "overview": [
+        "The FA Annex, a three-storey Victorian house built in 1875, stands out with its steep slate roof, detailed dormer windows and prominent stone bay window at the front.",
+        "Once home to notable Montrealers, it became part of the university in 1970. Today, it hosts offices and student services, including part of the Department of Religions and Cultures."
+      ],
+      "departments": ["Religions and Cultures"]
+    }
   },
   {
     "id": "SGW-FB",
@@ -228,7 +453,82 @@
       { "latitude": 45.4947542, "longitude": -73.5779622 },
       { "latitude": 45.4947429, "longitude": -73.5779414 },
       { "latitude": 45.4946786, "longitude": -73.5780177 }
-    ]
+    ],
+    "details": {
+      "accessibility": [
+        {
+          "icon": "wheelchairLift",
+          "title": "Wheelchair Lift",
+          "description": "This building is equipped with a wheelchair lift."
+        },
+        {
+          "icon": "accessibleEntrance",
+          "title": "Accessible Entrance",
+          "description": "This building has an automated accessible entrance door."
+        },
+        {
+          "icon": "accessibleElevator",
+          "title": "Accessible Building Elevator",
+          "description": "This building entrance is equipped with an accessible elevator."
+        }
+      ],
+      "connectivity": {
+        "title": "Connected Buildings",
+        "description": "This building is internally connected to the FG and GA buildings, allowing indoor access between facilities without exiting the complex."
+      },
+      "entries": [
+        {
+          "title": "1 entry on the main floor (Ste-Catherine St. W.)",
+          "description": ""
+        },
+        {
+          "title": "1 entry on the main floor (Guy St.)",
+          "description": "main entrance"
+        },
+        {
+          "title": "1 entry in the basement",
+          "description": "connecting the FG building."
+        },
+        {
+          "title": "1 entry in the basement",
+          "description": "connecting the GA building."
+        },
+        {
+          "title": "1 entry in the basement",
+          "description": "connecting the indoor parking."
+        }
+      ],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        }
+      ],
+      "overview": [
+        "The Faubourg Building, a 12-storey postmodern tower, opened in 1990 at the corner of Guy Street and Ste. Catherine Street West. Originally designed as a hotel, it became an office building and was acquired by Concordia in 1997.",
+        "Today, it’s home to Concordia Continuing Education and the Mel Hoppenheim School of Cinema, along with labs, classrooms, offices, study spaces and student services.",
+        "The building is part of a larger complex that once hosted a Buick car showroom, bowling alley and the legendary Toe Blake’s Tavern. Its red brick, green aluminum and glass exterior stands out with a distinctive sawtooth pattern along Guy Street.",
+        "The Faubourg Building connects to the Faubourg Ste-Catherine (FG) and Grey Nuns Annex (GA) Buildings and offers indoor parking."
+      ],
+      "venues": ["District 3 Innovation Hub"],
+      "departments": [
+        "Classics, Modern Languages and Linguistics",
+        "Concordia Continuing Education",
+        "Mel Hoppenheim School of Cinema",
+        "Theological Studies"
+      ],
+      "services": [
+        "Enrolment Services / Office of the Registrar / Student Recruitment",
+        "Environmental Health and Safety",
+        "Examinations Office",
+        "Human Resources",
+        "Office of Sustainability",
+        "Records Management and Archives (RMA) Office",
+        "Senior non-credit program",
+        "Study Hub"
+      ]
+    }
   },
   {
     "id": "SGW-FG",
@@ -254,7 +554,64 @@
       { "latitude": 45.4945281, "longitude": -73.5782003 },
       { "latitude": 45.4943598, "longitude": -73.5783982 },
       { "latitude": 45.4938097, "longitude": -73.5790389 }
-    ]
+    ],
+    "details": {
+      "accessibility": [
+        {
+          "icon": "wheelchairLift",
+          "title": "Wheelchair Lift",
+          "description": "This building is equipped with a wheelchair lift."
+        },
+        {
+          "icon": "accessibilityRamp",
+          "title": "Accessibility Ramp",
+          "description": "This building entrance is equipped with an accessibility ramp."
+        },
+        {
+          "icon": "accessibleEntrance",
+          "title": "Accessible Entrance",
+          "description": "This building has an automated accessible entrance door."
+        },
+        {
+          "icon": "accessibleElevator",
+          "title": "Accessible Building Elevator",
+          "description": "This building entrance is equipped with an accessible elevator."
+        }
+      ],
+      "connectivity": {
+        "title": "Connected Buildings",
+        "description": "This building is internally connected to the FB and GA buildings, allowing indoor access between facilities without exiting the complex."
+      },
+      "entries": [
+        {
+          "title": "1 entry on the main floor (Ste-Catherine St. W.)",
+          "description": "main entrance"
+        },
+        {
+          "title": "1 entry in the basement",
+          "description": "connecting the FG building."
+        },
+        {
+          "title": "1 entry in the basement",
+          "description": "connecting the GA building."
+        }
+      ],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        }
+      ],
+      "overview": [
+        "Located on the site of a former auto showroom, the Faubourg Ste-Catherine Building has a colourful history. Built in 1926, the building was originally a McLaughlin-Buick dealership and then later hosted a bowling alley, a pool room and a tavern. In 1985, the building was redeveloped into an indoor urban market inspired by Boston's Faneuil Hall, with an attached tower originally intended as a hotel.",
+        "Today, the building houses classrooms as well as the Department of Education's Student Resource Centre. You can also find a selection of restaurants in the building's sunlit atrium."
+      ],
+      "departments": ["Education"],
+      "services": [
+        "Records Management and Archives (RMA) Research Room and Vault"
+      ]
+    }
   },
   {
     "id": "SGW-GA",
@@ -281,7 +638,52 @@
       { "latitude": 45.4944101, "longitude": -73.5776918 },
       { "latitude": 45.4944364, "longitude": -73.5777428 },
       { "latitude": 45.4936289, "longitude": -73.5787043 }
-    ]
+    ],
+    "details": {
+      "accessibility": [
+        {
+          "icon": "accessibilityRamp",
+          "title": "Accessibility Ramp",
+          "description": "This building entrance is equipped with an accessibility ramp."
+        },
+        {
+          "icon": "accessibleEntrance",
+          "title": "Accessible Entrance",
+          "description": "This building has an automated accessible entrance door."
+        }
+      ],
+      "connectivity": {
+        "title": "Connected Buildings",
+        "description": "This building is internally connected to the FB and FG buildings, allowing indoor access between facilities without exiting the complex."
+      },
+      "entries": [
+        {
+          "title": "1 entry on the main floor (St-Mathieu St. - main entrance",
+          "description": ""
+        },
+        {
+          "title": "1 entry in the basement",
+          "description": "connecting the FB building."
+        },
+        {
+          "title": "1 entry in the basement",
+          "description": "connecting the FG building."
+        }
+      ],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        }
+      ],
+      "overview": [
+        "Built in stages between 1869 and 1925, the Grey Nuns Annex originally housed workers for the Grey Nuns’ hospital complex. It once included dorms, a bakery and workshops for painters and carpenters.",
+        "Acquired by Concordia in 2014, the stone building now serves as a research and administrative hub for Concordia’s Department of Education and other university services. Highlights include its preschool education lab and a modern footbridge linking it to the Faubourg (FB) Building.",
+        "With its historic dormers and stone walls, the annex is a rare example of 19th-century institutional architecture preserved on campus."
+      ],
+      "departments": ["Education"]
+    }
   },
   {
     "id": "SGW-GM",
@@ -305,7 +707,74 @@
       { "latitude": 45.4956265, "longitude": -73.578729 },
       { "latitude": 45.4959332, "longitude": -73.578441 },
       { "latitude": 45.4959562, "longitude": -73.5784181 }
-    ]
+    ],
+    "details": {
+      "accessibility": [
+        {
+          "icon": "accessibleEntrance",
+          "title": "Accessible Entrance",
+          "description": "This building has an automated accessible entrance door."
+        },
+        {
+          "icon": "accessibleElevator",
+          "title": "Accessible Building Elevator",
+          "description": "This building entrance is equipped with an accessible elevator."
+        }
+      ],
+      "metro": {
+        "title": "Guy–Concordia Station",
+        "description": "This campus is directly accessible via the Guy–Concordia metro station, providing convenient underground access to Concordia’s downtown buildings."
+      },
+      "connectivity": {
+        "title": "Connected Buildings",
+        "description": "This building is internally connected to the EV, JMSB, LB, and H buildings, allowing indoor access between facilities without exiting the complex."
+      },
+      "entries": [
+        {
+          "title": "2 entries on the main floor (De Maisonneuve Blvd. W.)",
+          "description": ""
+        },
+        {
+          "title": "2 entries in the basement from the tunnel",
+          "description": "connecting the metro and other buildings."
+        }
+      ],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        },
+        {
+          "icon": "shuttle",
+          "title": "Shuttle Services Terminal",
+          "description": "It is close to the shuttle services terminal."
+        }
+      ],
+      "overview": [
+        "Completed in 1966 above the Guy-Concordia metro station, the Guy-De Maisonneuve Building was one of Montreal’s first developments to integrate directly with the city’s expanding metro system. This modernist concrete and glass building originally featured commercial spaces at street level and offices above.",
+        "Today, the 11-storey building hosts administrative offices and academic spaces, including studios and classrooms for the Contemporary Dance, Theatre and Music departments. Major renovations in 2011 modernized the exterior with an energy-efficient glass curtain wall and restored a 1966 mural by artist Claude Théberge.",
+        "The building is connected to the Engineering, Computer Science and Visual Arts Integrated Complex (EV) and Guy-Concordia metro via underground tunnels."
+      ],
+      "departments": ["Contemporary Dance", "Music", "Theatre"],
+      "services": [
+        "Access Centre for Students with Disabilities",
+        "Facilities Management",
+        "Financial Aid and Awards Office",
+        "Financial Services",
+        "Graduate Studies",
+        "Health Services",
+        "Institute for Co-operative Education",
+        "International Students Office",
+        "Office of the President and Vice-Chancellor",
+        "Office of the Provost and Vice-President, Academic",
+        "Office of the Vice-President, Research, Innovation and Impact",
+        "Office of the Vice-President, Services and Sustainability",
+        "Ombuds Office",
+        "University Communications Services",
+        "Zen Den"
+      ]
+    }
   },
   {
     "id": "SGW-GN",
@@ -410,7 +879,60 @@
       { "latitude": 45.4934203, "longitude": -73.5770241 },
       { "latitude": 45.4934363, "longitude": -73.577002 },
       { "latitude": 45.4933855, "longitude": -73.5768933 }
-    ]
+    ],
+    "details": {
+      "accessibility": [
+        {
+          "icon": "accessibilityRamp",
+          "title": "Accessibility Ramp",
+          "description": "This building entrance is equipped with an accessibility ramp."
+        },
+        {
+          "icon": "accessibleEntrance",
+          "title": "Accessible Entrance",
+          "description": "This building has an automated accessible entrance door."
+        },
+        {
+          "icon": "accessibleElevator",
+          "title": "Accessible Building Elevator",
+          "description": "This building entrance is equipped with an accessible elevator."
+        }
+      ],
+      "entries": [
+        {
+          "title": "1 entry on the main floor (Guy St.)",
+          "description": "main entrance"
+        },
+        {
+          "title": "1 entry on the main floor (St-Mathew St.)",
+          "description": "classroom entrance"
+        },
+        { "title": "1 entry on the main floor (Guy St.)", "description": "" }
+      ],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        }
+      ],
+      "overview": [
+        "The Sisters of Charity of Montreal, also known as the Grey Nuns, have played an important part in the city’s history. Their former Mother House, built in 1871, was acquired by Concordia in 2007, serving a new purpose while preserving its outstanding heritage.",
+        "Today, the five-floor Grey Nuns Building houses approximately 600 undergraduate students and offers a beautiful reading room, an early-childhood observation nursery and a kitchen serving both campuses."
+      ],
+      "venues": [
+        "Classroom entrance (1175 St-Mathieu St.)",
+        "Grey Nuns Garden"
+      ],
+      "departments": ["Philosophy (1175 St-Mathieu St.)"],
+      "services": [
+        "Concordia Daycare (1185 St-Mathieu St.)",
+        "Concordia University Student Parents Centre (CUSP): 1175 St-Mathieu St.",
+        "Grey Nuns Reading Room & Group Study Rooms (1190 Guy St.)",
+        "Residences",
+        "Summer accommodations"
+      ]
+    }
   },
   {
     "id": "SGW-GS",
@@ -433,7 +955,20 @@
       { "latitude": 45.4967161, "longitude": -73.5811167 },
       { "latitude": 45.4967894, "longitude": -73.5813165 },
       { "latitude": 45.496655, "longitude": -73.5814399 }
-    ]
+    ],
+    "details": {
+      "entries": [
+        {
+          "title": "1 entry on the main floor (Sherbrooke St. W.)",
+          "description": "main entrance"
+        }
+      ],
+      "overview": [
+        "Located on the Sir George Williams Campus, the GS Building houses the Concordia University Part-time Faculty Association (CUPFA). The building provides office and meeting spaces for CUPFA’s operations, supporting part-time faculty members in their academic and professional activities.",
+        "Today, the five-floor Grey Nuns Building houses approximately 600 undergraduate students and offers a beautiful reading room, an early-childhood observation nursery and a kitchen serving both campuses."
+      ],
+      "services": ["Concordia University Part-time Faculty Association (CUPFA)"]
+    }
   },
   {
     "id": "SGW-H",
@@ -459,7 +994,89 @@
       { "latitude": 45.4971671, "longitude": -73.5795431 },
       { "latitude": 45.497128, "longitude": -73.5794591 },
       { "latitude": 45.4968261, "longitude": -73.5788241 }
-    ]
+    ],
+    "details": {
+      "accessibility": [
+        {
+          "icon": "accessibleEntrance",
+          "title": "Accessible Entrance",
+          "description": "This building has an automated accessible entrance door."
+        },
+        {
+          "icon": "accessibleElevator",
+          "title": "Accessible Building Elevator",
+          "description": "This building entrance is equipped with an accessible elevator."
+        }
+      ],
+      "metro": {
+        "title": "Guy–Concordia Station",
+        "description": "This campus is directly accessible via the Guy–Concordia metro station, providing convenient underground access to Concordia’s downtown buildings."
+      },
+      "connectivity": {
+        "title": "Connected Buildings",
+        "description": "This building is internally connected to the EV, JMSB, LB, and GM buildings, allowing indoor access between facilities without exiting the complex."
+      },
+      "entries": [
+        {
+          "title": "3 entries on the main floor (De Maisonneuve Blvd. W.)",
+          "description": "main entrance"
+        },
+        {
+          "title": "3 entries on the main floor (Bishop St.)",
+          "description": ""
+        },
+        {
+          "title": "2 entries in the basement from the tunnel",
+          "description": "connecting the metro and other buildings."
+        },
+        {
+          "title": "An entry from the student bar called Reggies,",
+          "description": "but it is not accessible 24/7."
+        }
+      ],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        },
+        {
+          "icon": "shuttle",
+          "title": "Shuttle Services Terminal",
+          "description": "It is close to the shuttle services terminal."
+        }
+      ],
+      "overview": [
+        "Completed in 1966, the Henry F. Hall Building is a prominent academic and social hub on the Sir George Williams Campus. Its cube-like form and exterior of pre-fabricated, stressed concrete reflect the Brutalist architectural style, a movement often associated with French architect Le Corbusier.",
+        "Inside, the building brings together many academic departments — along with classrooms and engineering teaching and research labs.",
+        "Beyond academics, it is a lively centre of student life, home to the Student Success Centre, Concordia Theatre and student spaces like the Hive Café, Reggies Pub, the People’s Potato and student association offices."
+      ],
+      "venues": [
+        "Concordia Theatre",
+        "Reggies",
+        "Sir George Williams University Alumni Auditorium"
+      ],
+      "departments": [
+        "Economics",
+        "Geography, Planning and Environment",
+        "Political Science",
+        "School of Irish Studies",
+        "Sociology and Anthropology"
+      ],
+      "services": [
+        "Campus Safety and Prevention Services",
+        "Concordia Student Union (CSU)",
+        "First Stop",
+        "Espace Franco",
+        "IT Service Desk",
+        "NouLa Black Student Centre",
+        "Office of Student Life and Engagement",
+        "Otsenhákta Student Centre",
+        "Student Success Centre",
+        "Welcome Crew Office",
+        "Zen Den"
+      ]
+    }
   },
   {
     "id": "SGW-K",
@@ -485,7 +1102,21 @@
       { "latitude": 45.49777, "longitude": -73.5794334 },
       { "latitude": 45.4977565, "longitude": -73.579405 },
       { "latitude": 45.4978508, "longitude": -73.5793152 }
-    ]
+    ],
+    "details": {
+      "entries": [{ "title": "1 entry on the main floor", "description": "" }],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        }
+      ],
+      "overview": [
+        "The oldest of the Bishop annexes, this row house was built in 1890. Its Romanesque-inspired stonework and carved details — like rounded archways and a stone porch with balcony — make it especially striking.",
+        "Acquired in 1970, the annex now houses offices for departments and unions."
+      ]
+    }
   },
   {
     "id": "SGW-LB",
@@ -527,7 +1158,92 @@
       { "latitude": 45.496716, "longitude": -73.5785731 },
       { "latitude": 45.4966932, "longitude": -73.578525 },
       { "latitude": 45.4966595, "longitude": -73.5785573 }
-    ]
+    ],
+    "details": {
+      "accessibility": [
+        {
+          "icon": "accessibleEntrance",
+          "title": "Accessible Entrance",
+          "description": "This building has an automated accessible entrance door."
+        },
+        {
+          "icon": "accessibleElevator",
+          "title": "Accessible Building Elevator",
+          "description": "This building entrance is equipped with an accessible elevator."
+        }
+      ],
+      "metro": {
+        "title": "Guy–Concordia Station",
+        "description": "This campus is directly accessible via the Guy–Concordia metro station, providing convenient underground access to Concordia’s downtown buildings."
+      },
+      "connectivity": {
+        "title": "Connected Buildings",
+        "description": "This building is internally connected to the EV, JMSB, H, and GM buildings, allowing indoor access between facilities without exiting the complex."
+      },
+      "entries": [
+        {
+          "title": "3 entries on the main floor (De Maisonneuve Blvd. W.)",
+          "description": "main entrance"
+        },
+        {
+          "title": "2 entries on the main floor (Mackay St.)",
+          "description": ""
+        },
+        {
+          "title": "2 entries in the basement from the tunnel",
+          "description": "connecting the metro and other buildings."
+        },
+        {
+          "title": "2 entries in the basement from the indoor parking",
+          "description": ""
+        }
+      ],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        },
+        {
+          "icon": "shuttle",
+          "title": "Shuttle Services Terminal",
+          "description": "It is close to the shuttle services terminal."
+        }
+      ],
+      "overview": [
+        "Opened in 1992, the J.W. McConnell (LB) Building is a central academic and cultural hub on the Sir George Williams Campus. Its tiered, stepped profile was designed to complement the surrounding neighbourhood, with its height gradually increasing from two to 10 storeys.",
+        "The lower floors feature a mix of public and student-focused spaces, including a student service centre, bookstore, print shop, art gallery and more. An underground tunnel links the building to the Hall Building and Guy-Concordia metro station.",
+        "The second to fifth floors house the R. Howard Webster Library, offering a variety of study spaces and services.",
+        "Upper levels contain classrooms, academic department offices and conference spaces."
+      ],
+      "venues": [
+        "4TH SPACE",
+        "Atrium",
+        "J.A. De Sève Cinema",
+        "Leonard and Bina Ellen Art Gallery",
+        "SHIFT Centre for Social Transformation"
+      ],
+      "departments": [
+        "Centre for Interdisciplinary Studies in Society and Culture (CISSC)",
+        "Centre for the Study of Learning and Performance",
+        "Education",
+        "English",
+        "Études françaises",
+        "History",
+        "Mathematics and Statistics"
+      ],
+      "services": [
+        "Birks Student Service Centre",
+        "Concordia Book Stop",
+        "Concordia Print Services",
+        "First Stop",
+        "Instructional and Information Technology Services (IITS)",
+        "J.A. De Sève Cinema",
+        "R. Howard Webster Library",
+        "SHIFT Centre for Social Transformation",
+        "Welcome Centre"
+      ]
+    }
   },
   {
     "id": "SGW-LD",
@@ -549,7 +1265,32 @@
       { "latitude": 45.4966344, "longitude": -73.5772922 },
       { "latitude": 45.496813, "longitude": -73.5771179 },
       { "latitude": 45.4968552, "longitude": -73.5772077 }
-    ]
+    ],
+    "details": {
+      "entries": [
+        {
+          "title": "3 entries on the main floor (Bishop St.)",
+          "description": "main entrance"
+        }
+      ],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        },
+        {
+          "icon": "shuttle",
+          "title": "Shuttle Services Terminal",
+          "description": "It is close to the shuttle services terminal."
+        }
+      ],
+      "overview": [
+        "Built in 1894, this red sandstone townhouse features ornate stonework and a three-storey bay window. Over time, it housed offices, restaurants and cafés.",
+        "In 2019, Concordia converted the building into a daycare and nursery for the Concordia Student Union. While the interior has evolved, many original architectural features remain visible from the street."
+      ],
+      "services": ["CSU Daycare & Nursery"]
+    }
   },
   {
     "id": "SGW-LS",
@@ -569,7 +1310,43 @@
       { "latitude": 45.4963629, "longitude": -73.5795726 },
       { "latitude": 45.4962668, "longitude": -73.5796648 },
       { "latitude": 45.4961716, "longitude": -73.5794628 }
-    ]
+    ],
+    "details": {
+      "accessibility": [
+        {
+          "icon": "accessibilityRamp",
+          "title": "Accessibility Ramp",
+          "description": "This building entrance is equipped with an accessibility ramp."
+        },
+        {
+          "icon": "accessibleEntrance",
+          "title": "Accessible Entrance",
+          "description": "This building has an automated accessible entrance door."
+        }
+      ],
+      "entries": [
+        {
+          "title": "2 entries on the main floor (De Maisonneuve Blvd. W.)",
+          "description": "main entrance"
+        }
+      ],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        },
+        {
+          "icon": "shuttle",
+          "title": "Shuttle Services Terminal",
+          "description": "It is close to the shuttle services terminal."
+        }
+      ],
+      "overview": [
+        "The Learning Square opened in 2019 to provide extra classroom space while the Henry F. Hall Building underwent renovations. This bright, modular two-storey structure was designed for flexibility and future reuse by Montreal-based firm Lapointe Magne et associés.",
+        "It houses eight state-of-the-art classrooms and includes universal accessibility features like gender-neutral washrooms and step-free entry."
+      ]
+    }
   },
   {
     "id": "SGW-M",
@@ -592,7 +1369,27 @@
       { "latitude": 45.4973882, "longitude": -73.5796579 },
       { "latitude": 45.4974254, "longitude": -73.5797325 },
       { "latitude": 45.4974204, "longitude": -73.5797377 }
-    ]
+    ],
+    "details": {
+      "entries": [
+        { "title": "1 entry on the main floor (Mackay St.)", "description": "" }
+      ],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        }
+      ],
+      "connectivity": {
+        "title": "Connected Buildings",
+        "description": "This building is internally connected to the S Annex building, allowing indoor access between facilities without exiting the complex."
+      },
+      "overview": [
+        "The M Annex is a 3-storey Victorian building located just north of the Hall Building. Built around 1884, it features a grey limestone facade, carved stone details and a distinctive two-storey curved bay window.",
+        "Originally a private residence, it later housed the Canadian Red Cross and was converted into apartments before being acquired by the university in 1967."
+      ]
+    }
   },
   {
     "id": "SGW-MB",
@@ -625,7 +1422,81 @@
       { "latitude": 45.4951179, "longitude": -73.5793059 },
       { "latitude": 45.495187, "longitude": -73.5792261 },
       { "latitude": 45.4949482, "longitude": -73.5787947 }
-    ]
+    ],
+    "details": {
+      "accessibility": [
+        {
+          "icon": "accessibleEntrance",
+          "title": "Accessible Entrance",
+          "description": "This building has an automated accessible entrance door."
+        },
+        {
+          "icon": "accessibleElevator",
+          "title": "Accessible Building Elevator",
+          "description": "This building entrance is equipped with an accessible elevator."
+        }
+      ],
+      "metro": {
+        "title": "Guy–Concordia Station",
+        "description": "This campus is directly accessible via the Guy–Concordia metro station, providing convenient underground access to Concordia’s downtown buildings."
+      },
+      "connectivity": {
+        "title": "Connected Buildings",
+        "description": "This building is internally connected to the EV, JMSB, LB, and GM buildings, allowing indoor access between facilities without exiting the complex."
+      },
+      "entries": [
+        {
+          "title": "3 entries on the main floor (Guy St.)",
+          "description": "main entrance"
+        },
+        { "title": "2 entries on the main floor (Guy St.)", "description": "" },
+        {
+          "title": "3 entries in the basement from the tunnel",
+          "description": "connecting the metro and other buildings."
+        }
+      ],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        },
+        {
+          "icon": "shuttle",
+          "title": "Shuttle Services Terminal",
+          "description": "It is close to the shuttle services terminal."
+        }
+      ],
+      "overview": [
+        "In 2009, the John Molson Building officially opened on the corner of Guy and de Maisonneuve. It includes digitally equipped teaching amphitheatres and classrooms, faculty and graduate student offices, the Office of the Dean, student and faculty social space, as well as space for privatized programs. Special features also include case study rooms designed for group work, and laboratories for consumer behaviour research.",
+        "Set on a tight footprint typical of a downtown property, the building is 15 storeys high, with two basement levels. The distinctive design features two-storey stacked atria, a vertically interconnected ground floor concourse, and a tunnel running under Guy Street connecting to the Guy-Concordia metro station and the Engineering, Computer Science and Visual Arts Integrated Complex.",
+        "The building was awarded LEED (Leadership in Energy and Environmental Design) Silver level certification for its eco-friendly design."
+      ],
+      "venues": [
+        "Concordia Conference Centre, 9th Floor",
+        "Cloud Deck",
+        "Goodman Institute"
+      ],
+      "departments": [
+        "Accountancy",
+        "Contemporary Dance",
+        "Executive MBA Program",
+        "Finance",
+        "Goodman Institute of Investment Management",
+        "Management",
+        "Marketing",
+        "Music",
+        "Supply Chain and Business Technology Management",
+        "Theatre"
+      ],
+      "services": [
+        "Career Management Services",
+        "First Stop",
+        "John Molson Executive Centre",
+        "Performing Arts Facilities",
+        "Zen Den"
+      ]
+    }
   },
   {
     "id": "SGW-MI",
@@ -649,7 +1520,23 @@
       { "latitude": 45.4976783, "longitude": -73.5792544 },
       { "latitude": 45.4977448, "longitude": -73.5791871 },
       { "latitude": 45.4977756, "longitude": -73.5791541 }
-    ]
+    ],
+    "details": {
+      "entries": [
+        { "title": "1 entry on the main floor (Bishop St.)", "description": "" }
+      ],
+      "overview": [
+        "Built in 1891, this red sandstone house was designed in the Richardsonian Romanesque style with bay windows, ironwork and a bold gabled roof. Concordia acquired it in 1971.",
+        "Once a private home, today the MI Annex hosts union offices."
+      ],
+      "services": [
+        "Association of Concordia University Management and Administrative Employees (ACUMAE)",
+        "Concordia University Continuing Education Part-time Faculty Union (CUCEPTFU)",
+        "Concordia University Professional Employee Union (CUPEU)",
+        "Concordia University Support Staff Union (CSN)",
+        "The Concordia University Union of Support Staff – Technical Sector (CUUSS-TS)"
+      ]
+    }
   },
   {
     "id": "SGW-MU",
@@ -669,7 +1556,16 @@
       { "latitude": 45.4977075, "longitude": -73.5796772 },
       { "latitude": 45.4977507, "longitude": -73.5796322 },
       { "latitude": 45.4979241, "longitude": -73.5794655 }
-    ]
+    ],
+    "details": {
+      "entries": [
+        { "title": "1 entry on the main floor (Bishop St.)", "description": "" }
+      ],
+      "overview": [
+        "Built in 1891, the MU Annex blends limestone and textured concrete, giving it a distinct look among the Bishop Street row houses. Once a private home, it was later converted into apartments before being acquired by Concordia in 1971.",
+        "Today, it provides office space for various university services."
+      ]
+    }
   },
   {
     "id": "SGW-P",
@@ -688,7 +1584,23 @@
       { "latitude": 45.496621, "longitude": -73.5792669 },
       { "latitude": 45.4965857, "longitude": -73.5791899 },
       { "latitude": 45.496684, "longitude": -73.5790979 }
-    ]
+    ],
+    "details": {
+      "entries": [
+        { "title": "1 entry on the main floor (Mackay St.)", "description": "" }
+      ],
+      "otherServices": [
+        {
+          "icon": "shuttle",
+          "title": "Shuttle Services Terminal",
+          "description": "It is close to the shuttle services terminal."
+        }
+      ],
+      "overview": [
+        "Designed and likely built by architect William Tutin Thomas in 1873-74, this three-storey Victorian building includes a striking bay window with a copper-clad oriel.",
+        "Originally a private residence for brokers and businessmen, the P Annex was acquired by the university in 1969 and is now used for offices and student services."
+      ]
+    }
   },
   {
     "id": "SGW-PR",
@@ -719,7 +1631,23 @@
       { "latitude": 45.4968917, "longitude": -73.5798536 },
       { "latitude": 45.4969027, "longitude": -73.5798436 },
       { "latitude": 45.4969999, "longitude": -73.5797534 }
-    ]
+    ],
+    "details": {
+      "entries": [
+        { "title": "1 entry on the main floor (Mackay St.)", "description": "" }
+      ],
+      "otherServices": [
+        {
+          "icon": "shuttle",
+          "title": "Shuttle Services Terminal",
+          "description": "It is close to the shuttle services terminal."
+        }
+      ],
+      "overview": [
+        "Designed and likely built by architect William Tutin Thomas in 1873-74, this three-storey Victorian building includes a striking bay window with a copper-clad oriel.",
+        "Originally a private residence for brokers and businessmen, the P Annex was acquired by the university in 1969 and is now used for offices and student services."
+      ]
+    }
   },
   {
     "id": "SGW-Q",
@@ -738,7 +1666,23 @@
       { "latitude": 45.4965778, "longitude": -73.5791972 },
       { "latitude": 45.4965484, "longitude": -73.579129 },
       { "latitude": 45.496652, "longitude": -73.579029 }
-    ]
+    ],
+    "details": {
+      "entries": [
+        { "title": "1 entry on the main floor (Mackay St.)", "description": "" }
+      ],
+      "otherServices": [
+        {
+          "icon": "shuttle",
+          "title": "Shuttle Services Terminal",
+          "description": "It is close to the shuttle services terminal."
+        }
+      ],
+      "overview": [
+        "Built in 1875 by architect Alexander Goodsir Fowler, the Q Annex is a modest two-storey Victorian stone home with simple lines and minimal ornamentation.",
+        "Once home to the Polish Consulate, it became university property in 1969 and now houses offices and student services."
+      ]
+    }
   },
   {
     "id": "SGW-R",
@@ -756,7 +1700,24 @@
       { "latitude": 45.4968443, "longitude": -73.5794153 },
       { "latitude": 45.4967406, "longitude": -73.5795156 },
       { "latitude": 45.4967012, "longitude": -73.5794243 }
-    ]
+    ],
+    "details": {
+      "entries": [
+        { "title": "1 entry on the main floor (Mackay St.)", "description": "" }
+      ],
+      "otherServices": [
+        {
+          "icon": "shuttle",
+          "title": "Shuttle Services Terminal",
+          "description": "It is close to the shuttle services terminal."
+        }
+      ],
+      "overview": [
+        "Built in 1875, the R Annex is one of a trio of similar Victorian houses on this block. It features a stone facade, bay window and intricate slate-roofed dormers.",
+        "The annex was acquired by the university in 1970 and now houses offices, including part of the Department of Religions and Cultures."
+      ],
+      "departments": ["Religions and Cultures"]
+    }
   },
   {
     "id": "SGW-RR",
@@ -777,7 +1738,24 @@
       { "latitude": 45.496613, "longitude": -73.5793816 },
       { "latitude": 45.496657, "longitude": -73.5793412 },
       { "latitude": 45.4967535, "longitude": -73.5792532 }
-    ]
+    ],
+    "details": {
+      "entries": [
+        { "title": "1 entry on the main floor (Mackay St.)", "description": "" }
+      ],
+      "otherServices": [
+        {
+          "icon": "shuttle",
+          "title": "Shuttle Services Terminal",
+          "description": "It is close to the shuttle services terminal."
+        }
+      ],
+      "overview": [
+        "The RR Annex, built in 1875, was transformed over the years from a private home to apartments, and even a restaurant in the 1960s. It retains its Victorian charm with a stone bay window mansard roof, and preserved stained glass elements.",
+        "The building was acquired by Concordia in 1979 and now houses the Liberal Arts College."
+      ],
+      "departments": ["Liberal Arts College"]
+    }
   },
   {
     "id": "SGW-S",
@@ -801,7 +1779,29 @@
       { "latitude": 45.4974321, "longitude": -73.5797603 },
       { "latitude": 45.4974585, "longitude": -73.5797346 },
       { "latitude": 45.4974912, "longitude": -73.5798023 }
-    ]
+    ],
+    "details": {
+      "entries": [
+        { "title": "1 entry on the main floor (Mackay St.)", "description": "" }
+      ],
+      "otherServices": [
+        {
+          "icon": "shuttle",
+          "title": "Shuttle Services Terminal",
+          "description": "It is close to the shuttle services terminal."
+        }
+      ],
+      "connectivity": {
+        "title": "Connected Buildings",
+        "description": "This building is internally connected to the M Annex building, allowing indoor access between facilities without exiting the complex."
+      },
+      "overview": [
+        "The S Annex is a historic three-storey Victorian residence, just steps from the Hall Building. Built around 1884, it features a grey limestone exterior with intricate stone carvings and a two-storey bay window with an octagonal layout that continues into the mansard roof.",
+        "Once known as “Odstone Hall,” the building served as a private home for nearly a century before becoming university property in 1970.",
+        "Today, the S Annex houses part of the Department of Philosophy and is connected internally to the M Annex next door."
+      ],
+      "departments": ["Philosophy"]
+    }
   },
   {
     "id": "SGW-SB",
@@ -825,7 +1825,44 @@
       { "latitude": 45.4965617, "longitude": -73.5858927 },
       { "latitude": 45.4965491, "longitude": -73.5858645 },
       { "latitude": 45.4965801, "longitude": -73.5858404 }
-    ]
+    ],
+    "details": {
+      "accessibility": [
+        {
+          "icon": "accessibilityRamp",
+          "title": "Accessibility Ramp",
+          "description": "This building entrance is equipped with an accessibility ramp."
+        },
+        {
+          "icon": "accessibleEntrance",
+          "title": "Accessible Entrance",
+          "description": "This building has an automated accessible entrance door."
+        },
+        {
+          "icon": "accessibleElevator",
+          "title": "Accessible Building Elevator",
+          "description": "This building entrance is equipped with an accessible elevator."
+        }
+      ],
+      "entries": [
+        {
+          "title": "1 entry on the main floor (Dr. Penfield Ave)",
+          "description": "main entrance"
+        }
+      ],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        }
+      ],
+      "overview": [
+        "Built in 1970, the Samuel Bronfman Building was originally home to the Canadian Jewish Congress. It was designed by architect Fred Lebensold and stands out for its bold concrete structure and unique triangular shape. In 1999, the building was acquired by Concordia.",
+        "It now houses offices, centres and institutes for the Faculty of Arts and Science. You’ll also find some quiet common areas and an indoor parking garage for faculty and staff."
+      ],
+      "services": ["Arts and Science Research Groups"]
+    }
   },
   {
     "id": "SGW-T",
@@ -843,7 +1880,24 @@
       { "latitude": 45.496657, "longitude": -73.5793412 },
       { "latitude": 45.496621, "longitude": -73.5792669 },
       { "latitude": 45.4967172, "longitude": -73.5791776 }
-    ]
+    ],
+    "details": {
+      "entries": [
+        { "title": "1 entry on the main floor (Mackay St.)", "description": "" }
+      ],
+      "otherServices": [
+        {
+          "icon": "shuttle",
+          "title": "Shuttle Services Terminal",
+          "description": "It is close to the shuttle services terminal."
+        }
+      ],
+      "overview": [
+        "The T Annex dates to 1875 and features a classic Victorian facade of grey stone, with a bay window topped by a copper oriel. The three-storey rowhouse was divided into apartments in 1957 and became university property soon after.",
+        "The annex now accommodates offices and student services."
+      ],
+      "services": ["Graduate Students Association"]
+    }
   },
   {
     "id": "SGW-TD",
@@ -868,7 +1922,21 @@
       { "latitude": 45.4951387, "longitude": -73.5783164 },
       { "latitude": 45.495163, "longitude": -73.5783712 },
       { "latitude": 45.4951729, "longitude": -73.5783952 }
-    ]
+    ],
+    "details": {
+      "entries": [
+        {
+          "title": "1 entry on the main floor (Ste-Catherine St. W.)",
+          "description": "main entrance"
+        },
+        { "title": "1 entry on the main floor (Guy St.)", "description": "" }
+      ],
+      "overview": [
+        "The classic bank building at Guy Street and Sainte-Catherine Street, the Toronto-Dominion Building opened in 1903 as a branch of the Bank of Toronto. The building was one of the first commercial projects of the Montreal architectural firm Ross and MacFarlane.",
+        "Inspiration for the design came from the Knickerbocker Trust Company Building in New York, which had been conceived four years earlier by architects McKim, Mead and Whyte, and was modeled on the Temple of Zeus in Agrigento (ca 480 BCE).",
+        "In 2005, TD Canada Trust donated this heritage bank building to Concordia. The Toronto-Dominion Building is adjacent to the John Molson Building."
+      ]
+    }
   },
   {
     "id": "SGW-V",
@@ -889,7 +1957,17 @@
       { "latitude": 45.4969695, "longitude": -73.5800161 },
       { "latitude": 45.4969316, "longitude": -73.5799272 },
       { "latitude": 45.4970326, "longitude": -73.5798276 }
-    ]
+    ],
+    "details": {
+      "entries": [
+        { "title": "1 entry on the main floor (Mackay St.)", "description": "" }
+      ],
+      "overview": [
+        "Built in 1937, the V Annex was originally an apartment building called the “Florentia apartments.” This four-storey structure features a white-painted limestone ground floor that contrasts with brown brick above.",
+        "It was acquired by the university in 1970 and today houses offices and student services. Inside, some original finishes may remain, including a curved staircase and cast-iron radiators."
+      ],
+      "services": ["Centre for Gendre Advocacy", "CUTV"]
+    }
   },
   {
     "id": "SGW-VA",
@@ -913,7 +1991,40 @@
       { "latitude": 45.4958122, "longitude": -73.5737944 },
       { "latitude": 45.4960569, "longitude": -73.573549 },
       { "latitude": 45.4961732, "longitude": -73.5737903 }
-    ]
+    ],
+    "details": {
+      "accessibility": [
+        {
+          "icon": "accessibleEntrance",
+          "title": "Accessible Entrance",
+          "description": "This building has an automated accessible entrance door."
+        },
+        {
+          "icon": "accessibleElevator",
+          "title": "Accessible Building Elevator",
+          "description": "This building entrance is equipped with an accessible elevator."
+        }
+      ],
+      "entries": [
+        {
+          "title": "2 entries on the main floor (René-Lévesque Blvd.)",
+          "description": "main entrance"
+        }
+      ],
+      "otherServices": [
+        {
+          "icon": "printer",
+          "title": "Printer Access",
+          "description": "This building has printer access."
+        }
+      ],
+      "overview": [
+        "Concordia’s Visual Arts Building has been home to the Faculty of Fine Arts' visual arts programs since 1979. Originally built in 1923, the four-storey, L-shaped building features large windows, a concrete structure and a chamomile-coloured façade. Its courtyard entrance and green space out front — once a used car lot — are frequently used for student art installations.",
+        "Today, the Visual Arts Building houses facilities for the creative arts, including the VAV Gallery, which showcases student artwork to the university community and public."
+      ],
+      "departments": ["Art Eduction", "Art History", "Studio Arts"],
+      "services": ["VAV Gallery"]
+    }
   },
   {
     "id": "SGW-X",
@@ -931,7 +2042,24 @@
       { "latitude": 45.4968645, "longitude": -73.5797555 },
       { "latitude": 45.4968297, "longitude": -73.5796809 },
       { "latitude": 45.4969271, "longitude": -73.5795884 }
-    ]
+    ],
+    "details": {
+      "entries": [
+        { "title": "1 entry on the main floor (Mackay St.)", "description": "" }
+      ],
+      "otherServices": [
+        {
+          "icon": "shuttle",
+          "title": "Shuttle Services Terminal",
+          "description": "It is close to the shuttle services terminal."
+        }
+      ],
+      "overview": [
+        "Built around 1878, the X Annex is a Victorian home known for its ornate stone details with carved accents around windows and doors.",
+        "The building was acquired by the university in 1969 and now offers space for offices and student services."
+      ],
+      "services": ["Concordia International"]
+    }
   },
   {
     "id": "SGW-Z",
@@ -956,6 +2084,26 @@
       { "latitude": 45.4968151, "longitude": -73.5798399 },
       { "latitude": 45.496877, "longitude": -73.5797833 },
       { "latitude": 45.4968645, "longitude": -73.5797555 }
-    ]
+    ],
+    "details": {
+      "entries": [
+        { "title": "1 entry on the main floor (Mackay St.)", "description": "" }
+      ],
+      "otherServices": [
+        {
+          "icon": "shuttle",
+          "title": "Shuttle Services Terminal",
+          "description": "It is close to the shuttle services terminal."
+        }
+      ],
+      "overview": [
+        "Dating back to 1879, the Z Annex is a three-storey Victorian stone house with a distinctive slate mansard roof and bay-window. Decorative woodwork and stone engravings highlight its original craftsmanship.",
+        "Formerly a private residence, the building was acquired by Concordia in 1969 and now supports student services and office functions."
+      ],
+      "services": [
+        "Multi-Faith and Spirituality Centre",
+        "Sustainable Concordia"
+      ]
+    }
   }
 ]
