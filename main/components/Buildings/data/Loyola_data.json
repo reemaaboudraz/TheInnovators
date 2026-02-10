@@ -89,7 +89,10 @@
         "description": "This building is internally connected to the FC and CC buildings, allowing indoor access between facilities without exiting the complex."
       },
       "entries": [
-        { "title": "3 entries on the main floor (Sherbrooke St. W.)", "description": "main entrance" },
+        {
+          "title": "3 entries on the main floor (Sherbrooke St. W.)",
+          "description": "main entrance"
+        },
         {
           "title": "1 entry",
           "description": "connecting FC building."
@@ -115,9 +118,7 @@
         "Opened in 1916 and completed in stages through 1927, the Administration Building is one of the original Loyola Campus structures. Designed by architects Peden and McLaren, it features matte Greendale brick with limestone trim, carved wooden details and distinctive oak doors inspired by the University Church of St. Mary the Virgin in Oxford, England. The building is also a Montreal heritage site.",
         "Over the years, it has served many purposes — including housing Jesuit priests and student residences — and today it’s home to Student Services and Faculty of Arts and Science administrative offices. It connects directly to the F.C. Smith (FC) and Central (CC) buildings."
       ],
-      "departments": [
-        "Faculty of Arts and Science"
-      ],
+      "departments": ["Faculty of Arts and Science"],
       "services": [
         "Access Centre for Students with Disabilities",
         "Centre for Teaching and Learning",
@@ -150,14 +151,15 @@
     ],
     "details": {
       "entries": [
-        { "title": "1 entry on the main floor (Bermore Ave.)", "description": "" }
+        {
+          "title": "1 entry on the main floor (Bermore Ave.)",
+          "description": ""
+        }
       ],
       "overview": [
         "Located on the Loyola Campus, the BB Annex supports campus services that enhance university life. The building is home to CPE les P’tits Profs, a childcare centre providing high-quality early childhood education to faculty, staff and student families within the Concordia community."
       ],
-      "services": [
-        "CPE Les P'tits Profs Daycare"
-      ]
+      "services": ["CPE Les P'tits Profs Daycare"]
     }
   },
   {
@@ -179,14 +181,15 @@
     ],
     "details": {
       "entries": [
-        { "title": "1 entry on the main floor (Bermore Ave.)", "description": "" }
+        {
+          "title": "1 entry on the main floor (Bermore Ave.)",
+          "description": ""
+        }
       ],
       "overview": [
         "The BH Annex is situated on the Loyola Campus. It houses Les P’tits Profs Daycare, which offers quality childcare for Concordia faculty, staff and students. The building plays a key role in fostering a supportive, family-friendly campus environment."
       ],
-      "services": [
-        "CPE Les P'tits Profs Daycare"
-      ]
+      "services": ["CPE Les P'tits Profs Daycare"]
     }
   },
   {
@@ -368,10 +371,15 @@
         "description": "This building is internally connected to the GE building, allowing indoor access between facilities without exiting the complex."
       },
       "entries": [
-        { "title": "2 entries on the main floor (Sherbrooke St. W.)", "description": "main entrance" },
+        {
+          "title": "2 entries on the main floor (Sherbrooke St. W.)",
+          "description": "main entrance"
+        },
         { "title": "1 entry", "description": "behind CJ building (garden)" },
-        { "title": "1 entry", "description": "through the tunnel and connecting GE building" }
-
+        {
+          "title": "1 entry",
+          "description": "through the tunnel and connecting GE building"
+        }
       ],
       "otherServices": [
         {
@@ -389,13 +397,8 @@
         "Originally built in 1962 as the Drummond Science Complex, this building was fully renovated and expanded in 2005. It now houses the Communication Studies and Journalism departments, as well as a bookstore, open lounge space and small café.",
         "The Communication Studies and Journalism Building features specialized media spaces. These include a fully digitized radio and television broadcast operation, network access, high-tech classrooms, new media and computer labs, and studios with high-end audiovisual equipment, including production, video and editing suites."
       ],
-      "departments": [
-        "Communication Studies",
-        "Journalism"
-      ],
-      "services": [
-        "Book Stop"
-      ]
+      "departments": ["Communication Studies", "Journalism"],
+      "services": ["Book Stop"]
     }
   },
   {
@@ -482,7 +485,10 @@
         }
       ],
       "entries": [
-        { "title": "1 entry on the main floor (Sherbrooke St. W.)", "description": "main entrance" },
+        {
+          "title": "1 entry on the main floor (Sherbrooke St. W.)",
+          "description": "main entrance"
+        },
         { "title": "1 entry from AD", "description": "" }
       ],
       "otherServices": [
@@ -496,12 +502,8 @@
         "The F.C. Smith Building is a multi-use space at Loyola Campus, best known today as home to the Loyola Chapel. Opened in 1933, the building has received a heritage designation from the City of Montreal.",
         "The Loyola Chapel offers a beautiful and quiet non-denominational environment, open to people of all faiths for reflection, celebration and community events. The building also hosts classes, events and other activities connected to student life and the broader university community."
       ],
-      "venues": [
-        "Loyola Chapel"
-      ],
-      "services": [
-        "Concordia Multi-Faith and Spirituality Centre"
-      ]
+      "venues": ["Loyola Chapel"],
+      "services": ["Concordia Multi-Faith and Spirituality Centre"]
     }
   },
   {
@@ -550,8 +552,14 @@
         "description": "This building is internally connected to CJ and SP buildings, allowing indoor access between facilities without exiting the complex."
       },
       "entries": [
-        { "title": "2 entries (Sherbrooke St. W.)", "description": "main entrance" },
-        { "title": "1 entry", "description": "through the tunnel and connecting CJ building" },
+        {
+          "title": "2 entries (Sherbrooke St. W.)",
+          "description": "main entrance"
+        },
+        {
+          "title": "1 entry",
+          "description": "through the tunnel and connecting CJ building"
+        },
         { "title": "1 entry", "description": "from SP building" }
       ],
       "otherServices": [
@@ -572,9 +580,7 @@
         "The Centre for Structural and Functional Genomics has four floors – 5,400 square metres – dedicated to research facilities. The building is connected to the adjacent Richard J. Renaud Science Complex (SP) through passageways on the second and third floors, as well as a tunnel on the basement level.",
         "A tunnel also links the centre with the Communication Studies/Journalism (CJ) Building. This underground network saves students and faculty time and trouble, especially during winter months."
       ],
-      "services": [
-        "Centre for Structural and Functional Genomics"
-      ]
+      "services": ["Centre for Structural and Functional Genomics"]
     }
   },
   {
@@ -611,15 +617,16 @@
         }
       ],
       "entries": [
-        { "title": "2 entries (Sherbrooke St. W.)", "description": "main entrance" }
+        {
+          "title": "2 entries (Sherbrooke St. W.)",
+          "description": "main entrance"
+        }
       ],
       "overview": [
         "Opened in 1964, Hingston Hall, wing HA, is one of two wings originally built as a student residence on the Loyola Campus. Today, it still serves this purpose, housing 131 students across its four floors.",
         "The building is named after William Hales Hingston, S.J., a key figure in Loyola’s early development, and honours Loyola's tradition of residential student life."
       ],
-      "services": [
-        "Student Residence"
-      ]
+      "services": ["Student Residence"]
     }
   },
   {
@@ -656,7 +663,10 @@
         }
       ],
       "entries": [
-        { "title": "2 entries (Sherbrooke St. W.)", "description": "main entrance" }
+        {
+          "title": "2 entries (Sherbrooke St. W.)",
+          "description": "main entrance"
+        }
       ],
       "overview": [
         "Hingston Hall, wing HB, opened in 1964 as part of the original Hingston Hall complex. It underwent major renovations in 2012 to convert the building into a modern student residence.",
@@ -698,15 +708,16 @@
         }
       ],
       "entries": [
-        { "title": "2 entries (Sherbrooke St. W.)", "description": "main entrance" }
+        {
+          "title": "2 entries (Sherbrooke St. W.)",
+          "description": "main entrance"
+        }
       ],
       "overview": [
         "Hingston Hall, wing HC, the smallest wing of the Hingston complex, complements the residential wings with academic space.",
         "It contains offices, classrooms and two amphitheatres, serving as a key space for learning and research at the Loyola Campus."
       ],
-      "services": [
-        "Student Residence"
-      ]
+      "services": ["Student Residence"]
     }
   },
   {
@@ -749,7 +760,10 @@
         }
       ],
       "entries": [
-        { "title": "2 entries (Sherbrooke St. W.)", "description": "main entrance" }
+        {
+          "title": "2 entries (Sherbrooke St. W.)",
+          "description": "main entrance"
+        }
       ],
       "overview": [
         "The Applied Science Hub is a state-of-the-art facility on Loyola Campus that opened in December 2020. The hub expands on the Richard J. Renaud Science Complex and reflects Concordia’s commitment to interdisciplinary research and sustainable design.",
@@ -808,7 +822,10 @@
         }
       ],
       "entries": [
-        { "title": "2 entries (Sherbrooke St. W.)", "description": "main entrance" }
+        {
+          "title": "2 entries (Sherbrooke St. W.)",
+          "description": "main entrance"
+        }
       ],
       "overview": [
         "Tucked into the northwest corner of Loyola Campus, the Jesuit Residence is a quiet, seven-storey building with a long history. Originally built in 1969 to house the Jesuit priests of Loyola College, it remained in use by the Jesuit Order until Concordia purchased the property. The residence reopened for student housing in 2006.",
@@ -853,7 +870,10 @@
         }
       ],
       "entries": [
-        { "title": "1 entry on the main floor (Sherbrooke St. W.)", "description": "main entrance" }
+        {
+          "title": "1 entry on the main floor (Sherbrooke St. W.)",
+          "description": "main entrance"
+        }
       ],
       "otherServices": [
         {
@@ -866,11 +886,7 @@
         "Opened in 1967, the Recreation and Athletics Complex is the heart of varsity and recreational sports at Concordia’s Loyola Campus. It features the NHL-standard Ed Meagher Arena, a 4,000-seat stadium, gymnasium and two outdoor turf fields.",
         "Today, the complex is home to Concordia Stingers varsity teams, intramural leagues, fitness classes and community sports programs. Students can join pick-up games or participate in organized leagues for basketball, volleyball, soccer, rugby and more."
       ],
-      "venues": [
-        "Concordia Stadium",
-        "Ed Meagher Arena",
-        "Gymnasium"
-      ]
+      "venues": ["Concordia Stadium", "Ed Meagher Arena", "Gymnasium"]
     }
   },
   {
@@ -905,7 +921,10 @@
         "description": "This building is internally connected to the FC and CC buildings, allowing indoor access between facilities without exiting the complex."
       },
       "entries": [
-        { "title": "3 entries on the main floor (Sherbrooke St. W.)", "description": "main entrance" },
+        {
+          "title": "3 entries on the main floor (Sherbrooke St. W.)",
+          "description": "main entrance"
+        },
         {
           "title": "1 entry",
           "description": "connecting FC building."
@@ -927,10 +946,7 @@
         "Following the opening of the Athletics Complex in 1967 and the relocation of the COTC, the building was converted for Facilities Operations Services.",
         "Today, this two-storey structure continues to support Concordia’s Facilities Operations Services and also serves as a workspace for student theatre workshops and engineering projects, including vehicle design and fabrication initiatives."
       ],
-      "services": [
-        "Environmental Health and Safety",
-        "Facilities Management"
-      ]
+      "services": ["Environmental Health and Safety", "Facilities Management"]
     }
   },
   {
@@ -967,7 +983,10 @@
         "description": "This building is internally connected to the SC and VL buildings, allowing indoor access between facilities without exiting the complex."
       },
       "entries": [
-        { "title": "1 entry on the main floor (Sherbrooke St. W.)", "description": "main entrance" },
+        {
+          "title": "1 entry on the main floor (Sherbrooke St. W.)",
+          "description": "main entrance"
+        },
         {
           "title": "1 entry",
           "description": "connecting SC building."
@@ -989,9 +1008,7 @@
         "Originally called the Concordia Concert Hall, it was renamed in 1999 for Montreal jazz legend Oscar Peterson, a former Loyola Medalist and honorary degree recipient.",
         "The concert hall is connected to the Student Centre and Vanier Library."
       ],
-      "services": [
-        "Concert Hall"
-      ]
+      "services": ["Concert Hall"]
     }
   },
   {
@@ -1031,7 +1048,10 @@
         "description": "This building is internally connected to the RF building, allowing indoor access between facilities without exiting the complex."
       },
       "entries": [
-        { "title": "2 entries on the main floor (Sherbrooke St. W.)", "description": "main entrance" },
+        {
+          "title": "2 entries on the main floor (Sherbrooke St. W.)",
+          "description": "main entrance"
+        },
         {
           "title": "1 entry",
           "description": "connecting RF building."
@@ -1165,7 +1185,10 @@
         "description": "This building is internally connected to the FC and CC buildings, allowing indoor access between facilities without exiting the complex."
       },
       "entries": [
-        { "title": "3 entries on the main floor (Sherbrooke St. W.)", "description": "main entrance" },
+        {
+          "title": "3 entries on the main floor (Sherbrooke St. W.)",
+          "description": "main entrance"
+        },
         {
           "title": "1 entry",
           "description": "connecting FC building."
@@ -1191,9 +1214,7 @@
         "Opened in 1916 and completed in stages through 1927, the Administration Building is one of the original Loyola Campus structures. Designed by architects Peden and McLaren, it features matte Greendale brick with limestone trim, carved wooden details and distinctive oak doors inspired by the University Church of St. Mary the Virgin in Oxford, England. The building is also a Montreal heritage site.",
         "Over the years, it has served many purposes — including housing Jesuit priests and student residences — and today it’s home to Student Services and Faculty of Arts and Science administrative offices. It connects directly to the F.C. Smith (FC) and Central (CC) buildings."
       ],
-      "departments": [
-        "Faculty of Arts and Science"
-      ],
+      "departments": ["Faculty of Arts and Science"],
       "services": [
         "Access Centre for Students with Disabilities",
         "Centre for Teaching and Learning",
@@ -1261,7 +1282,10 @@
         "description": "This building is internally connected to the CC building, allowing indoor access between facilities without exiting the complex."
       },
       "entries": [
-        { "title": "2 entries on the main floor (Sherbrooke St. W.)", "description": "main entrance" },
+        {
+          "title": "2 entries on the main floor (Sherbrooke St. W.)",
+          "description": "main entrance"
+        },
         {
           "title": "1 entry",
           "description": "connecting CC building."
@@ -1324,7 +1348,10 @@
         "description": "This building is internally connected to the PT and VL buildings, allowing indoor access between facilities without exiting the complex."
       },
       "entries": [
-        { "title": "2 entries on the main floor (Sherbrooke St. W.)", "description": "main entrance" },
+        {
+          "title": "2 entries on the main floor (Sherbrooke St. W.)",
+          "description": "main entrance"
+        },
         {
           "title": "1 entry",
           "description": "connecting PT building."
@@ -1346,11 +1373,7 @@
         "Today, the building hosts Buzz Dining Hall, the Hive Café, music practice rooms and student association offices. Built with student and alumni contributions, the centre was refreshed through the “Revive the Hive” campaign in the late 1990s.",
         "It connects directly to the Oscar Peterson Concert Hall and Vanier Library."
       ],
-      "services": [
-        "Cafeteria",
-        "Café",
-        "Food Services"
-      ]
+      "services": ["Cafeteria", "Café", "Food Services"]
     }
   },
   {
@@ -1379,7 +1402,10 @@
         }
       ],
       "entries": [
-        { "title": "1 entry on the main floor (Sherbrooke St. W.)", "description": "main entrance" }
+        {
+          "title": "1 entry on the main floor (Sherbrooke St. W.)",
+          "description": "main entrance"
+        }
       ],
       "overview": [
         "Completed in 2021, the Future Buildings Laboratory supports research and innovation in sustainable buildings and infrastructure. It carries forward the legacy of Concordia’s Solar House, originally designed for the university’s entry in the prestigious U.S. Solar Decathlon in 2005. After the competition, the house was reassembled on campus as a permanent research facility.",
@@ -1439,7 +1465,10 @@
     ],
     "details": {
       "entries": [
-        { "title": "1 entry on the main floor (Broadway St.)", "description": "main entrance" }
+        {
+          "title": "1 entry on the main floor (Broadway St.)",
+          "description": "main entrance"
+        }
       ],
       "overview": [
         "Situated at the western edge of Loyola Campus, St. Ignatius of Loyola Church is a heritage landmark built in 1917. The church showcases Romanesque Revival architecture, with its striking stone façade and traditional bell tower, and remains a significant historical feature of Concordia’s campus."
@@ -1531,7 +1560,10 @@
         "description": "This building is internally connected to the GE, HU and RF buildings, allowing indoor access between facilities without exiting the complex."
       },
       "entries": [
-        { "title": "1 entry on the main floor (West-Broadway St.)", "description": "" },
+        {
+          "title": "1 entry on the main floor (West-Broadway St.)",
+          "description": ""
+        },
         {
           "title": "1 entry",
           "description": "connecting GE building."
@@ -1600,15 +1632,16 @@
     ],
     "details": {
       "entries": [
-        { "title": "1 entry on the main floor (Terrebonne St.)", "description": "" }
+        {
+          "title": "1 entry on the main floor (Terrebonne St.)",
+          "description": ""
+        }
       ],
       "overview": [
         "Located a short walk from the heart of Loyola Campus, Concordia’s Terrebonne Building is a standalone facility that plays an important role in the university’s campus network.",
         "It houses the Centre for the Arts in Human Development (CAHD) — an educational, clinical and research centre serving adults with disabilities, neurodivergence and other needs."
       ],
-      "departments": [
-        "Centre for the Arts in Human Development (CAHD)"
-      ]
+      "departments": ["Centre for the Arts in Human Development (CAHD)"]
     }
   },
   {
@@ -1642,7 +1675,10 @@
         }
       ],
       "entries": [
-        { "title": "1 entry on the main floor (Sherbrooke St. W.)", "description": "main entrance" }
+        {
+          "title": "1 entry on the main floor (Sherbrooke St. W.)",
+          "description": "main entrance"
+        }
       ],
       "otherServices": [
         {
@@ -1660,12 +1696,8 @@
         "Originally built in 1964 as Loyola’s first library, this structure became known as the Vanier Extension after the new Vanier Library opened in 1989. Today, the Extension offers flexible, digitally equipped classrooms and also houses spaces for the Department of Applied Human Sciences.",
         "The building is directly connected to the Vanier Library and other campus buildings, and features public art, including The Four Horsemen by François Houde, installed in 1989."
       ],
-      "departments": [
-        "Applied Human Sciences"
-      ],
-      "services": [
-        "Library"
-      ]
+      "departments": ["Applied Human Sciences"],
+      "services": ["Library"]
     }
   },
   {
@@ -1751,9 +1783,7 @@
         "Named after distinguished Loyola alumnus and former Governor General of Canada Georges P. Vanier, this library has been a cornerstone of the Loyola Campus since 1964. Originally accommodating 150,000 volumes and seating 600 visitors, the Vanier Library doubled in capacity following major renovations and the addition of the Vanier Extension in 1989.",
         "Today, the library offers a mix of silent study spaces and collaborative work areas. Students can explore its three floors, spend time in one of its 22 learning spaces and reserve group study rooms."
       ],
-      "services": [
-        "Georges P. Vanier Library"
-      ]
+      "services": ["Georges P. Vanier Library"]
     }
   }
 ]
