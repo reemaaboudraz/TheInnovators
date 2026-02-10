@@ -1,35 +1,74 @@
-import React from "react";
-import { View, Text, Pressable, Alert } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, Pressable, Alert, ActivityIndicator } from "react-native";
 import { router } from "expo-router";
 import { styles } from "@/components/Styles/welcomeStyle";
-// adjust path as needed
+
+import { configureGoogleSignIn, signInWithGoogle } from "@/hooks/useGoogleAuth";
 
 export default function WelcomeScreen() {
-  // To do we have to configure google sign in
-  const onGoogleSignInPress = () => {
-    Alert.alert("Coming soon", "Google Sign-In logic will be added later.");
-  };
+    const [loading, setLoading] = useState(false);
 
-  const onContinueGuestPress = () => {
-    router.replace("/(tabs)/map");
-  };
+    useEffect(() => {
+        try {
+            configureGoogleSignIn();
+        } catch (e: any) {
+            console.log("Google config error:", e);
+            Alert.alert("Config error", e?.message ?? "Google config missing");
+        }
+    }, []);
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>Campus Guide</Text>
-        <Text style={styles.subtitle}>
-          Explore SGW & Loyola maps and find your way around.
-        </Text>
+    const onGoogleSignInPress = async () => {
+        try {
+            setLoading(true);
 
-        <Pressable style={styles.googleButton} onPress={onGoogleSignInPress}>
-          <Text style={styles.googleButtonText}>Sign in with Google</Text>
-        </Pressable>
-      </View>
+            await signInWithGoogle();
 
-      <Pressable onPress={onContinueGuestPress} style={styles.guestWrapper}>
-        <Text style={styles.guestText}>Continue without signing in</Text>
-      </Pressable>
-    </View>
-  );
+            // success -> go to map
+            router.replace("/(tabs)/map");
+        } catch (e: any) {
+            console.log("Google sign-in failed:", e);
+            Alert.alert(
+                "Google Sign-In failed",
+                e?.message ?? "Something went wrong.",
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const onContinueGuestPress = () => {
+        router.replace("/(tabs)/map");
+    };
+
+    return (
+        <View style={styles.container}>
+            <View style={styles.content}>
+                <Text style={styles.title}>Campus Guide</Text>
+                <Text style={styles.subtitle}>
+                    Explore SGW & Loyola maps and find your way around.
+                </Text>
+
+                <Pressable
+                    testID="google-sign-in-button"
+                    style={styles.googleButton}
+                    onPress={onGoogleSignInPress}
+                    disabled={loading}
+                >
+                    {loading ? (
+                        <ActivityIndicator />
+                    ) : (
+                        <Text style={styles.googleButtonText}>Sign in with Google</Text>
+                    )}
+                </Pressable>
+            </View>
+
+            <Pressable
+                testID="guest-sign-in-button"
+                onPress={onContinueGuestPress}
+                style={styles.guestWrapper}
+            >
+                <Text style={styles.guestText}>Continue without signing in</Text>
+            </Pressable>
+        </View>
+    );
 }
