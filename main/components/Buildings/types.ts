@@ -5,6 +5,36 @@ export type LatLng = {
   longitude: number;
 };
 
+// Data-driven popup content (kept in the campus JSON files).
+export type BuildingDetailIconKey =
+  | "accessibleEntrance"
+  | "accessibleElevator"
+  | "accessibilityRamp"
+  | "wheelchairLift"
+  | "metro"
+  | "connectedBuildings"
+  | "entry"
+  | "printer"
+  | "shuttle";
+
+export type BuildingDetailIconItem = {
+  icon: BuildingDetailIconKey;
+  title: string;
+  description: string;
+};
+
+export type BuildingDetails = {
+  accessibility?: BuildingDetailIconItem[];
+  metro?: { title: string; description: string };
+  connectivity?: { title: string; description: string };
+  entries: { title: string; description: string }[];
+  otherServices?: BuildingDetailIconItem[];
+  overview: string[];
+  venues?: string[];
+  departments?: string[];
+  services?: string[];
+};
+
 export type Building = {
   id: string;
   campus: Campus;
@@ -15,5 +45,11 @@ export type Building = {
   longitude: number;
   aliases: string[];
   polygon: LatLng[];
-  zoomCategory: 1 | 2 | 3; // 1=big, 2=medium, 3=small
+
+  // 1=big, 2=medium, 3=small (used by map zoom behavior)
+  zoomCategory: 1 | 2 | 3;
+
+  // extended building info shown in the popup
+  // make optional so buildings without details don't crash
+  details?: BuildingDetails;
 };
