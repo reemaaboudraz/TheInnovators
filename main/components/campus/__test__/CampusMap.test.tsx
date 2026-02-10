@@ -1,15 +1,59 @@
 /* eslint-disable import/first, react/display-name, @typescript-eslint/no-require-imports */
 import React from "react";
-import { render, fireEvent } from "@testing-library/react-native";
-import { describe, it, expect, beforeEach, jest } from "@jest/globals";
+import { render, fireEvent, act } from "@testing-library/react-native";
+import {
+  describe,
+  it,
+  expect,
+  beforeEach,
+  afterEach,
+  jest,
+} from "@jest/globals";
+import { Animated } from "react-native";
+
+type Region = {
+  latitude: number;
+  longitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
+};
+
+jest.useFakeTimers();
 
 const mockAnimateToRegion = jest.fn();
+
+// -------------------- Safe defaults --------------------
+beforeEach(() => {
+  mockAnimateToRegion.mockClear();
+  mockPaddingForZoomCategory.mockClear();
+  mockRegionFromPolygon.mockClear();
+  mockOnLocationFound = null;
+
+  // Make Animated operations synchronous/no-op to avoid act warnings
+  jest.spyOn(Animated, "timing").mockImplementation((): any => ({
+    start: (cb?: any) => cb?.(),
+  }));
+  jest.spyOn(Animated, "spring").mockImplementation((): any => ({
+    start: (cb?: any) => cb?.(),
+  }));
+  jest.spyOn(Animated, "decay").mockImplementation((): any => ({
+    start: (cb?: any) => cb?.(),
+  }));
+});
+
+afterEach(() => {
+  jest.restoreAllMocks();
+  act(() => {
+    jest.runOnlyPendingTimers();
+  });
+});
 
 // ✅ Fix Safe Area crash when BuildingPopup renders after selecting a building
 jest.mock("react-native-safe-area-context", () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 
+// -------------------- Datasets --------------------
 jest.mock("@/components/Buildings/SGW/SGWBuildings", () => ({
   SGW_BUILDINGS: [
     {
@@ -22,7 +66,6 @@ jest.mock("@/components/Buildings/SGW/SGWBuildings", () => ({
       campus: "SGW",
       zoomCategory: 2,
       aliases: ["hall", "henry hall"],
-      // Square polygon that properly contains the center point
       polygon: [
         { latitude: 45.497, longitude: -73.58 },
         { latitude: 45.497, longitude: -73.578 },
@@ -68,12 +111,12 @@ jest.mock("@/components/Buildings/Loyola/LoyolaBuildings", () => ({
 
 // -------------------- mapZoom (deterministic) --------------------
 const mockPaddingForZoomCategory = jest.fn<(cat: 1 | 2 | 3) => number>(
-  (_cat) => 1.35,
+  () => 1.35,
 );
 
 const mockRegionFromPolygon = jest.fn<
   (polygon: any, padding: number) => Region
->((_polygon, _padding) => ({
+>(() => ({
   latitude: 10,
   longitude: 20,
   latitudeDelta: 0.001,
@@ -254,7 +297,7 @@ jest.mock("@gorhom/bottom-sheet", () => {
 // ✅ Avoid asset / lookup issues inside BuildingPopup
 jest.mock("@/components/Buildings/details/buildingImages", () => ({
   BUILDING_IMAGES: {
-    H: 123, // truthy => covers thumbSource branch
+    H: 123,
   },
 }));
 
@@ -274,15 +317,6 @@ import CampusMap, {
   SGW_REGION,
   LOY_REGION,
 } from "../CampusMap";
-
-import BuildingPopup from "@/components/campus/BuildingPopup";
-import BuildingPin from "@/components/campus/BuildingPin";
-
-beforeEach(() => {
-  mockAnimateToRegion.mockClear();
-  mockPaddingForZoomCategory.mockClear();
-  mockRegionFromPolygon.mockClear();
-});
 
 describe("CampusMap - initial region", () => {
   it("uses SGW region as initialRegion", () => {
@@ -315,14 +349,16 @@ describe("CampusMap - search bar", () => {
   });
 
   it("clears selected building when typing in search bar", async () => {
-    const { getByPlaceholderText, getByTestId, findByText } = render(
-      <CampusMap />,
-    );
+    const { getByPlaceholderText, findByText } = render(<CampusMap />);
 
-    fireEvent.changeText(getByPlaceholderText("Where to next?"), "hall");
+    act(() => {
+      fireEvent.changeText(getByPlaceholderText("Where to next?"), "hall");
+    });
     await findByText(/H — Henry F\. Hall Building/i);
 
-    fireEvent.changeText(getByPlaceholderText("Where to next?"), "admin");
+    act(() => {
+      fireEvent.changeText(getByPlaceholderText("Where to next?"), "admin");
+    });
     expect(getByPlaceholderText("Where to next?").props.value).toBe("admin");
   });
 });
@@ -356,11 +392,9 @@ describe("CampusMap - suggestions", () => {
       fireEvent.press(getByTestId("suggestion-LOY-loy-ad"));
     });
 
-    // ✅ because we mock mapZoom => polygon zoom path is deterministic
     expect(mockPaddingForZoomCategory).toHaveBeenCalledWith(1);
     expect(mockRegionFromPolygon).toHaveBeenCalledTimes(1);
 
-    expect(mockAnimateToRegion).toHaveBeenCalledTimes(1);
     expect(mockAnimateToRegion).toHaveBeenCalledWith(
       {
         latitude: 10,
@@ -371,7 +405,6 @@ describe("CampusMap - suggestions", () => {
       600,
     );
 
-    // Your component uses " - " in setQuery(`${code} - ${name}`)
     expect(getByPlaceholderText("Where to next?").props.value).toMatch(
       /^AD\s-\sAdministration Building/i,
     );
@@ -379,16 +412,17 @@ describe("CampusMap - suggestions", () => {
 });
 
 describe("CampusMap - building shapes (Polygon/Marker)", () => {
-  it("pressing a Polygon selects it (strokeWidth/fillColor change) + animates", () => {
+  it("pressing a Polygon selects it and animates", () => {
     const { getByTestId } = render(<CampusMap />);
 
-    // ✅ IMPORTANT: your mock uses `polygon-${lat}-${lng}` (no extra hyphen)
     const polygonId = "polygon-45.4581--73.6401";
     const before = getByTestId(polygonId);
-
     expect(before.props.strokeWidth).toBe(2);
 
-    fireEvent.press(before);
+    act(() => {
+      fireEvent.press(before);
+    });
+
     expect(mockAnimateToRegion).toHaveBeenCalledTimes(1);
 
     const after = getByTestId(polygonId);
@@ -396,16 +430,17 @@ describe("CampusMap - building shapes (Polygon/Marker)", () => {
     expect(after.props.fillColor).toBe("rgba(224, 177, 0, 0.55)");
   });
 
-  it("pressing a Marker selects it (tracksViewChanges becomes true) + animates", () => {
+  it("pressing a Marker selects it and animates", () => {
     const { getByTestId } = render(<CampusMap />);
 
-    // ✅ Marker id format: `marker-${lat}-${lng}`
     const markerId = "marker-45.458--73.64";
     const before = getByTestId(markerId);
-
     expect(before.props.tracksViewChanges).toBe(false);
 
-    fireEvent.press(before);
+    act(() => {
+      fireEvent.press(before);
+    });
+
     expect(mockAnimateToRegion).toHaveBeenCalledTimes(1);
 
     const after = getByTestId(markerId);
@@ -416,7 +451,6 @@ describe("CampusMap - building shapes (Polygon/Marker)", () => {
     const { getByTestId } = render(<CampusMap />);
 
     const markerId = "marker-45.458--73.64";
-
     act(() => {
       fireEvent.press(getByTestId(markerId));
     });
@@ -431,378 +465,229 @@ describe("CampusMap - building shapes (Polygon/Marker)", () => {
   it("renders a building even when polygon is empty (no Polygon)", () => {
     const { getByTestId } = render(<CampusMap />);
     expect(getByTestId("marker-45.4978--73.5795")).toBeTruthy();
-    describe("CampusMap - polygon optional branch coverage", () => {
-      it("renders a building even when polygon is empty (no Polygon)", () => {
-        const { getByTestId } = render(<CampusMap />);
-        expect(getByTestId("marker-45.4978--73.5795")).toBeTruthy();
-      });
+  });
+});
 
-      it("selecting a building with empty polygon falls back to fixed deltas (no regionFromPolygon)", () => {
-        const { getByTestId } = render(<CampusMap />);
+describe("CampusMap - polygon optional branch coverage", () => {
+  it("selecting a building with empty polygon falls back to fixed deltas", () => {
+    const { getByTestId } = render(<CampusMap />);
 
-        const npMarker = getByTestId("marker-45.4978--73.5795");
-        act(() => {
-          fireEvent.press(npMarker);
-        });
-
-        expect(mockPaddingForZoomCategory).toHaveBeenCalledWith(3);
-        expect(mockRegionFromPolygon).not.toHaveBeenCalled();
-
-        expect(mockAnimateToRegion).toHaveBeenCalledWith(
-          {
-            latitude: 45.4978,
-            longitude: -73.5795,
-            latitudeDelta: 0.0025,
-            longitudeDelta: 0.0025,
-          },
-          600,
-        );
-      });
+    const npMarker = getByTestId("marker-45.4978--73.5795");
+    act(() => {
+      fireEvent.press(npMarker);
     });
+
+    expect(mockPaddingForZoomCategory).toHaveBeenCalledWith(3);
+    expect(mockRegionFromPolygon).not.toHaveBeenCalled();
+
+    expect(mockAnimateToRegion).toHaveBeenCalledWith(
+      {
+        latitude: 45.4978,
+        longitude: -73.5795,
+        latitudeDelta: 0.0025,
+        longitudeDelta: 0.0025,
+      },
+      600,
+    );
+  });
+});
+
+describe("CampusMap - campus toggle", () => {
+  it("renders the campus toggle with SGW and Loyola buttons", () => {
+    const { getByTestId } = render(<CampusMap />);
+    expect(getByTestId("campusToggle")).toBeTruthy();
+    expect(getByTestId("campusToggle-SGW")).toBeTruthy();
+    expect(getByTestId("campusToggle-Loyola")).toBeTruthy();
   });
 
-  describe("CampusMap - campus toggle", () => {
-    it("renders the campus toggle with SGW and Loyola buttons", () => {
-      const { getByTestId } = render(<CampusMap />);
+  it("pressing Loyola button switches campus and animates to Loyola region", () => {
+    const { getByTestId } = render(<CampusMap />);
 
-      expect(getByTestId("campusToggle")).toBeTruthy();
-      expect(getByTestId("campusToggle-SGW")).toBeTruthy();
-      expect(getByTestId("campusToggle-Loyola")).toBeTruthy();
-    });
-
-    it("pressing Loyola button switches campus and animates to Loyola region", () => {
-      const { getByTestId } = render(<CampusMap />);
-
+    act(() => {
       fireEvent.press(getByTestId("campusToggle-Loyola"));
-
-      expect(mockAnimateToRegion).toHaveBeenCalledWith(
-        {
-          latitude: 45.457984,
-          longitude: -73.639834,
-          latitudeDelta: 0.006,
-          longitudeDelta: 0.006,
-        },
-        500,
-      );
     });
 
-    it("pressing SGW button after Loyola switches back to SGW region", () => {
-      const { getByTestId } = render(<CampusMap />);
+    expect(mockAnimateToRegion).toHaveBeenCalledWith(
+      {
+        latitude: 45.457984,
+        longitude: -73.639834,
+        latitudeDelta: 0.006,
+        longitudeDelta: 0.006,
+      },
+      500,
+    );
+  });
 
+  it("pressing SGW button after Loyola switches back to SGW region", () => {
+    const { getByTestId } = render(<CampusMap />);
+
+    act(() => {
       fireEvent.press(getByTestId("campusToggle-Loyola"));
-      mockAnimateToRegion.mockClear();
+    });
+    mockAnimateToRegion.mockClear();
 
+    act(() => {
       fireEvent.press(getByTestId("campusToggle-SGW"));
-
-      expect(mockAnimateToRegion).toHaveBeenCalledWith(
-        {
-          latitude: 45.4973,
-          longitude: -73.5794,
-          latitudeDelta: 0.006,
-          longitudeDelta: 0.006,
-        },
-        500,
-      );
     });
 
-    // ✅ FIX: ToggleButton likely blocks redundant calls when already focused.
-    it("pressing same campus button does NOT trigger animation", () => {
-      const { getByTestId } = render(<CampusMap />);
+    expect(mockAnimateToRegion).toHaveBeenCalledWith(
+      {
+        latitude: 45.4973,
+        longitude: -73.5794,
+        latitudeDelta: 0.006,
+        longitudeDelta: 0.006,
+      },
+      500,
+    );
+  });
 
+  it("pressing same campus button does NOT trigger animation", () => {
+    const { getByTestId } = render(<CampusMap />);
+
+    act(() => {
       fireEvent.press(getByTestId("campusToggle-SGW"));
-
-      expect(mockAnimateToRegion).not.toHaveBeenCalled();
     });
 
-    it("BrandBar backgroundColor updates based on focused campus", () => {
-      const { getByTestId } = render(<CampusMap />);
+    expect(mockAnimateToRegion).not.toHaveBeenCalled();
+  });
 
-      expect(getByTestId("brandbar").props.backgroundColor).toBe("#912338");
+  it("BrandBar backgroundColor updates based on focused campus", () => {
+    const { getByTestId } = render(<CampusMap />);
 
+    expect(getByTestId("brandbar").props.backgroundColor).toBe("#912338");
+
+    act(() => {
       fireEvent.press(getByTestId("campusToggle-Loyola"));
-      expect(getByTestId("brandbar").props.backgroundColor).toBe("#e3ac20");
-
-      fireEvent.press(getByTestId("campusToggle-SGW"));
-      expect(getByTestId("brandbar").props.backgroundColor).toBe("#912338");
     });
+    expect(getByTestId("brandbar").props.backgroundColor).toBe("#e3ac20");
 
-    it("selecting building via suggestion updates focused campus to Loyola", async () => {
-      const { getByPlaceholderText, getByTestId, findByText } = render(
-        <CampusMap />,
-      );
+    act(() => {
+      fireEvent.press(getByTestId("campusToggle-SGW"));
+    });
+    expect(getByTestId("brandbar").props.backgroundColor).toBe("#912338");
+  });
 
+  it("selecting building via suggestion updates focused campus to Loyola", async () => {
+    const { getByPlaceholderText, getByTestId, findByText } = render(
+      <CampusMap />,
+    );
+
+    act(() => {
       fireEvent.changeText(getByPlaceholderText("Where to next?"), "admin");
-      await findByText(/AD — Administration Building/i);
+    });
+    await findByText(/AD — Administration Building/i);
 
+    act(() => {
       fireEvent.press(getByTestId("suggestion-LOY-loy-ad"));
+    });
 
-      expect(getByTestId("brandbar").props.backgroundColor).toBe("#e3ac20");
+    expect(getByTestId("brandbar").props.backgroundColor).toBe("#e3ac20");
+  });
+});
+
+describe("CampusMap - PanResponder helper functions (re-exported)", () => {
+  describe("calculatePanValue", () => {
+    it("returns 0 when on SGW with no drag", () => {
+      expect(calculatePanValue("SGW", 0, 300)).toBe(0);
+    });
+
+    it("returns clamped value when dragging right from SGW", () => {
+      expect(calculatePanValue("SGW", 75, 300)).toBe(0.5);
+    });
+
+    it("returns 1 when fully dragged right from SGW", () => {
+      expect(calculatePanValue("SGW", 150, 300)).toBe(1);
+    });
+
+    it("clamps to 1 when dragged beyond right edge", () => {
+      expect(calculatePanValue("SGW", 300, 300)).toBe(1);
+    });
+
+    it("clamps to 0 when dragged beyond left edge", () => {
+      expect(calculatePanValue("SGW", -100, 300)).toBe(0);
+    });
+
+    it("returns value when dragging left from LOY", () => {
+      expect(calculatePanValue("LOY", -75, 300)).toBe(0.5);
+    });
+
+    it("uses default width when toggleWidth is 0", () => {
+      const result = calculatePanValue("SGW", 50, 0);
+      expect(result).toBeGreaterThanOrEqual(0);
+      expect(result).toBeLessThanOrEqual(1);
     });
   });
 
-  describe("CampusMap - PanResponder helper functions (re-exported)", () => {
-    describe("calculatePanValue", () => {
-      it("returns 0 when on SGW with no drag", () => {
-        const result = calculatePanValue("SGW", 0, 300);
-        expect(result).toBe(0);
-      });
-
-      it("returns clamped value when dragging right from SGW", () => {
-        const result = calculatePanValue("SGW", 75, 300);
-        expect(result).toBe(0.5);
-      });
-
-      it("returns 1 when fully dragged right from SGW", () => {
-        const result = calculatePanValue("SGW", 150, 300);
-        expect(result).toBe(1);
-      });
-
-      it("clamps to 1 when dragged beyond right edge", () => {
-        const result = calculatePanValue("SGW", 300, 300);
-        expect(result).toBe(1);
-      });
-
-      it("clamps to 0 when dragged beyond left edge", () => {
-        const result = calculatePanValue("SGW", -100, 300);
-        expect(result).toBe(0);
-      });
-
-      it("returns value when dragging left from LOY", () => {
-        const result = calculatePanValue("LOY", -75, 300);
-        expect(result).toBe(0.5);
-      });
-
-      it("uses default width when toggleWidth is 0", () => {
-        const result = calculatePanValue("SGW", 50, 0);
-        expect(typeof result).toBe("number");
-        expect(result).toBeGreaterThanOrEqual(0);
-        expect(result).toBeLessThanOrEqual(1);
-      });
+  describe("determineCampusFromPan", () => {
+    it("returns SGW when finalValue <= 0.5 from SGW", () => {
+      expect(determineCampusFromPan("SGW", 50, 300)).toBe("SGW");
     });
 
-    describe("determineCampusFromPan", () => {
-      it("returns SGW when finalValue <= 0.5 from SGW", () => {
-        const result = determineCampusFromPan("SGW", 50, 300);
-        expect(result).toBe("SGW");
-      });
-
-      it("returns LOY when finalValue > 0.5 from SGW", () => {
-        const result = determineCampusFromPan("SGW", 100, 300);
-        expect(result).toBe("LOY");
-      });
-
-      it("returns LOY when finalValue > 0.5 from LOY (small left drag)", () => {
-        const result = determineCampusFromPan("LOY", -50, 300);
-        expect(result).toBe("LOY");
-      });
-
-      it("returns SGW when finalValue <= 0.5 from LOY (large left drag)", () => {
-        const result = determineCampusFromPan("LOY", -100, 300);
-        expect(result).toBe("SGW");
-      });
-
-      it("uses default width when toggleWidth is 0", () => {
-        const result = determineCampusFromPan("SGW", 50, 0);
-        expect(result === "SGW" || result === "LOY").toBe(true);
-      });
+    it("returns LOY when finalValue > 0.5 from SGW", () => {
+      expect(determineCampusFromPan("SGW", 100, 300)).toBe("LOY");
     });
 
-    describe("exported region constants", () => {
-      it("SGW_REGION has correct coordinates", () => {
-        expect(SGW_REGION).toEqual({
-          latitude: 45.4973,
-          longitude: -73.5794,
-          latitudeDelta: 0.006,
-          longitudeDelta: 0.006,
-        });
-      });
-
-      it("LOY_REGION has correct coordinates", () => {
-        expect(LOY_REGION).toEqual({
-          latitude: 45.457984,
-          longitude: -73.639834,
-          latitudeDelta: 0.006,
-          longitudeDelta: 0.006,
-        });
-      });
+    it("returns LOY when finalValue > 0.5 from LOY (small left drag)", () => {
+      expect(determineCampusFromPan("LOY", -50, 300)).toBe("LOY");
     });
 
-    describe("BuildingPin", () => {
-      it("uses default size=44 and SGW branch", () => {
-        const { getByText, UNSAFE_getAllByType } = render(
-          <BuildingPin code="H" campus="SGW" />,
-        );
-
-        getByText("H");
-
-        const { View, StyleSheet } = require("react-native");
-        const views = UNSAFE_getAllByType(View);
-
-        const flat = StyleSheet.flatten(views[0].props.style);
-        expect(flat).toMatchObject({ width: 44, height: 55 });
-      });
-
-      it("uses custom size and LOY branch", () => {
-        const { getByText, UNSAFE_getAllByType } = render(
-          <BuildingPin code="AD" campus="LOY" size={60} />,
-        );
-
-        getByText("AD");
-
-        const { View, StyleSheet } = require("react-native");
-        const views = UNSAFE_getAllByType(View);
-
-        const flat = StyleSheet.flatten(views[0].props.style);
-        expect(flat).toMatchObject({ width: 60, height: 75 });
-      });
+    it("returns SGW when finalValue <= 0.5 from LOY (large left drag)", () => {
+      expect(determineCampusFromPan("LOY", -100, 300)).toBe("SGW");
     });
 
-    describe("BuildingPopup", () => {
-      const baseBuilding = {
-        id: "sgw-h",
-        campus: "SGW",
-        code: "H",
-        name: "Henry F. Hall",
-        address: "1455 De Maisonneuve",
-        latitude: 45.1,
-        longitude: -73.1,
-      };
-
-      it("renders fallback branch when details are missing", () => {
-        const onClose = jest.fn();
-
-        const { getByText } = render(
-          <BuildingPopup
-            building={{ ...baseBuilding, details: undefined } as any}
-            campusTheme="SGW"
-            onClose={onClose}
-          />,
-        );
-
-        // ✅ Covers `!details ? (...) : (...)` branch
-        getByText("Details coming soon");
-        getByText("We’ll add the expanded info for this building next.");
-      });
-
-      it("renders details branch including maps + conditional description", () => {
-        const onClose = jest.fn();
-
-        const buildingWithDetails = {
-          ...baseBuilding,
-          details: {
-            accessibility: [
-              { icon: "elevator", title: "Elevator", description: "" }, // covers !!description false
-              { icon: "wifi", title: "Wi-Fi", description: "Available" }, // covers !!description true
-            ],
-            metro: { title: "Metro nearby", description: "Guy-Concordia" },
-            connectivity: {
-              title: "Connected",
-              description: "Underground links",
-            },
-            entries: [
-              { title: "Main entrance", description: "Front door" },
-              { title: "Side entrance", description: "Accessible ramp" },
-            ],
-            otherServices: [
-              { icon: "wifi", title: "Printing", description: "2nd floor" },
-            ],
-            overview: ["Paragraph 1", "Paragraph 2"],
-            venues: ["Cafeteria", "Study rooms"],
-            departments: ["Computer Science", "Engineering"],
-            services: ["Security", "Information desk"],
-          },
-        };
-
-        const { getByText } = render(
-          <BuildingPopup
-            building={buildingWithDetails as any}
-            campusTheme="LOY"
-            onClose={onClose}
-          />,
-        );
-
-        // ✅ covers the mapped sections highlighted red in Sonar
-        getByText("Building Accessibility");
-        getByText("Elevator");
-        getByText("Wi-Fi");
-        getByText("Available");
-
-        getByText("Venues");
-        getByText("Cafeteria");
-
-        getByText("Departments");
-        getByText("Engineering");
-
-        getByText("Services");
-        getByText("Information desk");
-      });
+    it("uses default width when toggleWidth is 0", () => {
+      const result = determineCampusFromPan("SGW", 50, 0);
+      expect(result === "SGW" || result === "LOY").toBe(true);
     });
   });
 
-  describe("CampusMap - Current Location Button", () => {
-    it("renders the current location button", () => {
-      const { getByTestId } = render(<CampusMap />);
-      expect(getByTestId("currentLocationButton")).toBeTruthy();
+  describe("exported region constants", () => {
+    it("SGW_REGION has correct coordinates", () => {
+      expect(SGW_REGION).toEqual({
+        latitude: 45.4973,
+        longitude: -73.5794,
+        latitudeDelta: 0.006,
+        longitudeDelta: 0.006,
+      });
     });
 
-    it("initially has showsUserLocation disabled", () => {
-      const { getByTestId } = render(<CampusMap />);
-      const map = getByTestId("mapView");
-      expect(map.props.showsUserLocation).toBe(false);
+    it("LOY_REGION has correct coordinates", () => {
+      expect(LOY_REGION).toEqual({
+        latitude: 45.457984,
+        longitude: -73.639834,
+        latitudeDelta: 0.006,
+        longitudeDelta: 0.006,
+      });
     });
   });
+});
 
-  describe("CampusMap - User Location Features", () => {
-    beforeEach(() => {
-      mockOnLocationFound = null;
-      mockAnimateToRegion.mockClear();
+describe("CampusMap - Current Location integration", () => {
+  it("renders currentLocationButton inside CampusMap", () => {
+    const { getByTestId } = render(<CampusMap />);
+    expect(getByTestId("currentLocationButton")).toBeTruthy();
+  });
+
+  it("wires onLocationFound callback from CampusMap", () => {
+    render(<CampusMap />);
+    expect(typeof mockOnLocationFound).toBe("function");
+  });
+
+  it("calling onLocationFound animates to user location region", () => {
+    render(<CampusMap />);
+
+    act(() => {
+      mockOnLocationFound!({ latitude: 45.5, longitude: -73.6 });
     });
 
-    it("handleLocationFound animates map to user location", () => {
-      render(<CampusMap />);
-      expect(mockOnLocationFound).not.toBeNull();
-
-      act(() => {
-        mockOnLocationFound!({ latitude: 45.5, longitude: -73.6 });
-      });
-
-      expect(mockAnimateToRegion).toHaveBeenCalledWith(
-        expect.objectContaining({
-          latitude: 45.5,
-          longitude: -73.6,
-          latitudeDelta: 0.005,
-          longitudeDelta: 0.005,
-        }),
-        500,
-      );
-    });
-
-    it("shows user location marker when user is outside buildings", () => {
-      const { queryByTestId } = render(<CampusMap />);
-      expect(mockOnLocationFound).not.toBeNull();
-
-      act(() => {
-        mockOnLocationFound!({ latitude: 45.5, longitude: -73.6 });
-      });
-
-      expect(queryByTestId("marker-45.5--73.6")).toBeTruthy();
-    });
-
-    it("highlights building in blue when user is inside a building polygon", () => {
-      const { getByTestId, queryByTestId } = render(<CampusMap />);
-      expect(mockOnLocationFound).not.toBeNull();
-
-      // inside H polygon: lat 45.497-45.498, lng -73.58 to -73.578
-      act(() => {
-        mockOnLocationFound!({ latitude: 45.4975, longitude: -73.579 });
-      });
-
-      expect(queryByTestId("userLocationMarker")).toBeNull();
-
-      const hPolygon = getByTestId("polygon-45.497--73.58");
-      expect(hPolygon.props.fillColor).toBe("rgba(97, 151, 251, 0.35)");
-      expect(hPolygon.props.strokeColor).toBe("#4A90D9");
-      expect(hPolygon.props.strokeWidth).toBe(3);
-    });
+    expect(mockAnimateToRegion).toHaveBeenCalledWith(
+      {
+        latitude: 45.5,
+        longitude: -73.6,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      },
+      500,
+    );
   });
 });

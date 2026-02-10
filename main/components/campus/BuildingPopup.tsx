@@ -55,7 +55,7 @@ export default function BuildingPopup({
    * - Keep space for the status bar / Dynamic Island using insets.top
    */
   const snapPoints = useMemo(() => {
-    const collapsed = Math.round(windowHeight * 0.19); // same feel as "19%"
+    const collapsed = Math.round(windowHeight * 0.19);
     const topBuffer = insets.top - 6;
     const expanded = Math.max(300, windowHeight - topBuffer);
 
@@ -76,8 +76,19 @@ export default function BuildingPopup({
 
   const thumbSource = BUILDING_IMAGES[building.code];
 
-  // Details are now coming from JSON -> building.details
+  // Details are coming from JSON -> building.details (some fields inside can be optional)
   const details = building.details;
+
+  // ✅ Safe defaults for optional sections
+  const accessibility = details?.accessibility ?? [];
+  const metro = details?.metro;
+  const connectivity = details?.connectivity;
+  const entries = details?.entries ?? [];
+  const otherServices = details?.otherServices ?? [];
+  const overview = details?.overview ?? [];
+  const venues = details?.venues ?? [];
+  const departments = details?.departments ?? [];
+  const services = details?.services ?? [];
 
   const Handle = useCallback(
     (_props: BottomSheetHandleProps) => {
@@ -135,6 +146,18 @@ export default function BuildingPopup({
     description: string;
   }) => <IconRow iconKey={iconKey} title={title} description={description} />;
 
+  // If details object exists but is "empty-ish", you may still want to show the coming soon card.
+  const hasAnyDetailData =
+    accessibility.length > 0 ||
+    !!metro ||
+    !!connectivity ||
+    entries.length > 0 ||
+    otherServices.length > 0 ||
+    overview.length > 0 ||
+    venues.length > 0 ||
+    departments.length > 0 ||
+    services.length > 0;
+
   return (
     <BottomSheet
       ref={sheetRef}
@@ -185,7 +208,7 @@ export default function BuildingPopup({
         contentContainerStyle={[styles.content, styles.hiddenAtFirst]}
         showsVerticalScrollIndicator={false}
       >
-        {!details ? (
+        {!details || !hasAnyDetailData ? (
           <View style={styles.card}>
             <Text style={styles.cardHeader}>Details coming soon</Text>
             <Text style={styles.cardText}>
@@ -194,98 +217,117 @@ export default function BuildingPopup({
           </View>
         ) : (
           <>
-            <View style={styles.card}>
-              <Text style={styles.cardHeader}>Building Accessibility</Text>
-              {details.accessibility.map((item) => (
-                <IconRow
-                  key={item.title}
-                  iconKey={item.icon}
-                  title={item.title}
-                  description={item.description}
-                />
-              ))}
-            </View>
+            {accessibility.length > 0 && (
+              <View style={styles.card}>
+                <Text style={styles.cardHeader}>Building Accessibility</Text>
+                {accessibility.map((item) => (
+                  <IconRow
+                    key={item.title}
+                    iconKey={item.icon}
+                    title={item.title}
+                    description={item.description}
+                  />
+                ))}
+              </View>
+            )}
 
-            <View style={styles.card}>
-              <Text style={styles.cardHeader}>Metro Accessibility</Text>
-              <SimpleRow
-                iconKey="metro"
-                title={details.metro.title}
-                description={details.metro.description}
-              />
-            </View>
-
-            <View style={styles.card}>
-              <Text style={styles.cardHeader}>Building Connectivity</Text>
-              <SimpleRow
-                iconKey="connectedBuildings"
-                title={details.connectivity.title}
-                description={details.connectivity.description}
-              />
-            </View>
-
-            <View style={styles.card}>
-              <Text style={styles.cardHeader}>Number of Entries</Text>
-              {details.entries.map((e, idx) => (
+            {metro && (
+              <View style={styles.card}>
+                <Text style={styles.cardHeader}>Metro Accessibility</Text>
                 <SimpleRow
-                  key={`${e.title}-${idx}`}
-                  iconKey="entry"
-                  title={e.title}
-                  description={e.description}
+                  iconKey="metro"
+                  title={metro.title}
+                  description={metro.description}
                 />
-              ))}
-            </View>
+              </View>
+            )}
 
-            <View style={styles.card}>
-              <Text style={styles.cardHeader}>Other services</Text>
-              {details.otherServices.map((item) => (
-                <IconRow
-                  key={item.title}
-                  iconKey={item.icon}
-                  title={item.title}
-                  description={item.description}
+            {connectivity && (
+              <View style={styles.card}>
+                <Text style={styles.cardHeader}>Building Connectivity</Text>
+                <SimpleRow
+                  iconKey="connectedBuildings"
+                  title={connectivity.title}
+                  description={connectivity.description}
                 />
-              ))}
-            </View>
+              </View>
+            )}
 
-            <View style={styles.card}>
-              <Text style={styles.cardHeader}>Building Overview</Text>
-              {details.overview.map((p, idx) => (
-                <Text key={idx} style={styles.paragraph}>
-                  {p}
-                </Text>
-              ))}
-            </View>
+            {entries.length > 0 && (
+              <View style={styles.card}>
+                <Text style={styles.cardHeader}>Number of Entries</Text>
+                {entries.map((e, idx) => (
+                  <SimpleRow
+                    key={`${e.title}-${idx}`}
+                    iconKey="entry"
+                    title={e.title}
+                    description={e.description}
+                  />
+                ))}
+              </View>
+            )}
 
-            <View style={styles.card}>
-              <Text style={styles.cardHeader}>Venues</Text>
-              {details.venues.map((v) => (
-                <View key={v} style={styles.bulletRow}>
-                  <Text style={styles.bullet}>•</Text>
-                  <Text style={styles.bulletText}>{v}</Text>
-                </View>
-              ))}
-            </View>
+            {otherServices.length > 0 && (
+              <View style={styles.card}>
+                <Text style={styles.cardHeader}>Other services</Text>
+                {otherServices.map((item) => (
+                  <IconRow
+                    key={item.title}
+                    iconKey={item.icon}
+                    title={item.title}
+                    description={item.description}
+                  />
+                ))}
+              </View>
+            )}
 
-            <View style={styles.card}>
-              <Text style={styles.cardHeader}>Departments</Text>
-              {details.departments.map((d) => (
-                <View key={d} style={styles.bulletRow}>
-                  <Text style={styles.bullet}>•</Text>
-                  <Text style={styles.bulletText}>{d}</Text>
-                </View>
-              ))}
-            </View>
+            {overview.length > 0 && (
+              <View style={styles.card}>
+                <Text style={styles.cardHeader}>Building Overview</Text>
+                {overview.map((p, idx) => (
+                  <Text key={idx} style={styles.paragraph}>
+                    {p}
+                  </Text>
+                ))}
+              </View>
+            )}
 
-            <View style={styles.card}>
-              <Text style={styles.cardHeader}>Services</Text>
-              {details.services.map((s) => (
-                <View key={s} style={styles.bulletRow}>
-                  <Text style={styles.bullet}>•</Text>
-                  <Text style={styles.bulletText}>{s}</Text>
-                </View>
-              ))}
-            </View>
+            {venues.length > 0 && (
+              <View style={styles.card}>
+                <Text style={styles.cardHeader}>Venues</Text>
+                {venues.map((v) => (
+                  <View key={v} style={styles.bulletRow}>
+                    <Text style={styles.bullet}>•</Text>
+                    <Text style={styles.bulletText}>{v}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {departments.length > 0 && (
+              <View style={styles.card}>
+                <Text style={styles.cardHeader}>Departments</Text>
+                {departments.map((d) => (
+                  <View key={d} style={styles.bulletRow}>
+                    <Text style={styles.bullet}>•</Text>
+                    <Text style={styles.bullet}>•</Text>
+                    <Text style={styles.bulletText}>{d}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {services.length > 0 && (
+              <View style={styles.card}>
+                <Text style={styles.cardHeader}>Services</Text>
+                {services.map((s) => (
+                  <View key={s} style={styles.bulletRow}>
+                    <Text style={styles.bullet}>•</Text>
+                    <Text style={styles.bulletText}>{s}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
           </>
         )}
 
