@@ -8,11 +8,10 @@ hide empty members
 
 note as Scope
     <size:18><b><u>Scope :</u></b></size>
-    This class diagram represents the static structure of the Concordia Campus Guide App.
-    It includes classes for campuses, buildings, rooms, and points of interest (POIs)
-    such as washrooms, elevators, and stairs. The diagram illustrates the relationships
-    between these classes, highlighting associations and compositions that define how
-    different entities interact within the system.
+    This domain model represents the key entities and their relationships within the Concordia Campus Guide App.
+    It includes classes for campuses, buildings, rooms, and points of interest (POIs) such as washrooms, elevators, 
+    and stairs. The model illustrates how concepts of the app interact with each other, providing a high-level 
+    overview of the system's structure and the data it manages.
 end note
 
 note as Convention
@@ -74,18 +73,6 @@ class "Building" as Building {
     codename 
 }
 
-note as BuildingNote
-    <size:14><b>Building collections details:</b></size>
-    SGW_BUILDINGS and LOYOLA_BUILDINGS are the two main building collections, 
-    each containing an array of Building objects respectively in the SGW and Loyola campuses.
-    These 2 collections were created to facilitate efficient searching and retrieval of building data 
-    based on the campus context in such components like LoyolaBuildings and SGWBuildings, 
-    which are responsible for handling building data and search functionalities for their respective campuses.
-end note
-
-
-
-
 ' ========== Implemented: data and search ==========
 class "SGWBuildingsSearch" as SGWBuildings {
 }
@@ -119,14 +106,6 @@ class "WelcomeScreen" as WelcomeScreen {
 
 class "BuildingsLoadError" as BuildingsLoadError {
 }
-
-note right of CampusMap
-    <size:14><b>Functional component as class:</b></size>
-    Composes BuildingShapesLayer, ToggleButton, CurrentLocationButton, BrandBar;
-    uses SGW_BUILDINGS LOYOLA_BUILDINGS, SGW_REGION / LOY_REGION,
-    UserLocation and pointInPolygon for "you are here" building.
-end note
-
 
 abstract class "PointOfInterest" as PointOfInterest {
     latitude
