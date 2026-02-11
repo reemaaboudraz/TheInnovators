@@ -1,0 +1,66 @@
+@startuml HOC
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 16
+skinparam DefaultFontStyle bold
+skinparam ArrowThickness 2.2
+title <u>Class Diagram - Concordia Campus Guide App - Version 3 (with annotations)</u>\n<i>Date : 2026-02-08 </i>\n<i>Authors : Malak Sefrioui and Yash Nathani</i>
+hide empty members
+
+' ========== Domain types (data shapes) ==========
+enum "Campus" as Campus {
+    SGW
+    LOY
+}
+
+class "LatLng" as LatLng {
+    + latitude : number
+    + longitude : number
+}
+
+class "Region" as Region {
+    - latitude : number
+    - longitude : number
+    - latitudeDelta : number
+    - longitudeDelta : number
+}
+
+class "Building" as Building {
+    - id : string
+    - campus : Campus
+    - code : string
+    - name : string
+    - address : string
+    - latitude : number
+    - longitude : number
+    - aliases : string[]
+    - polygon : LatLng[]
+
+    - numberOfFloors: int
+    - codename : String
+    - indoors: List<Indoor>
+}
+
+CampusMap "1" --> "* Loyola buildings     " Building : uses
+CampusMap "1" --> "* SGW buildings     " Building : uses
+
+' ========== Implemented: UI (functional components as classes) ==========
+class "CampusMap" as CampusMap {
+    - focusedCampus : Campus
+    - query : string
+    - selected : Building | null
+    - userLocation : LatLng | null
+    - ALL_BUILDINGS : Building[]
+    + SGW_REGION : Region
+    + LOY_REGION : Region
+    + handleCampusChange(campus : Campus) : void
+    + handleLocationFound(location : LatLng) : void
+    + onPickBuilding(b : Building) : void
+}
+
+CampusMap "1" --> "2" Region : has
+CampusMap "1" --> "0..1    " Building : selected
+CampusMap "1" --> "1" LatLng : userLocation
+Building "1" --> "*" LatLng : polygon
+
+
+@enduml

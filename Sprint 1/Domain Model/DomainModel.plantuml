@@ -3,154 +3,215 @@ skinparam DefaultFontName Arial
 skinparam DefaultFontSize 16
 skinparam DefaultFontStyle bold
 skinparam ArrowThickness 2.2
-title <u>Domain Model - Concordia Campus Guide App - Version 1 (with annotations)</u>\n<i>Date : 2026-01-19 </i>\n<i>Author : Malak Sefrioui</i>
+title <u>Domain Model Concordia Campus Guide App Version 3 (with annotations)</u>\n<i>Date : 2026-02-08 </i>\n<i>Authors : Malak Sefrioui and Yash Nathani</i>
 hide empty members
 
 note as Scope
     <size:18><b><u>Scope :</u></b></size>
-    This domain model covers main concepts/entities involved in a campus Navigation
-    system for Concordia University. It includes classes for campuses, buildings,
-    rooms, and points of interest (POIs) such as washrooms, elevators, stairs.
-    These classes englobe the necessary concepts that will be needed throughout the
-    future iterations/features of the system such as campuses and buildings for
-    feature 1 (Show my location on campus) and Points of Interest for feature 5 
-    (Find nearest POI).
+    This class diagram represents the static structure of the Concordia Campus Guide App.
+    It includes classes for campuses, buildings, rooms, and points of interest (POIs)
+    such as washrooms, elevators, and stairs. The diagram illustrates the relationships
+    between these classes, highlighting associations and compositions that define how
+    different entities interact within the system.
 end note
 
-class "Terminal" as terminal {}
-
-class "ClassCatalog" as ClassCatalog {
-    - classes: List<Class>
-}
-
-class "Class" as Class {
-    - courseCode
-    - courseName
-    - instructor
-    - dayOfWeek
-    - startTime
-    - endTime
-}
-
-ClassCatalog "1" -- "*" Class : contains
-Class "1" -- "1" Room : heldIn
-
-note left of ClassCatalog
-    <size:18><b><u>Class Scheduling Feature :</u></b></size>
-    The ClassCatalog and Class classes have been added to the domain model
-    to support the feature "Navigate me to my next class".
-    The ClassCatalog will act as the schedule that contains all the classes
-    a student is enrolled in. By naming convention "ObjectCatalog", instead
-    of "Schedule", the name of the class remains consistent with the other
-    catalog classes in the domain model.
+note as Convention
+    <size:18><b><u>JS/TS functional components as classes (TA guidance) :</u></b></size>
+    Functional components (e.g. CampusMap, ToggleButton) are shown as classes:
 end note
 
-class "CampusCatalog" as CampusCatalog {}
-
-class "Campus" as Campus {
-    - latitude
-    - longitude
-    - name
-    - codename
+' ========== Domain types (data shapes) ==========
+enum "Campus" as Campus {
+    SGW
+    LOY
 }
 
-class "BuildingCatalog" as Buildings {}
+abstract class "Tabs"{}
+
+class "MapTab" as Map {
+}
+
+class "WelcomeTab" as Welcome {
+}
+
+class "ConnectClassTab" as ClassTab {
+}
+
+class "ConnectClass" as ConnectClass {
+}
+
+
+enum "LocationStatus" as LocationStatus {
+    idle
+    loading
+    granted
+    denied
+}
+
+class "LatLng" as LatLng {
+    latitude 
+    longitude 
+}
+
+class "Region" as Region {
+    latitude 
+    longitude 
+    latitudeDelta 
+    longitudeDelta 
+}
+
 class "Building" as Building {
-    - latitude
-    - longitude
-    - name
-    - address
-    - numberOfFloors
-    - codename
+    id 
+    campus 
+    code 
+    name 
+    address 
+    latitude 
+    longitude 
+    aliases
+    polygon 
+    numberOfFloors
+    codename 
 }
-class "Room" as Room {
-    - roomNumber
-    - capacity
-    - floorNB
+
+note as BuildingNote
+    <size:14><b>Building collections details:</b></size>
+    SGW_BUILDINGS and LOYOLA_BUILDINGS are the two main building collections, 
+    each containing an array of Building objects respectively in the SGW and Loyola campuses.
+    These 2 collections were created to facilitate efficient searching and retrieval of building data 
+    based on the campus context in such components like LoyolaBuildings and SGWBuildings, 
+    which are responsible for handling building data and search functionalities for their respective campuses.
+end note
+
+
+
+
+' ========== Implemented: data and search ==========
+class "SGWBuildingsSearch" as SGWBuildings {
 }
-class "PointOfInterestCatalog" as PointOfInterestCatalog {}
+
+class "LoyolaBuildingsSearch" as LoyolaBuildings {
+}
+
+' ========== Implemented: UI (functional components as classes) ==========
+class "CampusMap" as CampusMap {
+    focusedCampus 
+    query 
+}
+
+class "BuildingShapesLayer" as BuildingShapesLayer {
+}
+
+BuildingShapesLayer "1" -- "*" Building : renders on map
+
+class "ToggleButton" as ToggleButton {
+    focusedCampus
+}
+
+class "CurrentLocationButton" as CurrentLocationButton {
+}
+
+class "BrandBar" as BrandBar {
+}
+
+class "WelcomeScreen" as WelcomeScreen {
+}
+
+class "BuildingsLoadError" as BuildingsLoadError {
+}
+
+note right of CampusMap
+    <size:14><b>Functional component as class:</b></size>
+    Composes BuildingShapesLayer, ToggleButton, CurrentLocationButton, BrandBar;
+    uses SGW_BUILDINGS LOYOLA_BUILDINGS, SGW_REGION / LOY_REGION,
+    UserLocation and pointInPolygon for "you are here" building.
+end note
+
 
 abstract class "PointOfInterest" as PointOfInterest {
-    - latitude
-    - longitude
+    latitude
+    longitude
 }
-
 abstract class "Indoor" as Indoor {
+    latitude
+    longitude
 }
 
 class "Washroom" as Washroom {
-    - isPublic
-    - isGenderNeutral
-    - isMale
-    - isFemale
-    - isAccessible
-    - floorNB
+    latitude
+    longitude
+    isPublic
+    isGenderNeutral
+    isMale
+    isFemale
+    isAccessible
+    floorNB
 }
 class "Elevator" as Elevator {
-    - isAccessible
+    latitude
+    longitude
+    isAccessible
 }
 class "Stairs" as Stairs {
+    latitude
+    longitude
 }
+
 class "WaterFountain" as WaterFountain {
-    - hasBottleFiller
-    - floorNB
+    latitude
+    longitude
+    hasBottleFiller
+    floorNB
+}
+
+class "Room" as Room {
+    latitude
+    longitude
+    roomNumber
+    capacity
+    floorNB
 }
 
 abstract class "Outdoor" as Outdoor {
-    - address
-    - name
-    - type
+    address
+    name
+    type 
+    latitude
+    longitude
 }
 
 class "Restaurant" as Restaurant {
-    - cuisineType
+    address
+    name
+    type 
+    latitude
+    longitude
+    cuisineType
 }
 class "CoffeeShop" as CoffeeShop {
+    address
+    name
+    type 
+    latitude
+    longitude
 }
 
-terminal "1" -- "1" CampusCatalog : contains
-terminal "1" -- "1" Buildings : contains
-terminal "1" -- "1" PointOfInterestCatalog : contains
-terminal "1" -- "1" ClassCatalog : contains
+class "Class" as Class {
+    courseCode
+    courseName
+    instructor
+    dayOfWeek
+    startTime
+    endTime
+    heldIn
+}
 
-note top of terminal
-    <size:18><b><u>Controller Design Pattern :</u></b></size>
-    The terminal class will use a controller design pattern by which it
-    will act as the interface of the system by receiving user inputs and
-    will delegate the tasks to the appropriate catalog classes.
-end note
 
-note as Factory
-    <size:18><b><u>Factory Design Pattern :</u></b></size>
-    PointOfInterestCatalog will be using the factory design pattern
-    to create different types of PointOfInterest objects within a 
-    single method.
-end note
 
-note as Creators
-    <size:18><b><u>Creators and Information Experts :</u></b></size>
-    All the catalog classes (CampusCatalog, Buildings, 
-    Rooms, PointOfInterestCatalog) take on the CREATOR 
-    and INFORMATION EXPERT responsibilities from the 
-    GRASP by being the classes responsible for the 
-    creation of their respective objects and by finding objects
-    based on some relevant attributes.
-end note
+Class "1" -- "1" Room : heldIn
 
-Creators .. CampusCatalog
-Creators .. Buildings
-Creators .. PointOfInterestCatalog
-Factory .. PointOfInterestCatalog
+Building "1" -- "*" Indoor : contains
 
-CampusCatalog "1" *-- "2" Campus : contains
-
-Buildings "1" *-- "*" Building : contains
-
-Campus "1" -- "*" Building : has
-
-Building "1" -- "*" Indoor : has
-
-PointOfInterestCatalog "1" *-- "*" PointOfInterest : contains
 
 PointOfInterest <|-- Indoor
 Indoor <|-- Washroom
@@ -161,5 +222,39 @@ Indoor <|-- Room
 PointOfInterest <|-- Outdoor
 Outdoor <|-- Restaurant
 Outdoor <|-- CoffeeShop
+
+CampusMap "1" -- "1" BuildingShapesLayer : renders
+CampusMap "1" -- "1" ToggleButton : renders
+CampusMap "1" -- "1" BrandBar : renders
+CampusMap "1" -- "1" PointOfInterest : uses
+CampusMap "1" -- "1" BuildingsLoadError : uses for error handling
+
+LoyolaBuildings "1" -- "*" Building : uses
+SGWBuildings "1" -- "*" Building : uses
+
+CampusMap "1" -- "2" Region : has
+CampusMap "1" -- "0..1" Building : selected
+CampusMap "1" -- "*" Building : uses for rendering
+CampusMap "1" -- "1" LatLng : userLocation
+Building "1" -- "*" LatLng : polygon
+
+ConnectClass "1" -- "1" Class : uses
+ClassTab "1" -- "1" ConnectClass : renders
+ConnectClass "1" -- "1" BrandBar : renders
+
+Tabs <|-- Map
+Tabs <|-- Welcome
+Tabs <|-- ClassTab
+
+Map "1" -- "1" CampusMap : renders
+Welcome "1" -- "1" WelcomeScreen : renders
+
+Welcome "1" -- "1" Map : navigates to
+ClassTab "1" -- "1" Welcome : navigates to
+Map "1" -- "1" ClassTab : navigates to
+
+CampusMap "1" -- "1" CurrentLocationButton : renders
+CampusMap "1" -- "1" LoyolaBuildings : uses for search
+CampusMap "1" -- "1" SGWBuildings : uses for search
 
 @enduml

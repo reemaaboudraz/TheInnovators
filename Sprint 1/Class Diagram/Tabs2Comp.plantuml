@@ -1,0 +1,74 @@
+@startuml tabs2comp
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 16
+skinparam DefaultFontStyle bold
+skinparam ArrowThickness 2.2
+title <u>Class Diagram - Concordia Campus Guide App - Version 3 (with annotations)</u>\n<i>Date : 2026-02-08 </i>\n<i>Authors : Malak Sefrioui and Yash Nathani</i>
+hide empty members
+
+' ========== Domain types (data shapes) ==========
+enum "Campus" as Campus {
+    SGW
+    LOY
+}
+
+abstract class "Tabs"{}
+
+class "MapTab" as Map {
+    -CampusMap : CampusMap
+}
+
+class "WelcomeTab" as Welcome {
+    -WelcomeScreen : WelcomeScreen
+}
+
+class "ConnectClassTab" as ClassTab {
+    -ConnectClass : ConnectClass
+}
+
+class "ConnectClass" as ConnectClass {
+    -ClassCatalog : ClassCatalog
+}
+
+ClassTab "1" --> "1" ConnectClass : renders
+
+Tabs <|-- Map
+Tabs <|-- Welcome
+Tabs <|-- ClassTab
+
+Map "1" --> "1" CampusMap : renders
+Welcome "1" --> "1" WelcomeScreen : renders
+
+Welcome "1" <--> "1" Map : navigates to
+ClassTab "1" <--> "1" Welcome : navigates to
+Map "1" <--> "1" ClassTab : navigates to
+
+class "LatLng" as LatLng {
+    + latitude : number
+    + longitude : number
+}
+
+Tabs -[hidden]-> LatLng
+
+' ========== Implemented: UI (functional components as classes) ==========
+class "CampusMap" as CampusMap {
+    - focusedCampus : Campus
+    - query : string
+    - selected : Building | null
+    - userLocation : LatLng | null
+    - ALL_BUILDINGS : Building[]
+    + SGW_REGION : Region
+    + LOY_REGION : Region
+    + handleCampusChange(campus : Campus) : void
+    + handleLocationFound(location : LatLng) : void
+    + onPickBuilding(b : Building) : void
+}
+
+CampusMap ..> "0..1 UserLocation"LatLng : uses
+
+class "WelcomeScreen" as WelcomeScreen {
+    + onGoogleSignInPress() : void
+    + onContinueGuestPress() : void
+}
+
+@enduml

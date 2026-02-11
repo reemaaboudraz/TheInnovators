@@ -1,0 +1,125 @@
+@startuml HOC1
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 16
+skinparam DefaultFontStyle bold
+skinparam ArrowThickness 2.2
+title <u>Class Diagram - Concordia Campus Guide App - Version 3 (with annotations)</u>\n<i>Date : 2026-02-08 </i>\n<i>Authors : Malak Sefrioui and Yash Nathani</i>
+hide empty members
+
+' ========== Domain types (data shapes) ==========
+enum "Campus" as Campus {
+    SGW
+    LOY
+}
+
+CampusMap "1" --> "1" CurrentLocationButton : renders
+CampusMap "1" --> "1" LoyolaBuildings : uses for search
+CampusMap "1" --> "1" SGWBuildings : uses for search
+
+enum "LocationStatus" as LocationStatus {
+    idle
+    loading
+    granted
+    denied
+}
+' ========== Implemented: data and search ==========
+class "SGWBuildingsSearch" as SGWBuildings {
+    - SGW_BUILDINGS : Building[]
+    + searchSGWBuildings(query : string, limit? : number) : Building[]
+    + getSGWBuildingByCode(code : string) : Building | undefined
+}
+
+class "LoyolaBuildingsSearch" as LoyolaBuildings {
+    - LOYOLA_BUILDINGS : Building[]
+    + normalizeText(text : string) : string
+    + searchLoyolaBuildings(searchQuery : string, resultLimit? : number) : Building[]
+    + getLoyolaBuildingByCode(code : string) : Building | undefined
+}
+
+note as BuildingNote
+    <size:18><b><u>Logic only Components:</u></b></size>
+    These components are logical components that retrieves the building based on a keyword search.
+end note
+
+note as BuildingNote2
+    <size:18><b><u>Aesthetic only Component:</u></b></size>
+    These components are purely aesthetic and do not have any logic. 
+    They are used to enhance the visual experience of the app.
+end note
+
+note as BuildingNot3
+    <size:18><b><u>Mixed Component:</u></b></size>
+    These components are aesthetic but also have some logic. 
+    They are used to enhance the visual experience of the app 
+    while also providing some functionality.
+end note
+
+BuildingNote .. SGWBuildings : represents 
+BuildingNote .. LoyolaBuildings : represents
+
+BuildingNote2 .. BrandBar : represents
+
+BuildingNot3 .. ToggleButton : represents
+BuildingNot3 .. CurrentLocationButton : represents
+BuildingNot3 .. BuildingsLoadError : represents
+BuildingNot3 .. BuildingShapesLayer : represents
+
+' ========== Implemented: UI (functional components as classes) ==========
+class "CampusMap" as CampusMap {
+    - focusedCampus : Campus
+    - query : string
+    - selected : Building | null
+    - userLocation : LatLng | null
+    - ALL_BUILDINGS : Building[]
+    + SGW_REGION : Region
+    + LOY_REGION : Region
+    + handleCampusChange(campus : Campus) : void
+    + handleLocationFound(location : LatLng) : void
+    + onPickBuilding(b : Building) : void
+}
+
+class "BuildingShapesLayer" as BuildingShapesLayer {
+    - buildings : Building[]
+    - selectedBuildingId : string | null
+    - userLocationBuildingId : string | null
+    + onPickBuilding(b : Building) : void
+}
+
+
+class "ToggleButton" as ToggleButton {
+    - focusedCampus : Campus
+    + onCampusChange(campus : Campus) : void
+    + calculatePanValue(currentCampus : Campus, dx : number, toggleWidth : number) : number
+    + determineCampusFromPan(currentCampus : Campus, dx : number, toggleWidth : number) : Campus
+}
+
+class "CurrentLocationButton" as CurrentLocationButton {
+    + onLocationFound(location : UserLocation) : void
+    + onPermissionDenied?() : void
+}
+
+class "BrandBar" as BrandBar {
+    + height? : number
+    + backgroundColor? : string
+    + testID? : string
+    + adjustColorShade(baseColor : string, intensity : number) : string
+}
+
+
+class "BuildingsLoadError" as BuildingsLoadError {
+    + visible : boolean
+    + onRefresh() : void
+    + accentColor? : string
+    + testIDPrefix? : string
+}
+
+
+CampusMap "1" --> "1" BuildingShapesLayer : renders
+CampusMap "1" --> "1" ToggleButton : renders
+CampusMap "1" --> "1" CurrentLocationButton : renders
+CampusMap "1" --> "1" BrandBar : renders
+CampusMap "1" --> "1" BuildingsLoadError : uses for error handling
+
+CurrentLocationButton "1" ..> "1" LocationStatus : uses for permission status
+
+@enduml

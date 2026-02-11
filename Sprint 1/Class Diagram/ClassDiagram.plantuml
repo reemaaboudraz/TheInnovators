@@ -3,93 +3,186 @@ skinparam DefaultFontName Arial
 skinparam DefaultFontSize 16
 skinparam DefaultFontStyle bold
 skinparam ArrowThickness 2.2
-title <u>Class Diagram - Concordia Campus Guide App - Version 2 (with annotations)</u>\n<i>Date : 2026-01-27 </i>\n<i>Authors : Malak Sefrioui and Yash Nathani</i>
+title <u>Class Diagram - Concordia Campus Guide App - Version 3 (with annotations)</u>\n<i>Date : 2026-02-08 </i>\n<i>Authors : Malak Sefrioui and Yash Nathani</i>
 hide empty members
 
 note as Scope
     <size:18><b><u>Scope :</u></b></size>
     This class diagram represents the static structure of the Concordia Campus Guide App.
-    It includes classes for campuses, buildings, rooms, and points of interest (POIs)
+    It includes classes for campuses, buildings, claases, rooms, and points of interest (POIs)
     such as washrooms, elevators, and stairs. The diagram illustrates the relationships
     between these classes, highlighting associations and compositions that define how
     different entities interact within the system.
 end note
 
-class "Terminal" as terminal {
-    + loadBaseMap()
-    + loadSGWCampus()
-    + loadLoyolaCampus()
-    + getCampusDetails(codename: String): Campus
-    + getBuildingsOnCampus(campusCodename: String): List<Building>
-    + getBuildingByCodename(codename: String): Building
-    + getPOIByTypeAndBuilding(type: String, buildingCodename: String): List<PointOfInterest>
-    + getPOIsInBuilding(buildingCodename: String): List<PointOfInterest>
+' ========== Domain types (data shapes) ==========
+enum "Campus" as Campus {
+    SGW
+    LOY
 }
 
-class "CampusCatalog" as CampusCatalog {
-    - campuses: List<Campus>
-    + getCampusByCodename(codename: String): Campus
-    + addCampus(latitude: double, longitude: double, name: String, codename: String): void
-    + getBuildingsOnCampus(campusCodename: String): List<Building>
-    + getAllCampuses(): List<Campus>
-}
-class "Campus" as Campus {
-    - latitude: double
-    - longitude: double
-    - name: String
-    - codename : String
-    - buildings: List<Building>
-    + getLatitude(): double
-    + getLongitude(): double
-    + getName(): String
-    + getCodename(): String
-    + getBuildings(): List<Building>
+CampusMap "1" --> "1" CurrentLocationButton : renders
+CampusMap "1" --> "1" LoyolaBuildings : uses for search
+CampusMap "1" --> "1" SGWBuildings : uses for search
+
+abstract class "Tabs"{}
+
+class "MapTab" as Map {
+    -CampusMap : CampusMap
 }
 
-class "BuildingCatalog" as Buildings {
-    - buildings: List<Building>
-    + getBuildingByCodename(codename: String): Building
-    + getPOIByTypeAndBuilding(type: String, buildingCodename: String): List<PointOfInterest>
-    + getPOIByBuilding(buildingCodename: String): List<PointOfInterest>
-    + addBuilding(latitude: double, longitude: double, name: String, address: String, numberOfFloors: int, codename: String): void
-    + getAllBuildings(): List<Building>
+class "WelcomeTab" as Welcome {
+    -WelcomeScreen : WelcomeScreen
+}
+
+class "ConnectClassTab" as ClassTab {
+    -ConnectClass : ConnectClass
+}
+
+class "ConnectClass" as ConnectClass {
+    -Classes : Class[]
+}
+
+ConnectClass "1" --> "1" Class : uses
+ClassTab "1" --> "1" ConnectClass : renders
+ConnectClass "1" --> "1" BrandBar : renders
+
+Tabs <|-- Map
+Tabs <|-- Welcome
+Tabs <|-- ClassTab
+
+Map "1" --> "1" CampusMap : renders
+Welcome "1" --> "1" WelcomeScreen : renders
+
+Welcome "1" <--> "1" Map : navigates to
+ClassTab "1" <--> "1" Welcome : navigates to
+Map "1" <--> "1" ClassTab : navigates to
+
+enum "LocationStatus" as LocationStatus {
+    idle
+    loading
+    granted
+    denied
+}
+
+class "LatLng" as LatLng {
+    + latitude : number
+    + longitude : number
+}
+
+class "Region" as Region {
+    - latitude : number
+    - longitude : number
+    - latitudeDelta : number
+    - longitudeDelta : number
 }
 
 class "Building" as Building {
-    - latitude: double
-    - longitude: double
-    - name: String
-    - address: String
+    - id : string
+    - campus : Campus
+    - code : string
+    - name : string
+    - address : string
+    - latitude : number
+    - longitude : number
+    - aliases : string[]
+    - polygon : LatLng[]
     - numberOfFloors: int
     - codename : String
     - indoors: List<Indoor>
-    + getLatitude(): double
-    + getLongitude(): double
-    + getName(): String
-    + getAddress(): String
-    + getNumberOfFloors(): int
-    + getCodename(): String
-    + getIndoorsByType(type: String): List<Indoor>
-    + getAllIndoors(): List<Indoor>
 }
 
-class "PointOfInterestCatalog" as PointOfInterestCatalog {
-    - pois: List<PointOfInterest>
-    + addPOI(poi: PointOfInterest): void
-    + getAllPOIs(): List<PointOfInterest>
+LoyolaBuildings "1" --> "*" Building : uses
+SGWBuildings "1" --> "*" Building : uses
+
+' ========== Implemented: data and search ==========
+class "SGWBuildingsSearch" as SGWBuildings {
+    - SGW_BUILDINGS : Building[]
+    + searchSGWBuildings(query : string, limit? : number) : Building[]
+    + getSGWBuildingByCode(code : string) : Building | undefined
 }
+
+class "LoyolaBuildingsSearch" as LoyolaBuildings {
+    - LOYOLA_BUILDINGS : Building[]
+    + normalizeText(text : string) : string
+    + searchLoyolaBuildings(searchQuery : string, resultLimit? : number) : Building[]
+    + getLoyolaBuildingByCode(code : string) : Building | undefined
+}
+
+' ========== Implemented: UI (functional components as classes) ==========
+class "CampusMap" as CampusMap {
+    - focusedCampus : Campus
+    - query : string
+    - selected : Building | null
+    - userLocation : LatLng | null
+    - ALL_BUILDINGS : Building[]
+    + SGW_REGION : Region
+    + LOY_REGION : Region
+    + handleCampusChange(campus : Campus) : void
+    + handleLocationFound(location : LatLng) : void
+    + onPickBuilding(b : Building) : void
+}
+
+CampusMap "1" --> "2" Region : has
+CampusMap "1" --> "0..1" Building : selected
+CampusMap "1" --> "*" Building : uses for rendering
+CampusMap "1" --> "1" LatLng : userLocation
+Building "1" --> "*" LatLng : polygon
+
+class "BuildingShapesLayer" as BuildingShapesLayer {
+    - buildings : Building[]
+    - selectedBuildingId : string | null
+    - userLocationBuildingId : string | null
+    + onPickBuilding(b : Building) : void
+}
+
+BuildingShapesLayer "1" --> "*" Building : renders on map
+
+class "ToggleButton" as ToggleButton {
+    - focusedCampus : Campus
+    + onCampusChange(campus : Campus) : void
+    + calculatePanValue(currentCampus : Campus, dx : number, toggleWidth : number) : number
+    + determineCampusFromPan(currentCampus : Campus, dx : number, toggleWidth : number) : Campus
+}
+
+class "CurrentLocationButton" as CurrentLocationButton {
+    + onLocationFound(location : UserLocation) : void
+    + onPermissionDenied?() : void
+}
+
+class "BrandBar" as BrandBar {
+    + height? : number
+    + backgroundColor? : string
+    + testID? : string
+    + adjustColorShade(baseColor : string, intensity : number) : string
+}
+
+class "WelcomeScreen" as WelcomeScreen {
+    + onGoogleSignInPress() : void
+    + onContinueGuestPress() : void
+}
+
+class "BuildingsLoadError" as BuildingsLoadError {
+    + visible : boolean
+    + onRefresh() : void
+    + accentColor? : string
+    + testIDPrefix? : string
+}
+
+CampusMap "1" --> "1" BuildingShapesLayer : renders
+CampusMap "1" --> "1" ToggleButton : renders
+CampusMap "1" --> "1" BrandBar : renders
+CampusMap "1" --> "1" PointOfInterest : uses
+CampusMap "1" --> "1" BuildingsLoadError : uses for error handling
+
 
 abstract class "PointOfInterest" as PointOfInterest {
     - latitude: double
     - longitude: double
-    + getLatitude(): double
-    + getLongitude(): double
 }
 abstract class "Indoor" as Indoor {
     - latitude: double
     - longitude: double
-    + getLatitude(): double
-    + getLongitude(): double
 }
 
 class "Washroom" as Washroom {
@@ -101,21 +194,15 @@ class "Washroom" as Washroom {
     - isFemale: boolean
     - isAccessible: boolean
     - floorNB: int
-    + getLatitude(): double
-    + getLongitude(): double
 }
 class "Elevator" as Elevator {
     - latitude: double
     - longitude: double
     - isAccessible: boolean
-    + getLatitude(): double
-    + getLongitude(): double
 }
 class "Stairs" as Stairs {
     - latitude: double
     - longitude: double
-    + getLatitude(): double
-    + getLongitude(): double
 }
 
 class "WaterFountain" as WaterFountain {
@@ -123,8 +210,6 @@ class "WaterFountain" as WaterFountain {
     - longitude: double
     - hasBottleFiller: boolean
     - floorNB: int
-    + getLatitude(): double
-    + getLongitude(): double
 }
 
 class "Room" as Room {
@@ -133,11 +218,6 @@ class "Room" as Room {
     - roomNumber: String
     - capacity: int
     - floorNB: int
-    + getRoomNumber(): String
-    + getCapacity(): int
-    + getFloorNB(): int
-    + getLatitude(): double
-    + getLongitude(): double
 }
 
 abstract class "Outdoor" as Outdoor {
@@ -146,11 +226,6 @@ abstract class "Outdoor" as Outdoor {
     - type : String
     - latitude: double
     - longitude: double
-    + getLatitude(): double
-    + getLongitude(): double
-    + getAddress(): String
-    + getName(): String
-    + getType(): String
 }
 
 class "Restaurant" as Restaurant {
@@ -160,12 +235,6 @@ class "Restaurant" as Restaurant {
     - latitude: double
     - longitude: double
     - cuisineType: String
-    + getLatitude(): double
-    + getLongitude(): double
-    + getAddress(): String
-    + getName(): String
-    + getType(): String
-    + getCuisineType(): String
 }
 class "CoffeeShop" as CoffeeShop {
     - address: String
@@ -173,19 +242,6 @@ class "CoffeeShop" as CoffeeShop {
     - type : String
     - latitude: double
     - longitude: double
-    + getLatitude(): double
-    + getLongitude(): double
-    + getAddress(): String
-    + getName(): String
-    + getType(): String
-}
-
-
-class "ClassCatalog" as ClassCatalog {
-    - classes: List<Class>
-    + getAllClasses(): List<Class>
-    + addClass(courseCode: String, courseName: String, instructor: String, dayOfWeek: String, startTime: String, endTime: String): void
-    + getClassesByDay(dayOfWeek: String): List<Class>
 }
 
 class "Class" as Class {
@@ -196,32 +252,12 @@ class "Class" as Class {
     - startTime: String
     - endTime: String
     - heldIn: Room
-    + getCourseCode(): String
-    + getCourseName(): String
-    + getInstructor(): String
-    + getDayOfWeek(): String
-    + getStartTime(): String
-    + getEndTime(): String
-    + getHeldIn(): Room
 }
 
-ClassCatalog "1" --> "*" Class : contains
 Class "1" --> "1" Room : heldIn
-
-terminal "1" --> "1" ClassCatalog : contains
-terminal "1" --> "1" CampusCatalog
-terminal "1" --> "1" Buildings
-terminal "1" --> "1" PointOfInterestCatalog
-
-CampusCatalog "1" --> "2" Campus : contains
-
-Buildings "1" --> "*" Building : contains
-
-Campus "1" --> "*" Building : contains
 
 Building "1" --> "*" Indoor : contains
 
-PointOfInterestCatalog "1" --> "*" PointOfInterest : contains
 
 PointOfInterest <|-- Indoor
 Indoor <|-- Washroom
@@ -232,5 +268,8 @@ Indoor <|-- Room
 PointOfInterest <|-- Outdoor
 Outdoor <|-- Restaurant
 Outdoor <|-- CoffeeShop
+
+
+CurrentLocationButton "1" ..> "1" LocationStatus : uses for permission status
 
 @enduml
