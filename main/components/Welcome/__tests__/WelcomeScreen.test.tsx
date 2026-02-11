@@ -2,24 +2,34 @@ import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
 import { describe, it, expect, jest } from "@jest/globals";
 import { Alert } from "react-native";
-import { router } from "expo-router";
 import WelcomeScreen from "@/components/Welcome/WelcomeScreen";
 
+jest.mock("expo-router", () => ({
+    router: { replace: jest.fn() },
+}));
+
+jest.mock("@/hooks/useGoogleAuth", () => ({
+    useGoogleAuth: () => ({
+        signInWithGoogle: jest.fn(), // no Alert here
+    }),
+}));
+
 describe("WelcomeScreen", () => {
-  it("navigates to map when continuing as guest", () => {
-    const { getByText } = render(<WelcomeScreen />);
+    it("navigates to map when continuing as guest", () => {
+        const { router } = require("expo-router");
+        const { getByText } = render(<WelcomeScreen />);
 
-    fireEvent.press(getByText("Continue without signing in"));
-    expect(router.replace).toHaveBeenCalledWith("/(tabs)/map");
-  });
+        fireEvent.press(getByText("Continue without signing in"));
+        expect(router.replace).toHaveBeenCalledWith("/(tabs)/map");
+    });
 
-  it("shows alert when Google sign-in pressed", () => {
-    const alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {});
-    const { getByText } = render(<WelcomeScreen />);
+    it("shows alert when Google sign-in pressed", () => {
+        const alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {});
+        const { getByText } = render(<WelcomeScreen />);
 
-    fireEvent.press(getByText("Sign in with Google"));
-    expect(alertSpy).toHaveBeenCalled();
+        fireEvent.press(getByText("Sign in with Google"));
+        expect(alertSpy).toHaveBeenCalled();
 
-    alertSpy.mockRestore();
-  });
+        alertSpy.mockRestore();
+    });
 });
