@@ -195,7 +195,14 @@ export default function CampusMap() {
       </MapView>
 
       <View style={styles.topOverlay} testID="topOverlay">
-        <ToggleButton
+          <Text
+              testID="focusedCampusLabel"
+              style={{ opacity: 0, position: "absolute", top: 0, left: 0 }}
+          >
+              {focusedCampus}
+          </Text>
+
+          <ToggleButton
           focusedCampus={focusedCampus}
           onCampusChange={handleCampusChange}
         />
