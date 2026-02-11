@@ -2,11 +2,21 @@ import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
 import { describe, it, expect, jest } from "@jest/globals";
 import { Alert } from "react-native";
-import { router } from "expo-router";
 import WelcomeScreen from "@/components/Welcome/WelcomeScreen";
+
+jest.mock("expo-router", () => ({
+  router: { replace: jest.fn() },
+}));
+
+jest.mock("@/hooks/useGoogleAuth", () => ({
+  useGoogleAuth: () => ({
+    signInWithGoogle: jest.fn(), // no Alert here
+  }),
+}));
 
 describe("WelcomeScreen", () => {
   it("navigates to map when continuing as guest", () => {
+    const { router } = require("expo-router");
     const { getByText } = render(<WelcomeScreen />);
 
     fireEvent.press(getByText("Continue without signing in"));
