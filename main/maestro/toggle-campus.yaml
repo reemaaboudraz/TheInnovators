@@ -1,0 +1,47 @@
+appId: com.theinnovators.campusguide
+---
+- launchApp
+- waitForAnimationToEnd
+
+# Welcome Screen -> Guest
+- assertVisible:
+    id: "guest-sign-in-button"
+- tapOn:
+    id: "guest-sign-in-button"
+
+# Map loaded
+- assertVisible:
+    id: "campusMap-root"
+- assertVisible:
+    id: "campusToggle"
+
+# Starts at SGW (wait until SGW button is selected)
+- extendedWaitUntil:
+    visible:
+      id: "campusToggle-SGW"
+      selected: true
+    timeout: 10000
+
+# Switch to Loyola
+- tapOn:
+    id: "campusToggle-Loyola"
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: "campusToggle-Loyola"
+      selected: true
+    timeout: 10000
+
+- takeScreenshot: "after-switch-to-loyola"
+
+# Switch back to SGW
+- tapOn:
+    id: "campusToggle-SGW"
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: "campusToggle-SGW"
+      selected: true
+    timeout: 10000
+
+- takeScreenshot: "after-switch-to-sgw"
