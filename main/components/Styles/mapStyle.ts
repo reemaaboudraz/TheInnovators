@@ -5,37 +5,102 @@ export const styles = StyleSheet.create({
 
   topOverlay: {
     position: "absolute",
-    top: 10,
+    top: 14,
     left: 14,
     right: 14,
     gap: 10,
   },
 
-  searchBar: {
-    height: 40,
-    borderRadius: 999,
-    backgroundColor: "rgba(255,255,255,0.92)",
-    paddingHorizontal: 12,
+  // FIGMA-LIKE compact white card
+  navigationCard: {
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.97)",
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+
+  inputsSection: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
   },
 
-  searchIcon: {
-    fontSize: 18,
-    color: "rgba(17,17,17,0.55)",
+  leftIconsColumn: {
+    width: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 2,
   },
 
-  searchInput: {
-    flex: 1,
+  startDot: {
+    fontSize: 18,
     color: "#111111",
+    lineHeight: 18,
+  },
+
+  dottedLine: {
+    width: 1,
+    height: 14,
+    borderWidth: 1,
+    borderStyle: "dotted",
+    borderColor: "rgba(17,17,17,0.4)",
+    marginVertical: 2,
+  },
+
+  destinationPin: {
+    fontSize: 16,
+    lineHeight: 16,
+  },
+
+  inputsColumn: {
+    flex: 1,
+    gap: 8,
+  },
+
+  routeInput: {
+    height: 42,
+    borderRadius: 999,
+    backgroundColor: "#F0F1F3",
+    paddingHorizontal: 14,
+    color: "#222",
     fontWeight: "600",
+    fontSize: 16,
+  },
+
+  routeInputActive: {
+    borderWidth: 1.5,
+    borderColor: "#8CA2FF",
+    backgroundColor: "#EEF3FF",
+  },
+
+  swapButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#F0F1F3",
+  },
+
+  swapButtonText: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#111",
+    lineHeight: 20,
   },
 
   suggestions: {
-    borderRadius: 16,
-    backgroundColor: "rgba(255,255,255,0.92)",
+    marginTop: 8,
+    borderRadius: 14,
+    backgroundColor: "rgba(255,255,255,0.98)",
     overflow: "hidden",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "rgba(0,0,0,0.12)",
   },
 
   suggestionRow: {
@@ -46,8 +111,9 @@ export const styles = StyleSheet.create({
   },
 
   suggestionTitle: {
+    color: "#111",
     fontWeight: "700",
-    color: "#111111",
+    fontSize: 14,
   },
 
   suggestionSub: {
@@ -56,21 +122,19 @@ export const styles = StyleSheet.create({
     fontSize: 12,
   },
 
-  clearButton: {
-    paddingHorizontal: 4,
-  },
-
-  clearIcon: {
-    fontSize: 16,
-    color: "rgba(17,17,17,0.55)",
-    fontWeight: "700",
+  // hidden compat element
+  hiddenCompatButton: {
+    width: 0,
+    height: 0,
+    opacity: 0,
+    overflow: "hidden",
   },
 
   campusToggleContainer: {
     flexDirection: "row",
     borderRadius: 999,
     backgroundColor: "#EBE6E0",
-    marginTop: 50,
+    marginTop: 46,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -104,18 +168,33 @@ export const styles = StyleSheet.create({
     borderRadius: 999,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
+    shadowOpacity: 0.22,
+    shadowRadius: 2,
     elevation: 2,
   },
 
   campusToggleText: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: "700",
-    color: "#5C4033",
   },
 
-  campusToggleTextActive: {
-    color: "#FFFFFF",
+  sliderShadowLayer: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.35)",
+  },
+
+  activeLabel: { color: "#FFFFFF" },
+  inactiveLabel: { color: "#8F6B1E" },
+  activeLabelSgw: { color: "#FFFFFF" },
+  inactiveLabelSgw: { color: "#8C6A2D" },
+
+  mapBottomOffset: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 40,
+    height: 1,
   },
 });
