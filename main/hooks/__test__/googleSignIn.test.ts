@@ -6,7 +6,7 @@ import {
   signInWithGoogle,
   signOutGoogle,
 } from "@/hooks/useGoogleAuth";
-import { auth } from "@/firebase/firebase";
+import { auth } from "@/firebase.ts/firebase";
 jest.mock("expo-constants", () => ({
   expoConfig: {
     extra: {

@@ -1,7 +1,7 @@
 import Constants from "expo-constants";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
-import { auth } from "@/firebase/firebase";
+import { auth } from "@/firebase.ts/firebase";
 
 const { googleWebClientId, googleIosClientId } =
   Constants.expoConfig?.extra ?? {};

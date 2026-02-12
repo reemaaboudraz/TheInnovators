@@ -8,14 +8,7 @@ export default {
     ios: {
       bundleIdentifier: "com.theinnovators.campusguide",
       supportsTablet: true,
-      googleServicesFile: "./GoogleService-Info.plist",
-
-      infoPlist: {
-        NSLocationWhenInUseUsageDescription:
-          "We use your location to show your position on the campus map and help with navigation.",
-        NSLocationAlwaysAndWhenInUseUsageDescription:
-          "We use your location to provide navigation features on campus.",
-      },
+      //googleServicesFile: "./GoogleService-Info.plist",
     },
 
     android: {
@@ -49,7 +42,7 @@ export default {
       firebaseAppId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
       googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
       googleWebClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-      googleAndroidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+        googleAndroidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
       googleIosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
     },
   },
