@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Region, Marker } from "react-native-maps";
+import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
 
 import { SGW_BUILDINGS } from "@/components/Buildings/SGW/SGWBuildings";
@@ -60,6 +61,23 @@ export default function CampusMap() {
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
 
   const mapRef = useRef<MapView>(null);
+
+  // Automatically fetch user location on mount
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") return;
+
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+
+      setUserLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+    })();
+  }, []);
 
   const ALL_BUILDINGS = useMemo(
     () => [...SGW_BUILDINGS, ...LOYOLA_BUILDINGS],
