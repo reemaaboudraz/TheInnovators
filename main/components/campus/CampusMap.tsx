@@ -64,19 +64,42 @@ export default function CampusMap() {
 
   // Automatically fetch user location on mount
   useEffect(() => {
+    let cancelled = false;
+
     (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") return;
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted" || cancelled) return;
 
-      const location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      });
+        // Try last-known position first (instant, works on emulators)
+        const last = await Location.getLastKnownPositionAsync();
+        if (last && !cancelled) {
+          setUserLocation({
+            latitude: last.coords.latitude,
+            longitude: last.coords.longitude,
+          });
+          return;
+        }
 
-      setUserLocation({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
+        // Fall back to a fresh fix with a timeout
+        const location = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Low,
+        });
+
+        if (!cancelled) {
+          setUserLocation({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          });
+        }
+      } catch {
+        // Location unavailable (common on emulators) — silently ignore
+      }
     })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const ALL_BUILDINGS = useMemo(

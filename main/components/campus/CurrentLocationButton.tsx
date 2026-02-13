@@ -41,9 +41,19 @@ export default function CurrentLocationButton({
 
       setStatus("granted");
 
-      // Get current location
+      
+      const last = await Location.getLastKnownPositionAsync();
+      if (last) {
+        onLocationFound({
+          latitude: last.coords.latitude,
+          longitude: last.coords.longitude,
+        });
+        return;
+      }
+
+      
       const location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
+        accuracy: Location.Accuracy.Low,
       });
 
       onLocationFound({

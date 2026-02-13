@@ -48,3 +48,7 @@ app-example
 # vscode editor-specific settings
 .vscode/
 
+# Firebase config
+google-services.json
+GoogleService-Info.plist
+
