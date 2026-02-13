@@ -1,0 +1,100 @@
+@startuml Domain Model NAV
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 16
+skinparam DefaultFontStyle bold
+skinparam ArrowThickness 2.2
+title <u>Domain Model Concordia Campus Guide App Version 3 (with annotations)</u>\n<i>Date : 2026-02-08 </i>\n<i>Authors : Malak Sefrioui and Yash Nathani</i>
+hide empty members
+
+' ========== Domain types (data shapes) ==========
+enum "Campus" as Campus {
+    SGW
+    LOY
+}
+
+enum "LocationStatus" as LocationStatus {
+    idle
+    loading
+    granted
+    denied
+}
+
+' ========== Implemented: data and search ==========
+class "SearchComponent" as SearchComponent {
+    query
+}
+
+class "InfoSearchBar" as InfoSearchBar {
+    query
+}
+
+class "DirectionsSearchBar" as DirectionsSearchBar {
+    query
+}
+
+SearchComponent <|-- InfoSearchBar : extends when directionsMode is inactive
+SearchComponent <|-- DirectionsSearchBar : extends when directionsMode is active
+
+CampusMap "1" -- "1" SearchComponent : renders
+
+class "NavigationComponent" as NavigationComponent {
+    selectedMode
+    selectedRoute
+}
+
+CampusMap "1" -- "1" NavigationComponent : renders if directionsMode is active
+
+enum "selectedMode" as selectedMode {
+    walking
+    transit
+    driving
+    biking
+    undefined
+}
+
+enum "directionsMode" as directionsMode {
+    active
+    inactive
+}
+
+class "RouteOptions" as RouteOptions {
+}
+
+NavigationComponent "1" -- "1" RouteOptions : renders depending on selectedMode
+
+RouteOptions <|-- WalkingRouteOptions
+RouteOptions <|-- TransitRouteOptions
+RouteOptions <|-- DrivingRouteOptions
+RouteOptions <|-- BikingRouteOptions
+
+class "DirectionsComponent" as DirectionsComponent {
+    origin
+    destination
+    lineColor
+    lineWidth
+}
+NavigationComponent "1" -- "1" DirectionsComponent : uses to show directions of selectedRoute
+
+class "WalkingRouteOptions" as WalkingRouteOptions {
+}
+
+class "TransitRouteOptions" as TransitRouteOptions {
+}
+
+class "DrivingRouteOptions" as DrivingRouteOptions {
+}
+
+class "BikingRouteOptions" as BikingRouteOptions {
+}
+
+class "DirectionsComponent" as DirectionsComponent {
+}
+
+' ========== Implemented: UI (functional components as classes) ==========
+class "CampusMap" as CampusMap {
+    focusedCampus
+    locationStatus
+    directionsMode
+}
+
+@enduml

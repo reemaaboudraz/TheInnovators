@@ -74,16 +74,83 @@ class "Building" as Building {
 }
 
 ' ========== Implemented: data and search ==========
-class "SGWBuildingsSearch" as SGWBuildings {
+class "SearchComponent" as SearchComponent {
+    query
 }
 
-class "LoyolaBuildingsSearch" as LoyolaBuildings {
+class "InfoSearchBar" as InfoSearchBar {
+    query
 }
+
+class "DirectionsSearchBar" as DirectionsSearchBar {
+    query
+}
+
+SearchComponent <|-- InfoSearchBar : extends when directionsMode is inactive
+SearchComponent <|-- DirectionsSearchBar : extends when directionsMode is active
+
+CampusMap "1" -- "1" SearchComponent : renders
+
+class "NavigationComponent" as NavigationComponent {
+    selectedMode
+    selectedRoute
+}
+
+CampusMap "1" -- "1" NavigationComponent : renders if directionsMode is active
+
+enum "selectedMode" as selectedMode {
+    walking
+    transit
+    driving
+    biking
+    undefined
+}
+
+enum "directionsMode" as directionsMode {
+    active
+    inactive
+}
+
+class "RouteOptions" as RouteOptions {
+}
+
+NavigationComponent "1" -- "1" RouteOptions : renders depending on selectedMode
+
+RouteOptions <|-- WalkingRouteOptions
+RouteOptions <|-- TransitRouteOptions
+RouteOptions <|-- DrivingRouteOptions
+RouteOptions <|-- BikingRouteOptions
+
+class "DirectionsComponent" as DirectionsComponent {
+    origin
+    destination
+    lineColor
+    lineWidth
+}
+NavigationComponent "1" -- "1" DirectionsComponent : uses to show directions of selectedRoute
+
+class "WalkingRouteOptions" as WalkingRouteOptions {
+}
+
+class "TransitRouteOptions" as TransitRouteOptions {
+}
+
+class "DrivingRouteOptions" as DrivingRouteOptions {
+}
+
+class "BikingRouteOptions" as BikingRouteOptions {
+}
+
+class "DirectionsComponent" as DirectionsComponent {
+}
+
+class "Route"
 
 ' ========== Implemented: UI (functional components as classes) ==========
 class "CampusMap" as CampusMap {
-    focusedCampus 
-    query 
+    focusedCampus
+    locationStatus
+    directionsMode
 }
 
 class "BuildingShapesLayer" as BuildingShapesLayer {
@@ -207,9 +274,6 @@ CampusMap "1" -- "1" ToggleButton : renders
 CampusMap "1" -- "1" BrandBar : renders
 CampusMap "1" -- "1" PointOfInterest : uses
 CampusMap "1" -- "1" BuildingsLoadError : uses for error handling
-
-LoyolaBuildings "1" -- "*" Building : uses
-SGWBuildings "1" -- "*" Building : uses
 
 CampusMap "1" -- "2" Region : has
 CampusMap "1" -- "0..1" Building : selected
