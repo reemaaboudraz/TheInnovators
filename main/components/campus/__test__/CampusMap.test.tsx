@@ -71,7 +71,8 @@ jest.mock("expo-status-bar", () => ({ StatusBar: () => null }));
 jest.mock("expo-location", () => ({
   requestForegroundPermissionsAsync: () =>
     Promise.resolve({ status: "denied" }),
-  getCurrentPositionAsync: () => Promise.resolve({ coords: { latitude: 0, longitude: 0 } }),
+  getCurrentPositionAsync: () =>
+    Promise.resolve({ coords: { latitude: 0, longitude: 0 } }),
   getLastKnownPositionAsync: () => Promise.resolve(null),
   Accuracy: { Low: 2, Balanced: 3 },
 }));
