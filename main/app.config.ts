@@ -22,10 +22,7 @@ export default {
       package: "com.theinnovators.campusguide",
       googleServicesFile: "./google-services.json",
 
-      permissions: [
-        "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION",
-      ],
+      permissions: ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"],
 
       adaptiveIcon: {
         backgroundColor: "#E6F4FE",
@@ -65,10 +62,6 @@ export default {
       googleWebClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
       googleAndroidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
       googleIosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-
-     
-
-      
     },
   },
 };

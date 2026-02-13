@@ -41,7 +41,6 @@ export default function CurrentLocationButton({
 
       setStatus("granted");
 
-      
       const last = await Location.getLastKnownPositionAsync();
       if (last) {
         onLocationFound({
@@ -51,7 +50,6 @@ export default function CurrentLocationButton({
         return;
       }
 
-      
       const location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Low,
       });
