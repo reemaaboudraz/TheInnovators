@@ -171,6 +171,59 @@ describe("CurrentLocationButton", () => {
   });
 });
 
+describe("CurrentLocationButton - last known position fallback", () => {
+  it("uses last known position when available", async () => {
+    mockRequestForegroundPermissionsAsync.mockResolvedValueOnce({
+      status: "granted",
+    });
+    mockGetLastKnownPositionAsync.mockResolvedValueOnce({
+      coords: { latitude: 45.49, longitude: -73.58 },
+    });
+
+    const onLocationFound = jest.fn();
+    const { getByTestId } = render(
+      <CurrentLocationButton onLocationFound={onLocationFound} />,
+    );
+
+    fireEvent.press(getByTestId("currentLocationButton"));
+
+    await waitFor(() => {
+      expect(onLocationFound).toHaveBeenCalledWith({
+        latitude: 45.49,
+        longitude: -73.58,
+      });
+    });
+
+    expect(mockGetCurrentPositionAsync).not.toHaveBeenCalled();
+  });
+
+  it("falls back to getCurrentPositionAsync when last known is null", async () => {
+    mockRequestForegroundPermissionsAsync.mockResolvedValueOnce({
+      status: "granted",
+    });
+    mockGetLastKnownPositionAsync.mockResolvedValueOnce(null);
+    mockGetCurrentPositionAsync.mockResolvedValueOnce({
+      coords: { latitude: 45.5, longitude: -73.6 },
+    });
+
+    const onLocationFound = jest.fn();
+    const { getByTestId } = render(
+      <CurrentLocationButton onLocationFound={onLocationFound} />,
+    );
+
+    fireEvent.press(getByTestId("currentLocationButton"));
+
+    await waitFor(() => {
+      expect(mockGetLastKnownPositionAsync).toHaveBeenCalled();
+      expect(mockGetCurrentPositionAsync).toHaveBeenCalled();
+      expect(onLocationFound).toHaveBeenCalledWith({
+        latitude: 45.5,
+        longitude: -73.6,
+      });
+    });
+  });
+});
+
 describe("CurrentLocationButton - accessibility", () => {
   it("has correct accessibility attributes", () => {
     const onLocationFound = jest.fn();

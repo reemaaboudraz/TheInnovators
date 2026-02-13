@@ -68,12 +68,18 @@ jest.mock("@/components/Buildings/data/Loyola_data.json", () => [
 // -------------------- UI Mocks --------------------
 jest.mock("expo-status-bar", () => ({ StatusBar: () => null }));
 
+const mockLocRequestPermissions = jest.fn(() =>
+  Promise.resolve({ status: "denied" }),
+);
+const mockLocGetCurrent = jest.fn(() =>
+  Promise.resolve({ coords: { latitude: 0, longitude: 0 } }),
+);
+const mockLocGetLastKnown = jest.fn(() => Promise.resolve(null));
+
 jest.mock("expo-location", () => ({
-  requestForegroundPermissionsAsync: () =>
-    Promise.resolve({ status: "denied" }),
-  getCurrentPositionAsync: () =>
-    Promise.resolve({ coords: { latitude: 0, longitude: 0 } }),
-  getLastKnownPositionAsync: () => Promise.resolve(null),
+  requestForegroundPermissionsAsync: () => mockLocRequestPermissions(),
+  getCurrentPositionAsync: () => mockLocGetCurrent(),
+  getLastKnownPositionAsync: () => mockLocGetLastKnown(),
   Accuracy: { Low: 2, Balanced: 3 },
 }));
 
@@ -643,5 +649,75 @@ describe("CampusMap - Current Location button callback", () => {
       }),
       500,
     );
+  });
+});
+
+describe("CampusMap - auto-location on mount", () => {
+  beforeEach(() => {
+    mockLocRequestPermissions.mockReset();
+    mockLocGetCurrent.mockReset();
+    mockLocGetLastKnown.mockReset();
+
+    // Default: permission denied (no location fetched)
+    mockLocRequestPermissions.mockResolvedValue({ status: "denied" });
+    mockLocGetLastKnown.mockResolvedValue(null);
+    mockLocGetCurrent.mockResolvedValue({
+      coords: { latitude: 0, longitude: 0 },
+    });
+  });
+
+  it("does not fetch location when permission is denied", async () => {
+    render(<CampusMap />);
+
+    await act(async () => {});
+
+    expect(mockLocRequestPermissions).toHaveBeenCalled();
+    expect(mockLocGetLastKnown).not.toHaveBeenCalled();
+    expect(mockLocGetCurrent).not.toHaveBeenCalled();
+  });
+
+  it("uses last known position when available", async () => {
+    mockLocRequestPermissions.mockResolvedValue({ status: "granted" });
+    mockLocGetLastKnown.mockResolvedValue({
+      coords: { latitude: 45.497, longitude: -73.579 },
+    });
+
+    const { queryByTestId } = render(<CampusMap />);
+
+    await act(async () => {});
+
+    expect(mockLocGetLastKnown).toHaveBeenCalled();
+    expect(mockLocGetCurrent).not.toHaveBeenCalled();
+    // User is inside the H building polygon → marker should NOT render
+    expect(queryByTestId("userLocationMarker")).toBeNull();
+  });
+
+  it("falls back to getCurrentPositionAsync when last known is null", async () => {
+    mockLocRequestPermissions.mockResolvedValue({ status: "granted" });
+    mockLocGetLastKnown.mockResolvedValue(null);
+    mockLocGetCurrent.mockResolvedValue({
+      coords: { latitude: 45.5, longitude: -73.6 },
+    });
+
+    const { getByTestId } = render(<CampusMap />);
+
+    await act(async () => {});
+
+    expect(mockLocGetLastKnown).toHaveBeenCalled();
+    expect(mockLocGetCurrent).toHaveBeenCalled();
+    // User is outside all buildings → marker should render at those coords
+    expect(getByTestId("marker-45.5--73.6")).toBeTruthy();
+  });
+
+  it("silently ignores errors from location APIs", async () => {
+    mockLocRequestPermissions.mockResolvedValue({ status: "granted" });
+    mockLocGetLastKnown.mockRejectedValue(new Error("fail"));
+
+    render(<CampusMap />);
+
+    // Should not throw
+    await act(async () => {});
+
+    expect(mockLocGetLastKnown).toHaveBeenCalled();
   });
 });
