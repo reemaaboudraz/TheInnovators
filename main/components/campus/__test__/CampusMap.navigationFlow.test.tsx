@@ -63,7 +63,9 @@ jest.mock("expo-status-bar", () => ({ StatusBar: () => null }));
 
 jest.mock("@/components/campus/BuildingPopup", () => {
   const ReactActual = jest.requireActual("react") as typeof React;
-  const RN = jest.requireActual("react-native") as typeof import("react-native");
+  const RN = jest.requireActual(
+    "react-native",
+  ) as typeof import("react-native");
   const { View } = RN;
   return {
     __esModule: true,
@@ -75,19 +77,25 @@ jest.mock("@/components/campus/BuildingPopup", () => {
 
 jest.mock("@/components/campus/CurrentLocationButton", () => {
   const ReactActual = jest.requireActual("react") as typeof React;
-  const RN = jest.requireActual("react-native") as typeof import("react-native");
+  const RN = jest.requireActual(
+    "react-native",
+  ) as typeof import("react-native");
   const { View } = RN;
   return {
     __esModule: true,
     default: function MockCurrentLocationButton() {
-      return ReactActual.createElement(View, { testID: "currentLocationButton" });
+      return ReactActual.createElement(View, {
+        testID: "currentLocationButton",
+      });
     },
   };
 });
 
 jest.mock("@/components/layout/BrandBar", () => {
   const ReactActual = jest.requireActual("react") as typeof React;
-  const RN = jest.requireActual("react-native") as typeof import("react-native");
+  const RN = jest.requireActual(
+    "react-native",
+  ) as typeof import("react-native");
   const { View } = RN;
   return function BrandBarMock(props: any) {
     return ReactActual.createElement(View, {
@@ -101,7 +109,9 @@ const mockAnimateToRegion = jest.fn();
 
 jest.mock("react-native-maps", () => {
   const ReactActual = jest.requireActual("react") as typeof React;
-  const RN = jest.requireActual("react-native") as typeof import("react-native");
+  const RN = jest.requireActual(
+    "react-native",
+  ) as typeof import("react-native");
   const { View } = RN;
 
   const MockMapView = ReactActual.forwardRef((props: any, ref: any) => {
@@ -110,17 +120,25 @@ jest.mock("react-native-maps", () => {
     }));
 
     return ReactActual.createElement(
-        View,
-        { ...props, testID: props.testID || "mapView" },
-        props.children,
+      View,
+      { ...props, testID: props.testID || "mapView" },
+      props.children,
     );
   });
 
   const MockPolygon = (props: any) =>
-      ReactActual.createElement(View, { ...props, testID: "polygon" }, props.children);
+    ReactActual.createElement(
+      View,
+      { ...props, testID: "polygon" },
+      props.children,
+    );
 
   const MockMarker = (props: any) =>
-      ReactActual.createElement(View, { ...props, testID: "marker" }, props.children);
+    ReactActual.createElement(
+      View,
+      { ...props, testID: "marker" },
+      props.children,
+    );
 
   (MockMapView as any).displayName = "MockMapView";
 
@@ -158,7 +176,7 @@ describe("CampusMap navigation flow", () => {
     expect(getByTestId("destinationInput").props.value).toBe("");
 
     expect(getDirectionsButton.props.accessibilityState).toEqual(
-        expect.objectContaining({ disabled: true }),
+      expect.objectContaining({ disabled: true }),
     );
   });
 
@@ -175,7 +193,7 @@ describe("CampusMap navigation flow", () => {
     expect(getByTestId("startInput").props.value).toBe("");
     expect(getByTestId("destinationInput").props.value).toBe("");
     expect(getDirectionsButton.props.accessibilityState).toEqual(
-        expect.objectContaining({ disabled: true }),
+      expect.objectContaining({ disabled: true }),
     );
   });
 });

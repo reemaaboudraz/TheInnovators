@@ -348,7 +348,11 @@ describe("CampusMap - building shapes (Polygon/Marker)", () => {
     expect(queryByTestId("buildingPopup")).toBeTruthy();
 
     act(() => {
-      fireEvent.press(getByTestId("mapView"));
+      fireEvent(getByTestId("mapView"), "press", {
+        nativeEvent: {
+          coordinate: { latitude: 45.497, longitude: -73.579 },
+        },
+      });
     });
     expect(queryByTestId("buildingPopup")).toBeNull();
   });
