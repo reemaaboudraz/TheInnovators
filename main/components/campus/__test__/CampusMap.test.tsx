@@ -68,6 +68,14 @@ jest.mock("@/components/Buildings/data/Loyola_data.json", () => [
 // -------------------- UI Mocks --------------------
 jest.mock("expo-status-bar", () => ({ StatusBar: () => null }));
 
+jest.mock("expo-location", () => ({
+  requestForegroundPermissionsAsync: () =>
+    Promise.resolve({ status: "denied" }),
+  getCurrentPositionAsync: () => Promise.resolve({ coords: { latitude: 0, longitude: 0 } }),
+  getLastKnownPositionAsync: () => Promise.resolve(null),
+  Accuracy: { Low: 2, Balanced: 3 },
+}));
+
 // ✅ IMPORTANT: CampusMap renders BuildingPopup, which uses @gorhom/bottom-sheet + Reanimated.
 // Mock it so CampusMap tests don’t crash.
 jest.mock("@/components/campus/BuildingPopup", () => {

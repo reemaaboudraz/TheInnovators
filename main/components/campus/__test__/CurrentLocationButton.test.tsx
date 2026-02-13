@@ -6,13 +6,16 @@ import { Alert } from "react-native";
 // Mock expo-location
 const mockRequestForegroundPermissionsAsync = jest.fn();
 const mockGetCurrentPositionAsync = jest.fn();
+const mockGetLastKnownPositionAsync = jest.fn();
 
 jest.mock("expo-location", () => ({
   requestForegroundPermissionsAsync: () =>
     mockRequestForegroundPermissionsAsync(),
   getCurrentPositionAsync: () => mockGetCurrentPositionAsync(),
+  getLastKnownPositionAsync: () => mockGetLastKnownPositionAsync(),
   Accuracy: {
     Balanced: 3,
+    Low: 2,
   },
 }));
 
