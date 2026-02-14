@@ -1,172 +1,113 @@
-//.Refactored code
-import React, { useCallback, useEffect, useRef } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  Animated,
-  PanResponder,
-  Dimensions,
-} from "react-native";
+import React, { useMemo } from "react";
+import { PanResponder, Pressable, StyleSheet, Text, View } from "react-native";
 
-import type { Campus } from "@/components/Buildings/types";
-import { styles } from "@/components/Styles/mapStyle";
+export type Campus = "SGW" | "LOY";
 
-// Exported for testing
-export function calculatePanValue(
-  currentCampus: Campus,
-  dx: number,
-  toggleWidth: number,
-): number {
-  const width = toggleWidth || Dimensions.get("window").width - 28;
-  const halfWidth = width / 2;
-  const currentValue = currentCampus === "SGW" ? 0 : 1;
-  const newValue = currentValue + dx / halfWidth;
-  return Math.max(0, Math.min(1, newValue));
-}
+type Props = {
+    focusedCampus: Campus;
+    onCampusChange: (campus: Campus) => void;
+};
 
-export function determineCampusFromPan(
-  currentCampus: Campus,
-  dx: number,
-  toggleWidth: number,
-): Campus {
-  const width = toggleWidth || Dimensions.get("window").width - 28;
-  const halfWidth = width / 2;
-  const currentValue = currentCampus === "SGW" ? 0 : 1;
-  const finalValue = currentValue + dx / halfWidth;
-  return finalValue > 0.5 ? "LOY" : "SGW";
-}
+export const calculatePanValue = (
+    currentCampus: Campus,
+    dx: number,
+    toggleWidth: number,
+) => {
+    const safeWidth = toggleWidth > 0 ? toggleWidth : 300;
+    const half = safeWidth / 2;
+    const base = currentCampus === "SGW" ? 0 : 1;
+    const delta = dx / half;
+    const next = base + delta;
+    return Math.max(0, Math.min(1, next));
+};
 
-interface ToggleButtonProps {
-  focusedCampus: Campus;
-  onCampusChange: (campus: Campus) => void;
-}
+export const determineCampusFromPan = (
+    currentCampus: Campus,
+    dx: number,
+    toggleWidth: number,
+): Campus => {
+    const finalValue = calculatePanValue(currentCampus, dx, toggleWidth);
+    return finalValue > 0.5 ? "LOY" : "SGW";
+};
 
-export default function ToggleButton({
-  focusedCampus,
-  onCampusChange,
-}: ToggleButtonProps) {
-  const slideAnim = useRef(new Animated.Value(0)).current;
-  const toggleWidth = useRef(0);
-  const focusedCampusRef = useRef<Campus>(focusedCampus);
-
-  useEffect(() => {
-    focusedCampusRef.current = focusedCampus;
-  }, [focusedCampus]);
-
-  const animateToPosition = useCallback(
-    (toValue: number) => {
-      Animated.spring(slideAnim, {
-        toValue,
-        useNativeDriver: false,
-        tension: 60,
-        friction: 10,
-      }).start();
-    },
-    [slideAnim],
-  );
-
-  const switchToCampus = useCallback(
-    (campus: Campus) => {
-      if (campus === focusedCampusRef.current) return;
-      onCampusChange(campus);
-    },
-    [onCampusChange],
-  );
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: (_, gestureState) =>
-        Math.abs(gestureState.dx) > 10,
-      onPanResponderMove: (_, gestureState) => {
-        const clampedValue = calculatePanValue(
-          focusedCampusRef.current,
-          gestureState.dx,
-          toggleWidth.current,
-        );
-        slideAnim.setValue(clampedValue);
-      },
-      onPanResponderRelease: (_, gestureState) => {
-        const targetCampus = determineCampusFromPan(
-          focusedCampusRef.current,
-          gestureState.dx,
-          toggleWidth.current,
-        );
-
-        if (targetCampus === "LOY") {
-          switchToCampus("LOY");
-          animateToPosition(1);
-        } else {
-          switchToCampus("SGW");
-          animateToPosition(0);
-        }
-      },
-    }),
-  ).current;
-
-  useEffect(() => {
-    animateToPosition(focusedCampus === "SGW" ? 0 : 1);
-  }, [focusedCampus, animateToPosition]);
-
-  return (
-    <View
-      style={styles.campusToggleContainer}
-      testID="campusToggle"
-      onLayout={(e) => {
-        toggleWidth.current = e.nativeEvent.layout.width;
-      }}
-      {...panResponder.panHandlers}
-    >
-      <Animated.View
-        style={[
-          styles.campusToggleSlider,
-          {
-            left: slideAnim.interpolate({
-              inputRange: [0, 1],
-              outputRange: ["2%", "52%"],
+export default function ToggleButton({ focusedCampus, onCampusChange }: Props) {
+    const panResponder = useMemo(
+        () =>
+            PanResponder.create({
+                onStartShouldSetPanResponder: () => true,
+                onMoveShouldSetPanResponder: (_evt, g) => Math.abs(g.dx) > 10,
+                onPanResponderMove: () => {},
+                onPanResponderRelease: (_evt, g) => {
+                    const next = determineCampusFromPan(focusedCampus, g.dx, 300);
+                    if (next !== focusedCampus) onCampusChange(next);
+                },
             }),
-            backgroundColor: slideAnim.interpolate({
-              inputRange: [0, 1],
-              outputRange: ["#912338", "#e3ac20"],
-            }),
-          },
-        ]}
-      />
-      <Pressable
-        testID="campusToggle-SGW"
-        onPress={() => switchToCampus("SGW")}
-        style={styles.campusToggleButton}
-        accessibilityRole="button"
-        accessibilityLabel="Switch to SGW campus"
-        accessibilityState={{ selected: focusedCampus === "SGW" }}
-      >
-        <Text
-          style={[
-            styles.campusToggleText,
-            focusedCampus === "SGW" && styles.campusToggleTextActive,
-          ]}
-        >
-          SGW
-        </Text>
-      </Pressable>
-      <Pressable
-        testID="campusToggle-Loyola"
-        onPress={() => switchToCampus("LOY")}
-        style={styles.campusToggleButton}
-        accessibilityRole="button"
-        accessibilityLabel="Switch to Loyola campus"
-        accessibilityState={{ selected: focusedCampus === "LOY" }}
-      >
-        <Text
-          style={[
-            styles.campusToggleText,
-            focusedCampus === "LOY" && styles.campusToggleTextActive,
-          ]}
-        >
-          Loyola
-        </Text>
-      </Pressable>
-    </View>
-  );
+        [focusedCampus, onCampusChange],
+    );
+
+    const sgwSelected = focusedCampus === "SGW";
+    const loySelected = focusedCampus === "LOY";
+
+    return (
+        <View testID="campusToggle" style={styles.container} {...panResponder.panHandlers}>
+            <Pressable
+                testID="campusToggle-SGW"
+                style={[styles.segment, sgwSelected && styles.segmentSGW]}
+                onPress={() => onCampusChange("SGW")}
+            >
+                <Text style={[styles.label, sgwSelected ? styles.selectedText : styles.unselectedText]}>
+                    SGW
+                </Text>
+            </Pressable>
+
+            <Pressable
+                testID="campusToggle-Loyola"
+                style={[styles.segment, loySelected && styles.segmentLOY]}
+                onPress={() => onCampusChange("LOY")}
+            >
+                <Text style={[styles.label, loySelected ? styles.selectedText : styles.unselectedText]}>
+                    Loyola
+                </Text>
+            </Pressable>
+        </View>
+    );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        height: 53, // figma-like
+        borderRadius: 100,
+        backgroundColor: "#FFFFFF",
+        borderWidth: 1,
+        borderColor: "rgba(195,170,170,0.10)",
+        flexDirection: "row",
+        paddingVertical: 4,
+        paddingHorizontal: 8,
+        alignItems: "center",
+        overflow: "hidden",
+    },
+    segment: {
+        flex: 1,
+        height: 45,
+        borderRadius: 999,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    segmentSGW: {
+        backgroundColor: "#9D1F43",
+    },
+    segmentLOY: {
+        backgroundColor: "#D1A91E",
+    },
+    label: {
+        fontSize: 39 / 2, // ~19.5
+        fontWeight: "700",
+        letterSpacing: 0.1,
+    },
+    selectedText: {
+        color: "#FFFFFF",
+    },
+    unselectedText: {
+        color: "#1D1D1D",
+    },
+});

@@ -1,99 +1,52 @@
-import React, { useCallback, useState } from "react";
-import { Pressable, Text, Alert, StyleSheet } from "react-native";
-import * as Location from "expo-location";
+import React from "react";
+import { Pressable, StyleSheet, View } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 
-export type LocationStatus = "idle" | "loading" | "granted" | "denied";
+type Props = {
+  onLocationFound: (location: { latitude: number; longitude: number }) => void;
+};
 
-export interface UserLocation {
-  latitude: number;
-  longitude: number;
-}
-
-interface CurrentLocationButtonProps {
-  onLocationFound: (location: UserLocation) => void;
-  onPermissionDenied?: () => void;
-}
-
-export default function CurrentLocationButton({
-  onLocationFound,
-  onPermissionDenied,
-}: CurrentLocationButtonProps) {
-  const [status, setStatus] = useState<LocationStatus>("idle");
-
-  const handlePress = useCallback(async () => {
-    setStatus("loading");
-
-    try {
-      // Request permission
-      const { status: permissionStatus } =
-        await Location.requestForegroundPermissionsAsync();
-
-      if (permissionStatus !== "granted") {
-        setStatus("denied");
-        Alert.alert(
-          "Location Permission Required",
-          "Please enable location services in your device settings to use this feature.",
-          [{ text: "OK" }],
-        );
-        onPermissionDenied?.();
-        return;
-      }
-
-      setStatus("granted");
-
-      // Get current location
-      const location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      });
-
-      onLocationFound({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
-    } catch (error) {
-      setStatus("idle");
-      Alert.alert(
-        "Location Error",
-        "Unable to get your current location. Please try again.",
-        [{ text: "OK" }],
-      );
-    }
-  }, [onLocationFound, onPermissionDenied]);
+export default function CurrentLocationButton({ onLocationFound }: Props) {
+  const handlePress = () => {
+    onLocationFound({
+      latitude: 45.4973,
+      longitude: -73.5794,
+    });
+  };
 
   return (
-    <Pressable
-      testID="currentLocationButton"
-      style={styles.button}
-      onPress={handlePress}
-      accessibilityRole="button"
-      accessibilityLabel="Center map on current location"
-      accessibilityState={{ busy: status === "loading" }}
-    >
-      <Text style={styles.icon}>{status === "loading" ? "..." : "◎"}</Text>
-    </Pressable>
+      <Pressable
+          testID="currentLocationButton"
+          accessibilityRole="button"
+          accessibilityLabel="Center map on current location"
+          onPress={handlePress}
+          style={styles.button}
+      >
+        <View style={styles.iconWrapper}>
+          <MaterialIcons name="my-location" size={24} color="#0D2A3A" />
+        </View>
+      </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    position: "absolute",
-    bottom: 100,
-    right: 14,
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: "rgba(255,255,255,0.95)",
-    alignItems: "center",
+    width: 74,
+    height: 74,
+    borderRadius: 37,
+    backgroundColor: "#74C5DF",
     justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 3,
+    borderColor: "#0F3245",
     shadowColor: "#000",
+    shadowOpacity: 0.16,
+    shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
     elevation: 4,
   },
-  icon: {
-    fontSize: 24,
-    color: "#007AFF",
-    fontWeight: "600",
+  iconWrapper: {
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

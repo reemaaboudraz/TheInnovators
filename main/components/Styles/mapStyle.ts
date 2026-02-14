@@ -1,200 +1,119 @@
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "transparent" },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
 
+  map: {
+    flex: 1,
+  },
+
+  // Keep overlay high and aligned with figma top spacing
   topOverlay: {
     position: "absolute",
-    top: 14,
-    left: 14,
-    right: 14,
-    gap: 10,
+    top: 32, // aligns segmented control Y from figma inspector
+    left: 10,
+    right: 10,
+    zIndex: 20,
   },
 
-  // FIGMA-LIKE compact white card
-  navigationCard: {
+  campusToggleContainer: {
+    width: "100%",
+    alignItems: "center",
+  },
+
+  // Search shell (white translucent rounded strip)
+  // Figma search field itself is 354x29; this wrapper gives exact positioning space.
+  browseSearchCard: {
+    width: 354,
+    height: 29,
     borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.97)",
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-
-  inputsSection: {
+    backgroundColor: "rgba(255,255,255,0.90)",
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    paddingHorizontal: 8,
+    alignSelf: "center",
   },
 
-  leftIconsColumn: {
-    width: 18,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 2,
+  browseSearchIcon: {
+    marginRight: 8,
   },
 
-  startDot: {
-    fontSize: 18,
-    color: "#111111",
-    lineHeight: 18,
-  },
-
-  dottedLine: {
-    width: 1,
-    height: 14,
-    borderWidth: 1,
-    borderStyle: "dotted",
-    borderColor: "rgba(17,17,17,0.4)",
-    marginVertical: 2,
-  },
-
-  destinationPin: {
-    fontSize: 16,
-    lineHeight: 16,
-  },
-
-  inputsColumn: {
+  browseSearchInput: {
     flex: 1,
-    gap: 8,
+    fontSize: 20 / 2, // 10
+    lineHeight: 13,
+    fontWeight: "500",
+    color: "#3A3A3A",
+    paddingVertical: 0,
   },
 
-  routeInput: {
-    height: 42,
-    borderRadius: 999,
-    backgroundColor: "#F0F1F3",
-    paddingHorizontal: 14,
-    color: "#222",
-    fontWeight: "600",
-    fontSize: 16,
+  browseClearButton: {
+    marginLeft: 6,
   },
 
-  routeInputActive: {
-    borderWidth: 1.5,
-    borderColor: "#8CA2FF",
-    backgroundColor: "#EEF3FF",
-  },
-
-  swapButton: {
-    width: 34,
-    height: 34,
-    borderRadius: 999,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#F0F1F3",
-  },
-
-  swapButtonText: {
-    fontSize: 20,
+  browseClearText: {
+    fontSize: 12,
+    color: "#B9B9BB",
     fontWeight: "700",
-    color: "#111",
-    lineHeight: 20,
   },
 
   suggestions: {
-    marginTop: 8,
-    borderRadius: 14,
-    backgroundColor: "rgba(255,255,255,0.98)",
+    marginTop: 6,
+    backgroundColor: "rgba(255,255,255,0.96)",
+    borderRadius: 12,
     overflow: "hidden",
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "rgba(0,0,0,0.12)",
   },
 
   suggestionRow: {
+    paddingVertical: 9,
     paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: "rgba(0,0,0,0.08)",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ECECEC",
   },
 
   suggestionTitle: {
-    color: "#111",
-    fontWeight: "700",
     fontSize: 14,
+    fontWeight: "600",
+    color: "#1E1E1E",
   },
 
   suggestionSub: {
     marginTop: 2,
-    color: "rgba(17,17,17,0.55)",
     fontSize: 12,
+    color: "#666",
   },
 
-  // hidden compat element
-  hiddenCompatButton: {
-    width: 0,
-    height: 0,
-    opacity: 0,
-    overflow: "hidden",
-  },
-
-  campusToggleContainer: {
-    flexDirection: "row",
-    borderRadius: 999,
-    backgroundColor: "#EBE6E0",
-    marginTop: 46,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    position: "relative",
-  },
-
-  campusToggleButton: {
-    flex: 1,
-    paddingVertical: 12,
+  rightButtonsColumn: {
+    position: "absolute",
+    right: 16,
+    bottom: 86,
+    zIndex: 30,
+    gap: 12,
     alignItems: "center",
+  },
+
+  directionsFab: {
+    width: 62,
+    height: 62,
+    borderRadius: 14,
+    backgroundColor: "#912338",
     justifyContent: "center",
-  },
-
-  campusToggleButtonLeft: {
-    borderTopLeftRadius: 999,
-    borderBottomLeftRadius: 999,
-  },
-
-  campusToggleButtonRight: {
-    borderTopRightRadius: 999,
-    borderBottomRightRadius: 999,
-  },
-
-  campusToggleSlider: {
-    position: "absolute",
-    top: 4,
-    bottom: 4,
-    width: "46%",
-    borderRadius: 999,
+    alignItems: "center",
+    borderWidth: 1.5,
+    borderColor: "#6E1B2A",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.22,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 4,
   },
 
-  campusToggleText: {
-    fontSize: 18,
+  directionsFabText: {
+    color: "#fff",
+    fontSize: 13,
     fontWeight: "700",
-  },
-
-  sliderShadowLayer: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.35)",
-  },
-
-  activeLabel: { color: "#FFFFFF" },
-  inactiveLabel: { color: "#8F6B1E" },
-  activeLabelSgw: { color: "#FFFFFF" },
-  inactiveLabelSgw: { color: "#8C6A2D" },
-
-  mapBottomOffset: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 40,
-    height: 1,
   },
 });

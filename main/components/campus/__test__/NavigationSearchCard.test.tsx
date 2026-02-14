@@ -1,87 +1,94 @@
+/* eslint-disable import/first */
 import React from "react";
-import { render, fireEvent } from "@testing-library/react-native";
-import NavigationSearchCard from "../NavigationSearchCard";
-import type { Building } from "@/components/Buildings/types";
+import { render, fireEvent, waitFor } from "@testing-library/react-native";
+import { describe, it, expect, beforeEach, jest } from "@jest/globals";
 
-const mockBuilding: Building = {
-  id: "sgw-h",
-  code: "H",
-  name: "Henry F. Hall Building",
-  address: "1455 De Maisonneuve Blvd W, Montreal, QC",
-  latitude: 45.49729,
-  longitude: -73.57898,
-  campus: "SGW",
-  zoomCategory: 2,
-  aliases: ["hall"],
-  polygon: [],
-};
+// Fix for RN StatusBar usage in Jest node env
+if (!(global as any).clearImmediate) {
+  (global as any).clearImmediate = (
+    fn: (...args: any[]) => void,
+    ...args: any[]
+  ) => setTimeout(fn, 0, ...args);
+}
 
-describe("NavigationSearchCard", () => {
-  it("renders start/destination inputs and disabled get directions initially", () => {
-    const { getByTestId } = render(
-      <NavigationSearchCard
-        startValue=""
-        destinationValue=""
-        selectionMode={null}
-        query=""
-        suggestions={[]}
-        onFocusStart={jest.fn()}
-        onFocusDestination={jest.fn()}
-        onChangeQuery={jest.fn()}
-        onPickSuggestion={jest.fn()}
-        onSwap={jest.fn()}
-        onGetDirections={jest.fn()}
-      />,
-    );
+jest.mock("expo-status-bar", () => ({ StatusBar: () => null }));
 
-    expect(getByTestId("startInput")).toBeTruthy();
-    expect(getByTestId("destinationInput")).toBeTruthy();
-
-    const button = getByTestId("getDirectionsButton");
-    expect(button.props.accessibilityState?.disabled).toBe(true);
+jest.mock("react-native-maps", () => {
+  const ReactActual = require("react");
+  const { View } = require("react-native");
+  const MockMap = ReactActual.forwardRef((props: any, ref: any) => {
+    ReactActual.useImperativeHandle(ref, () => ({
+      animateToRegion: jest.fn(),
+      fitToCoordinates: jest.fn(),
+    }));
+    return ReactActual.createElement(View, {
+      testID: "campusMapMock",
+      ...props,
+    });
   });
 
-  it("enables get directions when both values exist", () => {
-    const { getByTestId } = render(
-      <NavigationSearchCard
-        startValue="H - Henry F. Hall Building"
-        destinationValue="LB - Webster Library"
-        selectionMode={null}
-        query=""
-        suggestions={[]}
-        onFocusStart={jest.fn()}
-        onFocusDestination={jest.fn()}
-        onChangeQuery={jest.fn()}
-        onPickSuggestion={jest.fn()}
-        onSwap={jest.fn()}
-        onGetDirections={jest.fn()}
-      />,
-    );
+  return {
+    __esModule: true,
+    default: MockMap,
+    Marker: ({ children, ...props }: any) =>
+      ReactActual.createElement(View, props, children),
+    Polygon: ({ children, ...props }: any) =>
+      ReactActual.createElement(View, props, children),
+    Polyline: ({ children, ...props }: any) =>
+      ReactActual.createElement(View, props, children),
+    PROVIDER_GOOGLE: "google",
+  };
+});
 
-    const button = getByTestId("getDirectionsButton");
-    expect(button.props.accessibilityState?.disabled).toBe(false);
+jest.mock("expo-location", () => ({
+  requestForegroundPermissionsAsync: jest.fn(async () => ({
+    status: "granted",
+  })),
+  getCurrentPositionAsync: jest.fn(async () => ({
+    coords: { latitude: 45.497, longitude: -73.579 },
+  })),
+}));
+
+import CampusMap from "../CampusMap";
+
+describe("CampusMap navigation flow", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
-  it("shows suggestions in start mode and picks suggestion", () => {
-    const onPickSuggestion = jest.fn();
+  it("typing start/destination text alone does not commit route selection and button stays disabled", async () => {
+    const { getByTestId } = render(<CampusMap />);
 
-    const { getByTestId } = render(
-      <NavigationSearchCard
-        startValue=""
-        destinationValue=""
-        selectionMode="start"
-        query="h"
-        suggestions={[mockBuilding]}
-        onFocusStart={jest.fn()}
-        onFocusDestination={jest.fn()}
-        onChangeQuery={jest.fn()}
-        onPickSuggestion={onPickSuggestion}
-        onSwap={jest.fn()}
-        onGetDirections={jest.fn()}
-      />,
-    );
+    fireEvent.press(getByTestId("directionsModeButton"));
 
-    fireEvent.press(getByTestId("suggestion-SGW-sgw-h"));
-    expect(onPickSuggestion).toHaveBeenCalledWith(mockBuilding);
+    const startInput = getByTestId("startInput");
+    const destinationInput = getByTestId("destinationInput");
+    const getDirectionsButton = getByTestId("getDirectionsButton");
+
+    fireEvent.changeText(startInput, "H");
+    fireEvent.changeText(destinationInput, "EV");
+
+    await waitFor(() => {
+      expect(getDirectionsButton.props.accessibilityState).toEqual(
+        expect.objectContaining({ disabled: true }),
+      );
+    });
+  });
+
+  it("swap button does not crash and keeps disabled state when no committed selections exist", async () => {
+    const { getByTestId } = render(<CampusMap />);
+
+    fireEvent.press(getByTestId("directionsModeButton"));
+
+    const swapButton = getByTestId("swapRouteButton");
+    const getDirectionsButton = getByTestId("getDirectionsButton");
+
+    fireEvent.press(swapButton);
+
+    await waitFor(() => {
+      expect(getDirectionsButton.props.accessibilityState).toEqual(
+        expect.objectContaining({ disabled: true }),
+      );
+    });
   });
 });
