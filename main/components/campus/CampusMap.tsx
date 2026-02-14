@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Region, Marker } from "react-native-maps";
+import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
 
 import { SGW_BUILDINGS } from "@/components/Buildings/SGW/SGWBuildings";
@@ -60,6 +61,46 @@ export default function CampusMap() {
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
 
   const mapRef = useRef<MapView>(null);
+
+  // Automatically fetch user location on mount
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted" || cancelled) return;
+
+        // Try last-known position first (instant, works on emulators)
+        const last = await Location.getLastKnownPositionAsync();
+        if (last && !cancelled) {
+          setUserLocation({
+            latitude: last.coords.latitude,
+            longitude: last.coords.longitude,
+          });
+          return;
+        }
+
+        // Fall back to a fresh fix with a timeout
+        const location = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Low,
+        });
+
+        if (!cancelled) {
+          setUserLocation({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          });
+        }
+      } catch {
+        // Location unavailable (common on emulators) — silently ignore
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const ALL_BUILDINGS = useMemo(
     () => [...SGW_BUILDINGS, ...LOYOLA_BUILDINGS],

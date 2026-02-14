@@ -20,6 +20,8 @@ export default {
       package: "com.theinnovators.campusguide",
       googleServicesFile: "./google-services.json",
 
+      permissions: ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"],
+
       adaptiveIcon: {
         backgroundColor: "#E6F4FE",
         foregroundImage: "./assets/images/android-icon-foreground.png",
@@ -35,7 +37,16 @@ export default {
       },
     },
 
-    plugins: ["@react-native-google-signin/google-signin"],
+    plugins: [
+      "@react-native-google-signin/google-signin",
+      [
+        "expo-location",
+        {
+          locationWhenInUsePermission:
+            "We use your location to show your position on the campus map and help with navigation.",
+        },
+      ],
+    ],
 
     extra: {
       firebaseApiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
