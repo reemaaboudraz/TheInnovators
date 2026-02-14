@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { useMemo, useRef, useState } from "react";
 import {
+  Alert,
   Platform,
   Pressable,
   Text,
@@ -8,7 +9,7 @@ import {
   View,
   ScrollView,
   Keyboard,
-  Image, // ✅ added
+  Image,
 } from "react-native";
 import MapView, {
   Marker,
@@ -404,6 +405,28 @@ export default function CampusMap() {
     setEndBuilding(sBuilding);
   };
 
+  const onGetDirectionsPress = () => {
+    const hasStart = !!startText.trim() && !!startCoord;
+    const hasDestination = !!endText.trim() && !!endCoord;
+
+    if (!hasStart && !hasDestination) {
+      Alert.alert(
+        "Missing selection",
+        "Please select a starting location and a destination.",
+      );
+      return;
+    }
+    if (!hasStart) {
+      Alert.alert("Missing start", "Please select a starting location.");
+      return;
+    }
+    if (!hasDestination) {
+      Alert.alert("Missing destination", "Please select a destination.");
+      return;
+    }
+    // Both selected – ready for route calculation (not implemented)
+  };
+
   const selectedCampusColor = focusedCampus === "SGW" ? "#912338" : "#e3ac20";
 
   return (
@@ -692,6 +715,30 @@ export default function CampusMap() {
                     <MaterialIcons name="swap-vert" size={20} color="#111111" />
                   </Pressable>
                 </View>
+
+                {/* Get Directions button */}
+                <Pressable
+                    testID="getDirectionsSubmitButton"
+                    onPress={onGetDirectionsPress}
+                    style={{
+                      marginTop: 12,
+                      paddingVertical: 12,
+                      borderRadius: 12,
+                      backgroundColor: CAMPUS_COLORS.getDirections,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                >
+                  <Text
+                      style={{
+                        fontSize: 16,
+                        fontWeight: "600",
+                        color: "#fff",
+                      }}
+                  >
+                    Get Directions
+                  </Text>
+                </Pressable>
 
                 {/* Suggestions (kept same behavior) */}
                 {allSuggestions.length > 0 && (
