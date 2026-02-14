@@ -20,7 +20,7 @@ export default function CurrentLocationButton({
   onLocationFound,
   onPermissionDenied,
   style,
-}: CurrentLocationButtonProps) {
+}: Readonly<CurrentLocationButtonProps>) {
   const [status, setStatus] = useState<LocationStatus>("idle");
 
   const handlePress = useCallback(async () => {
