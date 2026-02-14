@@ -411,6 +411,7 @@ export default function CampusMap() {
                 {suggestions.map((b) => (
                   <Pressable
                     key={`${b.campus}-${b.id}`}
+                    testID={`routeSuggestion-${b.campus}-${b.id}`}
                     onPress={() => handlePickBuilding(b)}
                     style={styles.suggestionRow}
                   >
