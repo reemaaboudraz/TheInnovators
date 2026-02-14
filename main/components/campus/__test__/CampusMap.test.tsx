@@ -679,7 +679,7 @@ describe("CampusMap - auto-location on mount", () => {
   it("uses last known position when available", async () => {
     mockLocRequestPermissions.mockResolvedValue({ status: "granted" });
     // @ts-ignore
-      mockLocGetLastKnown.mockResolvedValue({
+    mockLocGetLastKnown.mockResolvedValue({
       coords: { latitude: 45.497, longitude: -73.579 },
     });
 
