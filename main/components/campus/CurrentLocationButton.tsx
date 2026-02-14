@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react";
-import { Pressable, Text, Alert, StyleSheet } from "react-native";
+import { Pressable, Alert, StyleSheet, ActivityIndicator } from "react-native";
 import * as Location from "expo-location";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export type LocationStatus = "idle" | "loading" | "granted" | "denied";
 
@@ -12,11 +13,13 @@ export interface UserLocation {
 interface CurrentLocationButtonProps {
   onLocationFound: (location: UserLocation) => void;
   onPermissionDenied?: () => void;
+  style?: any;
 }
 
 export default function CurrentLocationButton({
   onLocationFound,
   onPermissionDenied,
+  style,
 }: CurrentLocationButtonProps) {
   const [status, setStatus] = useState<LocationStatus>("idle");
 
@@ -24,7 +27,6 @@ export default function CurrentLocationButton({
     setStatus("loading");
 
     try {
-      // Request permission
       const { status: permissionStatus } =
         await Location.requestForegroundPermissionsAsync();
 
@@ -42,6 +44,7 @@ export default function CurrentLocationButton({
       setStatus("granted");
 
       const last = await Location.getLastKnownPositionAsync();
+
       if (last) {
         onLocationFound({
           latitude: last.coords.latitude,
@@ -71,22 +74,23 @@ export default function CurrentLocationButton({
   return (
     <Pressable
       testID="currentLocationButton"
-      style={styles.button}
+      style={[styles.button, style]}
       onPress={handlePress}
       accessibilityRole="button"
       accessibilityLabel="Center map on current location"
       accessibilityState={{ busy: status === "loading" }}
     >
-      <Text style={styles.icon}>{status === "loading" ? "..." : "◎"}</Text>
+      {status === "loading" ? (
+        <ActivityIndicator size="small" color="#007AFF" />
+      ) : (
+        <MaterialIcons name="my-location" size={24} color="#007AFF" />
+      )}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    position: "absolute",
-    bottom: 100,
-    right: 14,
     width: 48,
     height: 48,
     borderRadius: 24,
@@ -98,10 +102,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 4,
-  },
-  icon: {
-    fontSize: 24,
-    color: "#007AFF",
-    fontWeight: "600",
   },
 });
