@@ -20,30 +20,17 @@ import MapView, {
 import { StatusBar } from "expo-status-bar";
 import { MaterialIcons, Ionicons, FontAwesome6 } from "@expo/vector-icons";
 
+import type { Building, Campus } from "@/components/Buildings/types";
 import SGW_DATA from "@/components/Buildings/data/SGW_data.json";
 import LOY_DATA from "@/components/Buildings/data/Loyola_data.json";
 import ToggleButton from "@/components/campus/ToggleButton";
 import BuildingPopup from "@/components/campus/BuildingPopup";
+import BuildingPin from "@/components/campus/BuildingPin";
 import CurrentLocationButton from "@/components/campus/CurrentLocationButton";
 import BrandBar from "@/components/layout/BrandBar";
 import { styles } from "@/components/Styles/mapStyle";
 
-type Campus = "SGW" | "LOY";
-
 type Coord = { latitude: number; longitude: number };
-
-type Building = {
-  id: string;
-  code: string;
-  name: string;
-  address: string;
-  latitude: number;
-  longitude: number;
-  campus: Campus;
-  zoomCategory?: number;
-  aliases?: string[];
-  polygon?: Coord[];
-};
 
 type Suggestion =
     | {
@@ -243,6 +230,8 @@ export default function CampusMap() {
   const [endText, setEndText] = useState("");
   const [startCoord, setStartCoord] = useState<Coord | null>(null);
   const [endCoord, setEndCoord] = useState<Coord | null>(null);
+  const [startBuilding, setStartBuilding] = useState<Building | null>(null);
+  const [endBuilding, setEndBuilding] = useState<Building | null>(null);
 
   const provider = Platform.OS === "android" ? PROVIDER_GOOGLE : undefined;
 
@@ -287,10 +276,12 @@ export default function CampusMap() {
     if (field === "start") {
       setStartCoord(coord);
       setStartText(label);
+      setStartBuilding(building);
       setActiveField("end");
     } else {
       setEndCoord(coord);
       setEndText(label);
+      setEndBuilding(building);
     }
     setFocusedCampus(building.campus);
     mapRef.current?.animateToRegion(getBuildingFocusRegion(building), 600);
@@ -314,10 +305,12 @@ export default function CampusMap() {
         if (activeField === "start") {
           setStartCoord(item.coordinate);
           setStartText(item.title);
+          setStartBuilding(null);
           setActiveField("end");
         } else {
           setEndCoord(item.coordinate);
           setEndText(item.title);
+          setEndBuilding(null);
         }
       }
       mapRef.current?.animateToRegion(getRegionForCoordinate(item.coordinate), 600);
@@ -347,10 +340,12 @@ export default function CampusMap() {
     if (activeField === "start") {
       setStartCoord(coord);
       setStartText(label);
+      setStartBuilding(null);
       setActiveField("end");
     } else {
       setEndCoord(coord);
       setEndText(label);
+      setEndBuilding(null);
     }
 
     mapRef.current?.animateToRegion(getRegionForCoordinate(coord), 500);
@@ -386,6 +381,8 @@ export default function CampusMap() {
         setEndText("");
         setStartCoord(null);
         setEndCoord(null);
+        setStartBuilding(null);
+        setEndBuilding(null);
       }
       return next;
     });
@@ -396,11 +393,15 @@ export default function CampusMap() {
     const eText = endText;
     const sCoord = startCoord;
     const eCoord = endCoord;
+    const sBuilding = startBuilding;
+    const eBuilding = endBuilding;
 
     setStartText(eText);
     setEndText(sText);
     setStartCoord(eCoord);
     setEndCoord(sCoord);
+    setStartBuilding(eBuilding);
+    setEndBuilding(sBuilding);
   };
 
   const selectedCampusColor = focusedCampus === "SGW" ? "#912338" : "#e3ac20";
@@ -463,14 +464,38 @@ export default function CampusMap() {
           ))}
 
           {startCoord && (
-              <Marker coordinate={startCoord}>
-                <Ionicons name="ellipse-outline" size={24} color="#111111" />
+              <Marker
+                  coordinate={startCoord}
+                  anchor={{ x: 0.5, y: 1 }}
+                  centerOffset={{ x: 0, y: 0 }}
+              >
+                {startBuilding ? (
+                    <BuildingPin
+                        code={startBuilding.code}
+                        campus={startBuilding.campus}
+                        size={36}
+                    />
+                ) : (
+                    <Ionicons name="ellipse-outline" size={24} color="#111111" />
+                )}
               </Marker>
           )}
 
           {endCoord && (
-              <Marker coordinate={endCoord}>
-                <Ionicons name="location-outline" size={26} color="#c0392b" />
+              <Marker
+                  coordinate={endCoord}
+                  anchor={{ x: 0.5, y: 1 }}
+                  centerOffset={{ x: 0, y: 0 }}
+              >
+                {endBuilding ? (
+                    <BuildingPin
+                        code={endBuilding.code}
+                        campus={endBuilding.campus}
+                        size={36}
+                    />
+                ) : (
+                    <Ionicons name="location-outline" size={26} color="#c0392b" />
+                )}
               </Marker>
           )}
         </MapView>
@@ -710,7 +735,11 @@ export default function CampusMap() {
         {/* popup */}
         {selectedBuilding && !directionsMode && (
             <View style={{ position: "absolute", left: 16, right: 16, bottom: 110 }}>
-              <BuildingPopup building={selectedBuilding} onClose={() => setSelectedBuilding(null)} />
+              <BuildingPopup
+                building={selectedBuilding}
+                campusTheme={focusedCampus}
+                onClose={() => setSelectedBuilding(null)}
+              />
             </View>
         )}
 
