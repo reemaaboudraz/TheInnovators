@@ -437,9 +437,9 @@ export default function CampusMap() {
             setSelected(null);
 
             if (nav.isRouteMode) {
-                setQuery("");
+              setQuery("");
             } else {
-                focusRouteField("destination");
+              focusRouteField("destination");
             }
           }}
         />
