@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { useMemo, useRef, useState } from "react";
 import {
-  Alert,
   Platform,
   Pressable,
   Text,
@@ -34,21 +33,21 @@ import { styles } from "@/components/Styles/mapStyle";
 type Coord = { latitude: number; longitude: number };
 
 type Suggestion =
-    | {
-  kind: "building";
-  key: string;
-  campus: Campus;
-  building: Building;
-  title: string;
-  sub: string;
-}
-    | {
-  kind: "pin";
-  key: string;
-  title: string;
-  sub: string;
-  coordinate: Coord;
-};
+  | {
+      kind: "building";
+      key: string;
+      campus: Campus;
+      building: Building;
+      title: string;
+      sub: string;
+    }
+  | {
+      kind: "pin";
+      key: string;
+      title: string;
+      sub: string;
+      coordinate: Coord;
+    };
 
 type ActiveField = "start" | "end";
 
@@ -67,9 +66,9 @@ export const LOY_REGION: Region = {
 };
 
 export const calculatePanValue = (
-    currentCampus: Campus,
-    dx: number,
-    toggleWidth: number,
+  currentCampus: Campus,
+  dx: number,
+  toggleWidth: number,
 ): number => {
   const safeWidth = toggleWidth > 0 ? toggleWidth : 300;
   const half = safeWidth / 2;
@@ -80,9 +79,9 @@ export const calculatePanValue = (
 };
 
 export const determineCampusFromPan = (
-    currentCampus: Campus,
-    dx: number,
-    toggleWidth: number,
+  currentCampus: Campus,
+  dx: number,
+  toggleWidth: number,
 ): Campus => {
   const finalValue = calculatePanValue(currentCampus, dx, toggleWidth);
   return finalValue > 0.5 ? "LOY" : "SGW";
@@ -142,10 +141,10 @@ function matchBuilding(b: Building, q: string): boolean {
   const needle = q.trim().toLowerCase();
   if (!needle) return false;
   return (
-      b.code.toLowerCase().includes(needle) ||
-      b.name.toLowerCase().includes(needle) ||
-      b.address.toLowerCase().includes(needle) ||
-      (b.aliases ?? []).some((a) => a.toLowerCase().includes(needle))
+    b.code.toLowerCase().includes(needle) ||
+    b.name.toLowerCase().includes(needle) ||
+    b.address.toLowerCase().includes(needle) ||
+    (b.aliases ?? []).some((a) => a.toLowerCase().includes(needle))
   );
 }
 
@@ -160,8 +159,8 @@ function distanceMeters(a: Coord, b: Coord): number {
   const lat2 = toRadians(b.latitude);
 
   const h =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
 
   return 2 * R * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
 }
@@ -181,8 +180,7 @@ function isPointInPolygon(point: Coord, polygon: Coord[]): boolean {
     const yj = polygon[j].latitude;
 
     const intersects =
-        yi > y !== yj > y &&
-        x < ((xj - xi) * (y - yi)) / ((yj - yi) || 1e-12) + xi;
+      yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi || 1e-12) + xi;
 
     if (intersects) inside = !inside;
   }
@@ -190,7 +188,10 @@ function isPointInPolygon(point: Coord, polygon: Coord[]): boolean {
   return inside;
 }
 
-function resolveTapToBuilding(coord: Coord, buildings: Building[]): Building | null {
+function resolveTapToBuilding(
+  coord: Coord,
+  buildings: Building[],
+): Building | null {
   // 1) Exact polygon hit
   for (const b of buildings) {
     if (b.polygon?.length && isPointInPolygon(coord, b.polygon)) {
@@ -203,7 +204,10 @@ function resolveTapToBuilding(coord: Coord, buildings: Building[]): Building | n
   let minDistance = Number.POSITIVE_INFINITY;
 
   for (const b of buildings) {
-    const d = distanceMeters(coord, { latitude: b.latitude, longitude: b.longitude });
+    const d = distanceMeters(coord, {
+      latitude: b.latitude,
+      longitude: b.longitude,
+    });
     if (d < minDistance) {
       minDistance = d;
       nearest = b;
@@ -222,7 +226,9 @@ export default function CampusMap() {
 
   // normal mode search
   const [browseQuery, setBrowseQuery] = useState("");
-  const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(null);
+  const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(
+    null,
+  );
 
   // directions mode
   const [directionsMode, setDirectionsMode] = useState(false);
@@ -247,31 +253,37 @@ export default function CampusMap() {
 
   const allSuggestions = useMemo(() => {
     const q = directionsMode
-        ? activeField === "start"
-            ? startText
-            : endText
-        : browseQuery;
+      ? activeField === "start"
+        ? startText
+        : endText
+      : browseQuery;
 
     if (!q.trim()) return [];
 
-    const matched = ALL_BUILDINGS.filter((b) => matchBuilding(b, q)).slice(0, 8);
+    const matched = ALL_BUILDINGS.filter((b) => matchBuilding(b, q)).slice(
+      0,
+      8,
+    );
 
     return matched.map(
-        (b): Suggestion => ({
-          kind: "building",
-          key: `${b.campus}-${b.id}`,
-          campus: b.campus,
-          building: b,
-          title: `${b.code} — ${b.name}`,
-          sub: b.address,
-        }),
+      (b): Suggestion => ({
+        kind: "building",
+        key: `${b.campus}-${b.id}`,
+        campus: b.campus,
+        building: b,
+        title: `${b.code} — ${b.name}`,
+        sub: b.address,
+      }),
     );
   }, [browseQuery, directionsMode, activeField, startText, endText]);
 
   const clearNormalSearch = () => setBrowseQuery("");
 
   const applyBuildingToField = (building: Building, field: ActiveField) => {
-    const coord = { latitude: building.latitude, longitude: building.longitude };
+    const coord = {
+      latitude: building.latitude,
+      longitude: building.longitude,
+    };
     const label = `${building.code} - ${building.name}`;
 
     if (field === "start") {
@@ -314,13 +326,16 @@ export default function CampusMap() {
           setEndBuilding(null);
         }
       }
-      mapRef.current?.animateToRegion(getRegionForCoordinate(item.coordinate), 600);
+      mapRef.current?.animateToRegion(
+        getRegionForCoordinate(item.coordinate),
+        600,
+      );
     }
   };
 
   const focusedBuildings = useMemo(
-      () => ALL_BUILDINGS.filter((b) => b.campus === focusedCampus),
-      [focusedCampus],
+    () => ALL_BUILDINGS.filter((b) => b.campus === focusedCampus),
+    [focusedCampus],
   );
 
   const onMapPress = (e: MapPressEvent) => {
@@ -363,30 +378,18 @@ export default function CampusMap() {
 
   const onLocationFound = (loc: Coord) => {
     mapRef.current?.animateToRegion(
-        {
-          latitude: loc.latitude,
-          longitude: loc.longitude,
-          latitudeDelta: 0.005,
-          longitudeDelta: 0.005,
-        },
-        500,
+      {
+        latitude: loc.latitude,
+        longitude: loc.longitude,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      },
+      500,
     );
   };
 
   const toggleDirectionsMode = () => {
-    setDirectionsMode((prev) => {
-      const next = !prev;
-      if (!next) {
-        setActiveField("start");
-        setStartText("");
-        setEndText("");
-        setStartCoord(null);
-        setEndCoord(null);
-        setStartBuilding(null);
-        setEndBuilding(null);
-      }
-      return next;
-    });
+    setDirectionsMode((prev) => !prev);
   };
 
   const swapStartEnd = () => {
@@ -405,424 +408,416 @@ export default function CampusMap() {
     setEndBuilding(sBuilding);
   };
 
-  const onGetDirectionsPress = () => {
-    const hasStart = !!startText.trim() && !!startCoord;
-    const hasDestination = !!endText.trim() && !!endCoord;
-
-    if (!hasStart && !hasDestination) {
-      Alert.alert(
-        "Missing selection",
-        "Please select a starting location and a destination.",
-      );
-      return;
-    }
-    if (!hasStart) {
-      Alert.alert("Missing start", "Please select a starting location.");
-      return;
-    }
-    if (!hasDestination) {
-      Alert.alert("Missing destination", "Please select a destination.");
-      return;
-    }
-    // Both selected – ready for route calculation (not implemented)
-  };
-
   const selectedCampusColor = focusedCampus === "SGW" ? "#912338" : "#e3ac20";
 
   return (
-      <View style={styles.container}>
-        <StatusBar style="dark" />
+    <View style={styles.container}>
+      <StatusBar style="dark" />
 
-        <MapView
-            ref={(r) => {
-              mapRef.current = r;
-            }}
-            provider={provider}
-            style={styles.map}
-            testID="mapView"
-            initialRegion={SGW_REGION}
-            onPress={onMapPress}
-        >
-          {focusedBuildings.map((b) => (
-              <React.Fragment key={b.id}>
-                {!!b.polygon?.length && (
-                    <Polygon
-                        coordinates={b.polygon}
-                        tappable
-                        onPress={() => onBuildingPress(b)}
-                        fillColor={
-                          focusedCampus === "SGW"
-                              ? "rgba(145,35,56,0.20)"
-                              : "rgba(212,173,32,0.20)"
-                        }
-                        strokeColor={
-                          focusedCampus === "SGW"
-                              ? "rgba(145,35,56,0.85)"
-                              : "rgba(162,129,16,0.95)"
-                        }
-                        strokeWidth={2}
-                    />
-                )}
-                <Marker
-                    coordinate={{ latitude: b.latitude, longitude: b.longitude }}
-                    onPress={() => onBuildingPress(b)}
-                >
-                  <View
-                      style={{
-                        minWidth: 26,
-                        height: 26,
-                        borderRadius: 13,
-                        paddingHorizontal: 6,
-                        alignItems: "center",
-                        justifyContent: "center",
-                        backgroundColor: focusedCampus === "SGW" ? "#912338" : "#c49d13",
-                        borderWidth: 2,
-                        borderColor: focusedCampus === "SGW" ? "#6f1b2d" : "#9f7f0f",
-                      }}
-                  >
-                    <Text style={{ color: "#fff", fontWeight: "700", fontSize: 12 }}>{b.code}</Text>
-                  </View>
-                </Marker>
-              </React.Fragment>
-          ))}
-
-          {startCoord && (
-              <Marker
-                  coordinate={startCoord}
-                  anchor={{ x: 0.5, y: 1 }}
-                  centerOffset={{ x: 0, y: 0 }}
-              >
-                {startBuilding ? (
-                    <BuildingPin
-                        code={startBuilding.code}
-                        campus={startBuilding.campus}
-                        size={36}
-                    />
-                ) : (
-                    <Ionicons name="ellipse-outline" size={24} color="#111111" />
-                )}
-              </Marker>
-          )}
-
-          {endCoord && (
-              <Marker
-                  coordinate={endCoord}
-                  anchor={{ x: 0.5, y: 1 }}
-                  centerOffset={{ x: 0, y: 0 }}
-              >
-                {endBuilding ? (
-                    <BuildingPin
-                        code={endBuilding.code}
-                        campus={endBuilding.campus}
-                        size={36}
-                    />
-                ) : (
-                    <Ionicons name="location-outline" size={26} color="#c0392b" />
-                )}
-              </Marker>
-          )}
-        </MapView>
-
-        {/* Top overlays */}
-        <View style={styles.topOverlay} pointerEvents="box-none">
-          {/* keep BrandBar for tests but hidden */}
-          <View style={{ height: 0, overflow: "hidden" }}>
-            <BrandBar testID="brandbar" backgroundColor={selectedCampusColor} />
-          </View>
-
-          <View style={{ marginHorizontal: 10, marginTop: 24 }}>
-            <ToggleButton focusedCampus={focusedCampus} onCampusChange={onCampusChange} />
-          </View>
-
-          {/* Normal search card */}
-          {!directionsMode && (
-              <View style={{ marginHorizontal: 14, marginTop: 8 }}>
-                <View style={{ backgroundColor: "transparent" }}>
-                  <View
-                      style={{
-                        backgroundColor: "#ECECF1",
-                        borderRadius: 20,
-                        flexDirection: "row",
-                        alignItems: "center",
-                        paddingHorizontal: 12,
-                        height: 40,
-                      }}
-                  >
-                    <Ionicons name="search" size={15} color="#3C3C43" />
-                    <TextInput
-                        style={{
-                          marginLeft: 10,
-                          flex: 1,
-                          fontSize: 19,
-                          lineHeight: 24,
-                          fontWeight: "400",
-                          color: "#1F2024",
-                        }}
-                        placeholder="Where to next?"
-                        placeholderTextColor="#3C3C43"
-                        value={browseQuery}
-                        onChangeText={setBrowseQuery}
-                        testID="browseSearchInput"
-                    />
-                    {!!browseQuery && (
-                        <Pressable testID="clearSearch" onPress={clearNormalSearch}>
-                          <MaterialIcons name="cancel" size={22} color="#b5b5bc" />
-                        </Pressable>
-                    )}
-                  </View>
-
-                  {allSuggestions.length > 0 && (
-                      <ScrollView
-                          style={{
-                            maxHeight: 220,
-                            marginTop: 8,
-                            borderRadius: 12,
-                            backgroundColor: "#fff",
-                          }}
-                          keyboardShouldPersistTaps="handled"
-                      >
-                        {allSuggestions.map((s) => {
-                          if (s.kind !== "building") return null;
-                          return (
-                              <Pressable
-                                  key={s.key}
-                                  testID={`suggestion-${s.campus}-${s.building.id}`}
-                                  onPress={() => onSuggestionPress(s)}
-                                  style={{
-                                    paddingHorizontal: 12,
-                                    paddingVertical: 10,
-                                    borderBottomWidth: 1,
-                                    borderBottomColor: "#efeff4",
-                                  }}
-                              >
-                                <Text style={{ fontSize: 15, fontWeight: "600", color: "#1f1f1f" }}>
-                                  {s.title}
-                                </Text>
-                                <Text style={{ fontSize: 12, color: "#7a7a82", marginTop: 2 }}>
-                                  {s.sub}
-                                </Text>
-                              </Pressable>
-                          );
-                        })}
-                      </ScrollView>
-                  )}
-                </View>
-              </View>
-          )}
-
-          {/* ✅ Directions card tuned to Figma (344x81, radius 20, input 277x25) */}
-          {directionsMode && (
-              <View style={{ marginHorizontal: 18, marginTop: 8 }}>
-                <View
-                    style={{
-                      height: 81,
-                      borderRadius: 20,
-                      backgroundColor: "#FBFBFF",
-                      flexDirection: "row",
-                      alignItems: "center",
-                      paddingLeft: 10,
-                      paddingRight: 10,
-                    }}
-                >
-                  {/* Left rail icon from asset */}
-                  <View style={{ width: 26, alignItems: "center", justifyContent: "center" }}>
-                    <Image
-                        source={require("@/assets/icons/start-destination-rail.png")}
-                        style={{ width: 22, height: 54, resizeMode: "contain" }}
-                    />
-                  </View>
-
-                  {/* Inputs column */}
-                  <View style={{ flex: 1, marginLeft: 8, marginRight: 10 }}>
-                    {/* Start */}
-                    <Pressable onPress={() => setActiveField("start")}>
-                      <View
-                          style={{
-                            width: "100%",
-                            maxWidth: 277,
-                            height: 25,
-                            borderRadius: 20,
-                            backgroundColor: "#F2F2F2",
-                            justifyContent: "center",
-                            paddingHorizontal: 12,
-                            borderWidth: activeField === "start" ? 1 : 0,
-                            borderColor: "#B8B8C4",
-                          }}
-                      >
-                        <TextInput
-                            placeholder="Enter your starting location"
-                            placeholderTextColor="#8D8989"
-                            value={startText}
-                            onFocus={() => setActiveField("start")}
-                            onChangeText={setStartText}
-                            style={{
-                              fontSize: 12,
-                              lineHeight: 12,
-                              color: "#8D8989",
-                              paddingVertical: 0,
-                              includeFontPadding: false as never,
-                            }}
-                        />
-                      </View>
-                    </Pressable>
-
-                    <View style={{ height: 8 }} />
-
-                    {/* Destination */}
-                    <Pressable onPress={() => setActiveField("end")}>
-                      <View
-                          style={{
-                            width: "100%",
-                            maxWidth: 277,
-                            height: 25,
-                            borderRadius: 20,
-                            backgroundColor: "#F2F2F2",
-                            justifyContent: "center",
-                            paddingHorizontal: 12,
-                            borderWidth: activeField === "end" ? 1 : 0,
-                            borderColor: "#B8B8C4",
-                          }}
-                      >
-                        <TextInput
-                            placeholder="Enter your destination"
-                            placeholderTextColor="#8D8989"
-                            value={endText}
-                            onFocus={() => setActiveField("end")}
-                            onChangeText={setEndText}
-                            style={{
-                              fontSize: 12,
-                              lineHeight: 12,
-                              color: "#8D8989",
-                              paddingVertical: 0,
-                              includeFontPadding: false as never,
-                            }}
-                        />
-                      </View>
-                    </Pressable>
-                  </View>
-
-                  {/* Swap icon 20x20 area like Figma */}
-                  <Pressable
-                      onPress={swapStartEnd}
-                      hitSlop={8}
-                      style={{
-                        width: 20,
-                        height: 20,
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                  >
-                    <MaterialIcons name="swap-vert" size={20} color="#111111" />
-                  </Pressable>
-                </View>
-
-                {/* Get Directions button */}
-                <Pressable
-                    testID="getDirectionsSubmitButton"
-                    onPress={onGetDirectionsPress}
-                    style={{
-                      marginTop: 12,
-                      paddingVertical: 12,
-                      borderRadius: 12,
-                      backgroundColor: CAMPUS_COLORS.getDirections,
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                >
-                  <Text
-                      style={{
-                        fontSize: 16,
-                        fontWeight: "600",
-                        color: "#fff",
-                      }}
-                  >
-                    Get Directions
-                  </Text>
-                </Pressable>
-
-                {/* Suggestions (kept same behavior) */}
-                {allSuggestions.length > 0 && (
-                    <ScrollView
-                        style={{
-                          maxHeight: 200,
-                          marginTop: 8,
-                          borderRadius: 12,
-                          backgroundColor: "#fff",
-                        }}
-                        keyboardShouldPersistTaps="handled"
-                    >
-                      {allSuggestions.map((s) => {
-                        if (s.kind !== "building") return null;
-                        return (
-                            <Pressable
-                                key={s.key}
-                                onPress={() => onSuggestionPress(s)}
-                                style={{
-                                  paddingHorizontal: 12,
-                                  paddingVertical: 10,
-                                  borderBottomWidth: 1,
-                                  borderBottomColor: "#efeff4",
-                                }}
-                            >
-                              <Text style={{ fontSize: 15, fontWeight: "600", color: "#1f1f1f" }}>
-                                {s.title}
-                              </Text>
-                              <Text style={{ fontSize: 12, color: "#7a7a82", marginTop: 2 }}>
-                                {s.sub}
-                              </Text>
-                            </Pressable>
-                        );
-                      })}
-                    </ScrollView>
-                )}
-              </View>
-          )}
-        </View>
-
-        {/* popup */}
-        {selectedBuilding && !directionsMode && (
-            <View style={{ position: "absolute", left: 16, right: 16, bottom: 110 }}>
-              <BuildingPopup
-                building={selectedBuilding}
-                campusTheme={focusedCampus}
-                onClose={() => setSelectedBuilding(null)}
+      <MapView
+        ref={(r) => {
+          mapRef.current = r;
+        }}
+        provider={provider}
+        style={styles.map}
+        testID="mapView"
+        initialRegion={SGW_REGION}
+        onPress={onMapPress}
+      >
+        {focusedBuildings.map((b) => (
+          <React.Fragment key={b.id}>
+            {!!b.polygon?.length && (
+              <Polygon
+                coordinates={b.polygon}
+                tappable
+                onPress={() => onBuildingPress(b)}
+                fillColor={
+                  focusedCampus === "SGW"
+                    ? "rgba(145,35,56,0.20)"
+                    : "rgba(212,173,32,0.20)"
+                }
+                strokeColor={
+                  focusedCampus === "SGW"
+                    ? "rgba(145,35,56,0.85)"
+                    : "rgba(162,129,16,0.95)"
+                }
+                strokeWidth={2}
               />
-            </View>
+            )}
+            <Marker
+              coordinate={{ latitude: b.latitude, longitude: b.longitude }}
+              onPress={() => onBuildingPress(b)}
+            >
+              <View
+                style={{
+                  minWidth: 26,
+                  height: 26,
+                  borderRadius: 13,
+                  paddingHorizontal: 6,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor:
+                    focusedCampus === "SGW" ? "#912338" : "#c49d13",
+                  borderWidth: 2,
+                  borderColor: focusedCampus === "SGW" ? "#6f1b2d" : "#9f7f0f",
+                }}
+              >
+                <Text
+                  style={{ color: "#fff", fontWeight: "700", fontSize: 12 }}
+                >
+                  {b.code}
+                </Text>
+              </View>
+            </Marker>
+          </React.Fragment>
+        ))}
+
+        {startCoord && (
+          <Marker
+            coordinate={startCoord}
+            anchor={{ x: 0.5, y: 1 }}
+            centerOffset={{ x: 0, y: 0 }}
+          >
+            {startBuilding ? (
+              <BuildingPin
+                code={startBuilding.code}
+                campus={startBuilding.campus}
+                size={36}
+              />
+            ) : (
+              <Ionicons name="ellipse-outline" size={24} color="#111111" />
+            )}
+          </Marker>
         )}
 
-        {/* Floating buttons bottom-right */}
-        <View
-            style={{
-              position: "absolute",
-              right: 18,
-              bottom: 95,
-              alignItems: "center",
-              gap: 12,
-            }}
-            pointerEvents="box-none"
-        >
-          <CurrentLocationButton onLocationFound={onLocationFound} />
-          <Pressable
-              testID="getDirectionsButton"
-              onPress={toggleDirectionsMode}
-              style={{
-                width: 72,
-                height: 72,
-                borderRadius: 18,
-                backgroundColor: directionsMode ? "#8a1731" : CAMPUS_COLORS.getDirections,
-                alignItems: "center",
-                justifyContent: "center",
-                borderWidth: 2,
-                borderColor: "#ffffffcc",
-              }}
+        {endCoord && (
+          <Marker
+            coordinate={endCoord}
+            anchor={{ x: 0.5, y: 1 }}
+            centerOffset={{ x: 0, y: 0 }}
           >
-            {directionsMode ? (
-                <Ionicons name="close" size={34} color="#fff" />
+            {endBuilding ? (
+              <BuildingPin
+                code={endBuilding.code}
+                campus={endBuilding.campus}
+                size={36}
+              />
             ) : (
-                <FontAwesome6 name="route" size={26} color="#fff" />
+              <Ionicons name="location-outline" size={26} color="#c0392b" />
             )}
-          </Pressable>
+          </Marker>
+        )}
+      </MapView>
+
+      {/* Top overlays */}
+      <View style={styles.topOverlay} pointerEvents="box-none">
+        {/* keep BrandBar for tests but hidden */}
+        <View style={{ height: 0, overflow: "hidden" }}>
+          <BrandBar testID="brandbar" backgroundColor={selectedCampusColor} />
         </View>
+
+        <View style={{ marginHorizontal: 10, marginTop: 24 }}>
+          <ToggleButton
+            focusedCampus={focusedCampus}
+            onCampusChange={onCampusChange}
+          />
+        </View>
+
+        {/* Normal search card */}
+        {!directionsMode && (
+          <View style={{ marginHorizontal: 14, marginTop: 8 }}>
+            <View style={{ backgroundColor: "transparent" }}>
+              <View
+                style={{
+                  backgroundColor: "#ECECF1",
+                  borderRadius: 20,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingHorizontal: 12,
+                  height: 40,
+                }}
+              >
+                <Ionicons name="search" size={15} color="#3C3C43" />
+                <TextInput
+                  style={{
+                    marginLeft: 10,
+                    flex: 1,
+                    fontSize: 19,
+                    lineHeight: 24,
+                    fontWeight: "400",
+                    color: "#1F2024",
+                  }}
+                  placeholder="Where to next?"
+                  placeholderTextColor="#3C3C43"
+                  value={browseQuery}
+                  onChangeText={setBrowseQuery}
+                  testID="browseSearchInput"
+                />
+                {!!browseQuery && (
+                  <Pressable testID="clearSearch" onPress={clearNormalSearch}>
+                    <MaterialIcons name="cancel" size={22} color="#b5b5bc" />
+                  </Pressable>
+                )}
+              </View>
+
+              {allSuggestions.length > 0 && (
+                <ScrollView
+                  style={{
+                    maxHeight: 220,
+                    marginTop: 8,
+                    borderRadius: 12,
+                    backgroundColor: "#fff",
+                  }}
+                  keyboardShouldPersistTaps="handled"
+                >
+                  {allSuggestions.map((s) => {
+                    if (s.kind !== "building") return null;
+                    return (
+                      <Pressable
+                        key={s.key}
+                        testID={`suggestion-${s.campus}-${s.building.id}`}
+                        onPress={() => onSuggestionPress(s)}
+                        style={{
+                          paddingHorizontal: 12,
+                          paddingVertical: 10,
+                          borderBottomWidth: 1,
+                          borderBottomColor: "#efeff4",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 15,
+                            fontWeight: "600",
+                            color: "#1f1f1f",
+                          }}
+                        >
+                          {s.title}
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            color: "#7a7a82",
+                            marginTop: 2,
+                          }}
+                        >
+                          {s.sub}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </ScrollView>
+              )}
+            </View>
+          </View>
+        )}
+
+        
+        {directionsMode && (
+          <View style={{ marginHorizontal: 18, marginTop: 8 }}>
+            <View
+              style={{
+                height: 81,
+                borderRadius: 20,
+                backgroundColor: "#FBFBFF",
+                flexDirection: "row",
+                alignItems: "center",
+                paddingLeft: 10,
+                paddingRight: 10,
+              }}
+            >
+              
+              <View
+                style={{
+                  width: 26,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Image
+                  source={require("@/assets/icons/start-destination-rail.png")}
+                  style={{ width: 22, height: 54, resizeMode: "contain" }}
+                />
+              </View>
+
+              {/* Inputs column */}
+              <View style={{ flex: 1, marginLeft: 8, marginRight: 10 }}>
+                {/* Start */}
+                <Pressable onPress={() => setActiveField("start")}>
+                  <View
+                    style={{
+                      width: "100%",
+                      maxWidth: 277,
+                      height: 25,
+                      borderRadius: 20,
+                      backgroundColor: "#F2F2F2",
+                      justifyContent: "center",
+                      paddingHorizontal: 12,
+                      borderWidth: activeField === "start" ? 1 : 0,
+                      borderColor: "#B8B8C4",
+                    }}
+                  >
+                    <TextInput
+                      placeholder="Enter your starting location"
+                      placeholderTextColor="#8D8989"
+                      value={startText}
+                      onFocus={() => setActiveField("start")}
+                      onChangeText={setStartText}
+                      style={{
+                        fontSize: 12,
+                        lineHeight: 12,
+                        color: "#8D8989",
+                        paddingVertical: 0,
+                        includeFontPadding: false as never,
+                      }}
+                    />
+                  </View>
+                </Pressable>
+
+                <View style={{ height: 8 }} />
+
+                {/* Destination */}
+                <Pressable onPress={() => setActiveField("end")}>
+                  <View
+                    style={{
+                      width: "100%",
+                      maxWidth: 277,
+                      height: 25,
+                      borderRadius: 20,
+                      backgroundColor: "#F2F2F2",
+                      justifyContent: "center",
+                      paddingHorizontal: 12,
+                      borderWidth: activeField === "end" ? 1 : 0,
+                      borderColor: "#B8B8C4",
+                    }}
+                  >
+                    <TextInput
+                      placeholder="Enter your destination"
+                      placeholderTextColor="#8D8989"
+                      value={endText}
+                      onFocus={() => setActiveField("end")}
+                      onChangeText={setEndText}
+                      style={{
+                        fontSize: 12,
+                        lineHeight: 12,
+                        color: "#8D8989",
+                        paddingVertical: 0,
+                        includeFontPadding: false as never,
+                      }}
+                    />
+                  </View>
+                </Pressable>
+              </View>
+
+              {/* Swap icon 20x20 area like Figma */}
+              <Pressable
+                onPress={swapStartEnd}
+                hitSlop={8}
+                style={{
+                  width: 20,
+                  height: 20,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <MaterialIcons name="swap-vert" size={20} color="#111111" />
+              </Pressable>
+            </View>
+
+            {/* Suggestions (kept same behavior) */}
+            {allSuggestions.length > 0 && (
+              <ScrollView
+                style={{
+                  maxHeight: 200,
+                  marginTop: 8,
+                  borderRadius: 12,
+                  backgroundColor: "#fff",
+                }}
+                keyboardShouldPersistTaps="handled"
+              >
+                {allSuggestions.map((s) => {
+                  if (s.kind !== "building") return null;
+                  return (
+                    <Pressable
+                      key={s.key}
+                      onPress={() => onSuggestionPress(s)}
+                      style={{
+                        paddingHorizontal: 12,
+                        paddingVertical: 10,
+                        borderBottomWidth: 1,
+                        borderBottomColor: "#efeff4",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          fontWeight: "600",
+                          color: "#1f1f1f",
+                        }}
+                      >
+                        {s.title}
+                      </Text>
+                      <Text
+                        style={{ fontSize: 12, color: "#7a7a82", marginTop: 2 }}
+                      >
+                        {s.sub}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+            )}
+          </View>
+        )}
       </View>
+
+      {/* popup */}
+      {selectedBuilding && !directionsMode && (
+        <View
+          style={{ position: "absolute", left: 16, right: 16, bottom: 110 }}
+        >
+          <BuildingPopup
+            building={selectedBuilding}
+            campusTheme={focusedCampus}
+            onClose={() => setSelectedBuilding(null)}
+          />
+        </View>
+      )}
+
+      {/* Floating buttons bottom-right */}
+      <View
+        style={{
+          position: "absolute",
+          right: 18,
+          bottom: 95,
+          alignItems: "center",
+          gap: 12,
+        }}
+        pointerEvents="box-none"
+      >
+        <CurrentLocationButton onLocationFound={onLocationFound} />
+        <Pressable
+          testID="getDirectionsButton"
+          onPress={toggleDirectionsMode}
+          style={{
+            width: 72,
+            height: 72,
+            borderRadius: 18,
+            backgroundColor: directionsMode
+              ? "#8a1731"
+              : CAMPUS_COLORS.getDirections,
+            alignItems: "center",
+            justifyContent: "center",
+            borderWidth: 2,
+            borderColor: "#ffffffcc",
+          }}
+        >
+          {directionsMode ? (
+            <Ionicons name="close" size={34} color="#fff" />
+          ) : (
+            <FontAwesome6 name="route" size={26} color="#fff" />
+          )}
+        </Pressable>
+      </View>
+    </View>
   );
 }

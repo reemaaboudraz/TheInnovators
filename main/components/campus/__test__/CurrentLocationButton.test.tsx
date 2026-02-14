@@ -16,15 +16,15 @@ export default function CurrentLocationButton({ onLocationFound }: Props) {
   };
 
   return (
-      <Pressable
-          testID="currentLocationButton"
-          accessibilityRole="button"
-          accessibilityLabel="Center map on current location"
-          onPress={handlePress}
-          style={styles.button}
-      >
-        <MaterialIcons name="my-location" size={26} color="#0E2A39" />
-      </Pressable>
+    <Pressable
+      testID="currentLocationButton"
+      accessibilityRole="button"
+      accessibilityLabel="Center map on current location"
+      onPress={handlePress}
+      style={styles.button}
+    >
+      <MaterialIcons name="my-location" size={26} color="#0E2A39" />
+    </Pressable>
   );
 }
 

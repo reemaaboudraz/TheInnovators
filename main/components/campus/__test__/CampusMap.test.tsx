@@ -13,8 +13,8 @@ import {
 // RN StatusBar / internals in tests can call clearImmediate in some environments
 if (!(global as any).clearImmediate) {
   (global as any).clearImmediate = (
-      fn: (...args: any[]) => void,
-      ...args: any[]
+    fn: (...args: any[]) => void,
+    ...args: any[]
   ) => setTimeout(fn, 0, ...args);
 }
 
@@ -81,8 +81,8 @@ type PanConfig = {
   onPanResponderRelease?: (evt: unknown, gestureState: { dx: number }) => void;
   onStartShouldSetPanResponder?: () => boolean;
   onMoveShouldSetPanResponder?: (
-      evt: unknown,
-      gestureState: { dx: number },
+    evt: unknown,
+    gestureState: { dx: number },
   ) => boolean;
 };
 
@@ -92,14 +92,14 @@ let mockCapturedPanConfig: PanConfig | null = null;
 jest.mock("@/components/campus/ToggleButton", () => {
   const ReactActual = jest.requireActual("react") as typeof React;
   const RN = jest.requireActual(
-      "react-native",
+    "react-native",
   ) as typeof import("react-native");
   const { View, Pressable, Text, PanResponder } = RN;
 
   const calculatePanValue = (
-      currentCampus: "SGW" | "LOY",
-      dx: number,
-      toggleWidth: number,
+    currentCampus: "SGW" | "LOY",
+    dx: number,
+    toggleWidth: number,
   ) => {
     const safeWidth = toggleWidth > 0 ? toggleWidth : 300;
     const half = safeWidth / 2;
@@ -110,9 +110,9 @@ jest.mock("@/components/campus/ToggleButton", () => {
   };
 
   const determineCampusFromPan = (
-      currentCampus: "SGW" | "LOY",
-      dx: number,
-      toggleWidth: number,
+    currentCampus: "SGW" | "LOY",
+    dx: number,
+    toggleWidth: number,
   ) => {
     const finalValue = calculatePanValue(currentCampus, dx, toggleWidth);
     return finalValue > 0.5 ? "LOY" : "SGW";
@@ -135,24 +135,24 @@ jest.mock("@/components/campus/ToggleButton", () => {
     const panResponder = PanResponder.create(mockCapturedPanConfig);
 
     return ReactActual.createElement(
-        View,
-        { testID: "campusToggle", ...(panResponder?.panHandlers ?? {}) },
-        ReactActual.createElement(
-            Pressable,
-            {
-              testID: "campusToggle-SGW",
-              onPress: () => props.onCampusChange("SGW"),
-            },
-            ReactActual.createElement(Text, null, "SGW"),
-        ),
-        ReactActual.createElement(
-            Pressable,
-            {
-              testID: "campusToggle-Loyola",
-              onPress: () => props.onCampusChange("LOY"),
-            },
-            ReactActual.createElement(Text, null, "Loyola"),
-        ),
+      View,
+      { testID: "campusToggle", ...(panResponder?.panHandlers ?? {}) },
+      ReactActual.createElement(
+        Pressable,
+        {
+          testID: "campusToggle-SGW",
+          onPress: () => props.onCampusChange("SGW"),
+        },
+        ReactActual.createElement(Text, null, "SGW"),
+      ),
+      ReactActual.createElement(
+        Pressable,
+        {
+          testID: "campusToggle-Loyola",
+          onPress: () => props.onCampusChange("LOY"),
+        },
+        ReactActual.createElement(Text, null, "Loyola"),
+      ),
     );
   }
 
@@ -168,7 +168,7 @@ jest.mock("@/components/campus/ToggleButton", () => {
 jest.mock("@/components/campus/BuildingPopup", () => {
   const ReactActual = jest.requireActual("react") as typeof React;
   const RN = jest.requireActual(
-      "react-native",
+    "react-native",
   ) as typeof import("react-native");
   const { View, Text, Pressable } = RN;
 
@@ -176,49 +176,52 @@ jest.mock("@/components/campus/BuildingPopup", () => {
     __esModule: true,
     default: function MockBuildingPopup(props: any) {
       return ReactActual.createElement(
-          View,
-          { testID: "buildingPopup" },
-          ReactActual.createElement(
-              Text,
-              null,
-              `Popup: ${props?.building?.code ?? "?"}`,
-          ),
-          ReactActual.createElement(
-              Pressable,
-              { testID: "closePopup", onPress: props.onClose },
-              ReactActual.createElement(Text, null, "Close"),
-          ),
+        View,
+        { testID: "buildingPopup" },
+        ReactActual.createElement(
+          Text,
+          null,
+          `Popup: ${props?.building?.code ?? "?"}`,
+        ),
+        ReactActual.createElement(
+          Pressable,
+          { testID: "closePopup", onPress: props.onClose },
+          ReactActual.createElement(Text, null, "Close"),
+        ),
       );
     },
   };
 });
 
 let mockOnLocationFound:
-    | ((location: { latitude: number; longitude: number }) => void)
-    | null = null;
+  | ((location: { latitude: number; longitude: number }) => void)
+  | null = null;
 
 jest.mock("@/components/campus/CurrentLocationButton", () => {
   const ReactActual = jest.requireActual("react") as typeof React;
   const RN = jest.requireActual(
-      "react-native",
+    "react-native",
   ) as typeof import("react-native");
   const { Pressable, Text } = RN;
 
   return {
     __esModule: true,
     default: function MockCurrentLocationButton(props: {
-      onLocationFound: (location: { latitude: number; longitude: number }) => void;
+      onLocationFound: (location: {
+        latitude: number;
+        longitude: number;
+      }) => void;
     }) {
       mockOnLocationFound = props.onLocationFound;
       return ReactActual.createElement(
-          Pressable,
-          {
-            testID: "currentLocationButton",
-            onPress: () => {
-              props.onLocationFound({ latitude: 45.5, longitude: -73.6 });
-            },
+        Pressable,
+        {
+          testID: "currentLocationButton",
+          onPress: () => {
+            props.onLocationFound({ latitude: 45.5, longitude: -73.6 });
           },
-          ReactActual.createElement(Text, null, "◎"),
+        },
+        ReactActual.createElement(Text, null, "◎"),
       );
     },
   };
@@ -227,7 +230,7 @@ jest.mock("@/components/campus/CurrentLocationButton", () => {
 jest.mock("@/components/layout/BrandBar", () => {
   const ReactActual = jest.requireActual("react") as typeof React;
   const RN = jest.requireActual(
-      "react-native",
+    "react-native",
   ) as typeof import("react-native");
   const { View } = RN;
 
@@ -241,7 +244,7 @@ jest.mock("@/components/layout/BrandBar", () => {
 
 jest.mock("@/components/Styles/mapStyle", () => {
   const RN = jest.requireActual(
-      "react-native",
+    "react-native",
   ) as typeof import("react-native");
   return {
     styles: RN.StyleSheet.create({
@@ -279,7 +282,7 @@ jest.mock("@/components/Styles/mapStyle", () => {
 jest.mock("react-native-maps", () => {
   const ReactActual = jest.requireActual("react") as typeof React;
   const RN = jest.requireActual(
-      "react-native",
+    "react-native",
   ) as typeof import("react-native");
   const { View } = RN;
 
@@ -289,21 +292,21 @@ jest.mock("react-native-maps", () => {
     }));
 
     return ReactActual.createElement(
-        View,
-        { ...props, testID: props.testID || "mapView" },
-        props.children,
+      View,
+      { ...props, testID: props.testID || "mapView" },
+      props.children,
     );
   });
 
   const MockPolygon = (props: any) => {
     const first = props.coordinates?.[0];
     const tid = first
-        ? `polygon-${first.latitude}-${first.longitude}`
-        : "polygon";
+      ? `polygon-${first.latitude}-${first.longitude}`
+      : "polygon";
     return ReactActual.createElement(
-        View,
-        { ...props, testID: tid },
-        props.children,
+      View,
+      { ...props, testID: tid },
+      props.children,
     );
   };
 
@@ -311,9 +314,9 @@ jest.mock("react-native-maps", () => {
     const c = props.coordinate;
     const tid = c ? `marker-${c.latitude}-${c.longitude}` : "marker";
     return ReactActual.createElement(
-        View,
-        { ...props, testID: tid },
-        props.children,
+      View,
+      { ...props, testID: tid },
+      props.children,
     );
   };
 
@@ -380,7 +383,7 @@ describe("CampusMap - browse suggestions", () => {
 
   it("selecting a suggestion animates the map and updates input", async () => {
     const { getByPlaceholderText, getByTestId, findByText } = render(
-        <CampusMap />,
+      <CampusMap />,
     );
 
     fireEvent.changeText(getByPlaceholderText("Where to next?"), "admin");
@@ -393,16 +396,16 @@ describe("CampusMap - browse suggestions", () => {
 
     expect(durationArg).toBe(600);
     expect(regionArg).toEqual(
-        expect.objectContaining({
-          latitude: expect.any(Number),
-          longitude: expect.any(Number),
-          latitudeDelta: expect.any(Number),
-          longitudeDelta: expect.any(Number),
-        }),
+      expect.objectContaining({
+        latitude: expect.any(Number),
+        longitude: expect.any(Number),
+        latitudeDelta: expect.any(Number),
+        longitudeDelta: expect.any(Number),
+      }),
     );
 
     expect(getByPlaceholderText("Where to next?").props.value).toMatch(
-        /^AD - Administration Building/i,
+      /^AD - Administration Building/i,
     );
   });
 });
@@ -452,13 +455,13 @@ describe("CampusMap - building selection layer", () => {
     fireEvent.press(getByTestId("marker-45.4978--73.5795"));
 
     expect(mockAnimateToRegion).toHaveBeenCalledWith(
-        {
-          latitude: 45.4978,
-          longitude: -73.5795,
-          latitudeDelta: 0.0025,
-          longitudeDelta: 0.0025,
-        },
-        600,
+      {
+        latitude: 45.4978,
+        longitude: -73.5795,
+        latitudeDelta: 0.0025,
+        longitudeDelta: 0.0025,
+      },
+      600,
     );
   });
 });
@@ -579,14 +582,14 @@ describe("CampusMap - PanResponder handlers (captured from ToggleButton)", () =>
   it("onMoveShouldSetPanResponder true when dx > 10", () => {
     render(<CampusMap />);
     expect(
-        mockCapturedPanConfig?.onMoveShouldSetPanResponder?.(null, { dx: 15 }),
+      mockCapturedPanConfig?.onMoveShouldSetPanResponder?.(null, { dx: 15 }),
     ).toBe(true);
   });
 
   it("onMoveShouldSetPanResponder false when dx <= 10", () => {
     render(<CampusMap />);
     expect(
-        mockCapturedPanConfig?.onMoveShouldSetPanResponder?.(null, { dx: 5 }),
+      mockCapturedPanConfig?.onMoveShouldSetPanResponder?.(null, { dx: 5 }),
     ).toBe(false);
   });
 
@@ -628,13 +631,13 @@ describe("CampusMap - current location callback", () => {
     });
 
     expect(mockAnimateToRegion).toHaveBeenCalledWith(
-        expect.objectContaining({
-          latitude: 45.5,
-          longitude: -73.6,
-          latitudeDelta: 0.005,
-          longitudeDelta: 0.005,
-        }),
-        500,
+      expect.objectContaining({
+        latitude: 45.5,
+        longitude: -73.6,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      }),
+      500,
     );
   });
 });
