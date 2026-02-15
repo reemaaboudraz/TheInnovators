@@ -565,23 +565,30 @@ export default function CampusMap() {
                 <RoutePlanner
                     isRouteMode={nav.isRouteMode}
                     onToggle={() => {
-                        if (nav.isRouteMode) {
-                            // if condition is true, then clear the route start and destination
-                            nav.setRouteStart(null);
-                            nav.setRouteDest(null);
-                            nav.setRouteError(null);
-                            setStartText("");
-                            setDestText("");
-                            setQuery("");
-                        }
+                        const nextMode = !nav.isRouteMode;
 
-                        nav.toggleRouteMode();
+                        // Always close popup UI when switching modes
                         setSelected(null);
                         setPopupIndex(-1);
 
-                        if (!nav.isRouteMode) {
-                            focusRouteField("destination");
+                        if (nextMode) {
+                            // entering route mode
+                            nav.toggleRouteMode();
+                            nav.setActiveField("destination");
+                            setQuery(destText); // keep your behavior (destination focused)
+                            nav.setRouteError(null);
+                            return;
                         }
+
+                        // leaving route mode: clear route state BEFORE leaving UI
+                        nav.setRouteStart(null);
+                        nav.setRouteDest(null);
+                        nav.setRouteError(null);
+                        setStartText("");
+                        setDestText("");
+                        setQuery("");
+
+                        nav.toggleRouteMode();
                     }}
                 />
             </View>

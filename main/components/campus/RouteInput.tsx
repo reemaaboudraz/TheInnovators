@@ -74,14 +74,17 @@ export default function RouteInput({
             />
 
             {startValue.length > 0 && (
-              <Pressable
-                onPress={onClearStart}
-                hitSlop={8}
-                style={s.clearButton}
-                testID="clearStart"
-              >
-                <Text style={s.clearIcon}>✕</Text>
-              </Pressable>
+                <Pressable
+                    onPress={(e) => {
+                        e.stopPropagation?.();
+                        onClearStart();
+                    }}
+                    hitSlop={8}
+                    style={s.clearButton}
+                    testID="clearStart"
+                >
+                    <Text style={s.clearIcon}>✕</Text>
+                </Pressable>
             )}
           </View>
         </Pressable>
@@ -111,14 +114,17 @@ export default function RouteInput({
             />
 
             {destValue.length > 0 && (
-              <Pressable
-                onPress={onClearDestination}
-                hitSlop={8}
-                style={s.clearButton}
-                testID="clearDestination"
-              >
-                <Text style={s.clearIcon}>✕</Text>
-              </Pressable>
+                <Pressable
+                    onPress={(e) => {
+                        e.stopPropagation?.();
+                        onClearDestination();
+                    }}
+                    hitSlop={8}
+                    style={s.clearButton}
+                    testID="clearDestination"
+                >
+                    <Text style={s.clearIcon}>✕</Text>
+                </Pressable>
             )}
           </View>
         </Pressable>
