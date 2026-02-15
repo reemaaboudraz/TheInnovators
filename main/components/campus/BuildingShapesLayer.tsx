@@ -1,8 +1,9 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Marker, Polygon } from "react-native-maps";
-
 import type { Building, Campus } from "@/components/Buildings/types";
+import type { Region } from "react-native-maps";
+import { shouldShowBuildingLabel } from "@/components/campus/helper_methods/campusMap.labels";
 
 const CAMPUS_COLORS: Record<
   Campus,
@@ -31,10 +32,11 @@ const CAMPUS_COLORS: Record<
 };
 
 type Props = {
-  buildings: Building[];
-  selectedBuildingId: string | null;
-  userLocationBuildingId: string | null;
-  onPickBuilding: (b: Building) => void;
+    buildings: Building[];
+    selectedBuildingId: string | null;
+    userLocationBuildingId: string | null;
+    onPickBuilding: (b: Building) => void;
+    region: Region | null;
 };
 
 const USER_LOCATION_COLOR = {
@@ -48,19 +50,21 @@ const USER_LOCATION_COLOR = {
  * - Keeps CampusMap focused on layout + interaction flow (search/selection/camera)
  */
 export default function BuildingShapesLayer({
-  buildings,
-  selectedBuildingId,
-  userLocationBuildingId,
-  onPickBuilding,
-}: Readonly<Props>) {
+                                                buildings,
+                                                selectedBuildingId,
+                                                userLocationBuildingId,
+                                                onPickBuilding,
+                                                region,
+                                            }: Readonly<Props>) {
   return (
     <>
       {buildings.map((b) => {
         const isSelected = selectedBuildingId === b.id;
         const isUserLocation = userLocationBuildingId === b.id;
         const colors = CAMPUS_COLORS[b.campus];
+        const showLabel = shouldShowBuildingLabel(b, region);
 
-        // Determine fill and stroke colors based on state
+          // Determine fill and stroke colors based on state
         let fillColor = colors.fill;
         let strokeColor = colors.stroke;
         let strokeWidth = 2;
@@ -87,26 +91,29 @@ export default function BuildingShapesLayer({
               />
             ) : null}
 
-            <Marker
-              coordinate={{ latitude: b.latitude, longitude: b.longitude }}
-              onPress={() => onPickBuilding(b)}
-              tracksViewChanges={isSelected}
-              accessibilityLabel={`${b.code} ${b.name}`}
-            >
-              <View
-                accessible
-                accessibilityRole="button"
-                style={[
-                  s.codeCircle,
-                  {
-                    backgroundColor: colors.labelBg,
-                    borderColor: colors.labelBorder,
-                  },
-                ]}
-              >
-                <Text style={s.codeText}>{b.code}</Text>
-              </View>
-            </Marker>
+              {showLabel ? (
+                  <Marker
+                      coordinate={{ latitude: b.latitude, longitude: b.longitude }}
+                      onPress={() => onPickBuilding(b)}
+                      tracksViewChanges={isSelected}
+                      accessibilityLabel={`${b.code} ${b.name}`}
+                  >
+                      <View
+                          accessible
+                          accessibilityRole="button"
+                          style={[
+                              s.codeCircle,
+                              {
+                                  backgroundColor: colors.labelBg,
+                                  borderColor: colors.labelBorder,
+                              },
+                          ]}
+                      >
+                          <Text style={s.codeText}>{b.code}</Text>
+                      </View>
+                  </Marker>
+              ) : null}
+
           </React.Fragment>
         );
       })}
