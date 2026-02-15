@@ -22,7 +22,7 @@ type Props = {
 export default function BuildingPin({ code, campus, size = 44, label }: Props) {
   const src = campus === "SGW" ? SGW_PIN : LOY_PIN;
   const displayText = label ?? code;
-  const pinHeight = size * 1.50
+  const pinHeight = size * 1.5;
 
   return (
     <View
