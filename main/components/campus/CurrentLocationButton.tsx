@@ -1,7 +1,11 @@
 import React, { useCallback, useState } from "react";
 import { Pressable, Alert, StyleSheet, ActivityIndicator } from "react-native";
-import * as Location from "expo-location";
 import { MaterialIcons } from "@expo/vector-icons";
+
+import {
+  getDeviceLocation,
+  LocationError,
+} from "@/components/campus/helper_methods/locationUtils";
 
 export type LocationStatus = "idle" | "loading" | "granted" | "denied";
 
@@ -27,41 +31,38 @@ export default function CurrentLocationButton({
     setStatus("loading");
 
     try {
-      const { status: permissionStatus } =
-        await Location.requestForegroundPermissionsAsync();
-
-      if (permissionStatus !== "granted") {
-        setStatus("denied");
-        Alert.alert(
-          "Location Permission Required",
-          "Please enable location services in your device settings to use this feature.",
-          [{ text: "OK" }],
-        );
-        onPermissionDenied?.();
-        return;
-      }
+      const loc = await getDeviceLocation();
 
       setStatus("granted");
+      onLocationFound({
+        latitude: loc.latitude,
+        longitude: loc.longitude,
+      });
+    } catch (error: any) {
+      // Keep your status behavior consistent
+      if (error instanceof LocationError) {
+        if (error.code === "PERMISSION_DENIED") {
+          setStatus("denied");
+          Alert.alert(
+            "Location Permission Required",
+            "Please enable location services in your device settings to use this feature.",
+            [{ text: "OK" }],
+          );
+          onPermissionDenied?.();
+          return;
+        }
 
-      const last = await Location.getLastKnownPositionAsync();
-
-      if (last) {
-        onLocationFound({
-          latitude: last.coords.latitude,
-          longitude: last.coords.longitude,
-        });
-        return;
+        if (error.code === "SERVICES_OFF") {
+          setStatus("idle");
+          Alert.alert(
+            "Location Services Off",
+            "Please enable location services on your device to use this feature.",
+            [{ text: "OK" }],
+          );
+          return;
+        }
       }
 
-      const location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Low,
-      });
-
-      onLocationFound({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
-    } catch (error) {
       setStatus("idle");
       Alert.alert(
         "Location Error",

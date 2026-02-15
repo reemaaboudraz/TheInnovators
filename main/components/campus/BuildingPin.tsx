@@ -28,9 +28,11 @@ export default function BuildingPin({
   size = 44,
   label,
   variant = "popup",
-}: Props) {
-  const src =
-    variant === "map" ? MAP_PIN : campus === "SGW" ? SGW_PIN : LOY_PIN;
+}: Readonly<Props>) {
+  const src: ImageSourcePropType = (() => {
+    if (variant === "map") return MAP_PIN;
+    return campus === "SGW" ? SGW_PIN : LOY_PIN;
+  })();
   const displayText = label ?? code;
   const pinHeight = size * 1.5;
 
