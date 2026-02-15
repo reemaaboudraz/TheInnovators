@@ -1,5 +1,5 @@
 import { describe, it, expect } from "@jest/globals";
-import { isPointInPolygon } from "../pointInPolygon";
+import { isPointInPolygon } from "../helper_methods/pointInPolygon";
 import type { LatLng } from "@/components/Buildings/types";
 
 describe("isPointInPolygon", () => {

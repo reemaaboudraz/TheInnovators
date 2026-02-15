@@ -1,4 +1,3 @@
-
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
     View,
@@ -8,20 +7,18 @@ import {
     Platform,
     StyleSheet,
 } from "react-native";
-import MapView, { PROVIDER_GOOGLE, Region, Marker } from "react-native-maps";
-import { getDeviceLocation, LocationError } from "@/components/campus/locationUtils";
+import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
+import { getDeviceLocation, LocationError } from "@/components/campus/helper_methods/locationUtils";
 import { StatusBar } from "expo-status-bar";
-
 import { SGW_BUILDINGS } from "@/components/Buildings/SGW/SGWBuildings";
 import { LOYOLA_BUILDINGS } from "@/components/Buildings/Loyola/LoyolaBuildings";
+import { SGW_REGION, LOY_REGION, INITIAL_REGION } from "@/components/campus/helper_methods/campusMap.constants";
 import type { Building, Campus } from "@/components/Buildings/types";
-
 import {
     regionFromPolygon,
     paddingForZoomCategory,
 } from "@/components/Buildings/mapZoom";
-import { isPointInPolygon } from "@/components/campus/pointInPolygon";
-
+import { isPointInPolygon } from "@/components/campus/helper_methods/pointInPolygon";
 import BuildingShapesLayer from "@/components/campus/BuildingShapesLayer";
 import ToggleButton from "@/components/campus/ToggleButton";
 import BuildingPin from "@/components/campus/BuildingPin";
@@ -29,10 +26,8 @@ import CurrentLocationButton, {
     UserLocation,
 } from "@/components/campus/CurrentLocationButton";
 import BuildingPopup from "@/components/campus/BuildingPopup";
-
 import BrandBar from "@/components/layout/BrandBar";
 import { styles } from "@/components/Styles/mapStyle";
-
 import { useNavigation } from "@/hooks/useNavigation";
 import RoutePlanner from "@/components/campus/RoutePlanner"; // diamond button only
 import RouteInput from "@/components/campus/RouteInput";
@@ -42,22 +37,6 @@ export {
     calculatePanValue,
     determineCampusFromPan,
 } from "@/components/campus/ToggleButton";
-
-export const SGW_REGION: Region = {
-    latitude: 45.4973,
-    longitude: -73.5794,
-    latitudeDelta: 0.006,
-    longitudeDelta: 0.006,
-};
-
-export const LOY_REGION: Region = {
-    latitude: 45.457984,
-    longitude: -73.639834,
-    latitudeDelta: 0.006,
-    longitudeDelta: 0.006,
-};
-
-const INITIAL_REGION: Region = SGW_REGION;
 
 function SuggestionsList({
                              suggestions,

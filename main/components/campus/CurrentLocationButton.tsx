@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { Pressable, Alert, StyleSheet, ActivityIndicator } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import { getDeviceLocation, LocationError } from "@/components/campus/locationUtils";
+import { getDeviceLocation, LocationError } from "@/components/campus/helper_methods/locationUtils";
 
 export type LocationStatus = "idle" | "loading" | "granted" | "denied";
 
