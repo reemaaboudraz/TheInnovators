@@ -31,6 +31,12 @@ import { styles } from "@/components/Styles/mapStyle";
 import { useNavigation } from "@/hooks/useNavigation";
 import RoutePlanner from "@/components/campus/RoutePlanner"; // diamond button only
 import RouteInput from "@/components/campus/RouteInput";
+import {
+    buildAllBuildings,
+    getUserLocationBuildingId,
+    getBuildingContainingPoint,
+    makeUserLocationBuilding,
+} from "@/components/campus/helper_methods/campusMap.buildings";
 
 // Re-export for backwards compatibility with tests
 export {
@@ -111,7 +117,7 @@ export default function CampusMap() {
     }, []);
 
     const ALL_BUILDINGS = useMemo(
-        () => [...SGW_BUILDINGS, ...LOYOLA_BUILDINGS],
+        () => buildAllBuildings(SGW_BUILDINGS, LOYOLA_BUILDINGS),
         [],
     );
 
@@ -138,23 +144,11 @@ export default function CampusMap() {
     };
 
     // Find which building user is inside
-    const userLocationBuildingId = useMemo(() => {
-        if (!userLocation) return null;
+    const userLocationBuildingId = useMemo(
+        () => getUserLocationBuildingId(ALL_BUILDINGS, userLocation),
+        [ALL_BUILDINGS, userLocation],
+    );
 
-        const building = ALL_BUILDINGS.find(
-            (b) =>
-                b.polygon?.length &&
-                isPointInPolygon(
-                    {
-                        latitude: userLocation.latitude,
-                        longitude: userLocation.longitude,
-                    },
-                    b.polygon,
-                ),
-        );
-
-        return building?.id ?? null;
-    }, [userLocation, ALL_BUILDINGS]);
 
     // KEEP your existing suggestion memo (query-driven)
     const suggestions = useMemo(() => {
@@ -200,27 +194,6 @@ export default function CampusMap() {
         );
     };
 
-    const makeUserLocationBuilding = (lat: number, lng: number): Building => ({
-        id: "USER_LOCATION",
-        campus: focusedCampus,
-        code: "",
-        name: "Your location",
-        address: "",
-        latitude: lat,
-        longitude: lng,
-        aliases: [],
-        polygon: [],
-        zoomCategory: 2,
-    });
-
-    const getBuildingContainingPoint = (lat: number, lng: number) => {
-        return ALL_BUILDINGS.find(
-            (b) =>
-                b.polygon?.length &&
-                isPointInPolygon({ latitude: lat, longitude: lng }, b.polygon),
-        );
-    };
-
     const handleGetDirectionsFromPopup = async (destination: Building) => {
         // 1) Enter route mode immediately (UX feels instant)
         if (!nav.isRouteMode) nav.toggleRouteMode();
@@ -234,13 +207,18 @@ export default function CampusMap() {
             const loc = await getDeviceLocation();
 
             const buildingInside = getBuildingContainingPoint(
+                ALL_BUILDINGS,
                 loc.latitude,
                 loc.longitude,
             );
 
             const startBuilding = buildingInside
                 ? buildingInside
-                : makeUserLocationBuilding(loc.latitude, loc.longitude);
+                : makeUserLocationBuilding(
+                loc.latitude,
+                loc.longitude,
+                focusedCampus,
+            );
 
             nav.setRouteStart(startBuilding);
             setStartText(
