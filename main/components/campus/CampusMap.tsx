@@ -37,6 +37,8 @@ import {
     getBuildingContainingPoint,
     makeUserLocationBuilding,
 } from "@/components/campus/helper_methods/campusMap.buildings";
+import { computeFloatingBottom } from "@/components/campus/helper_methods/campusMap.ui";
+
 
 // Re-export for backwards compatibility with tests
 export {
@@ -290,19 +292,11 @@ export default function CampusMap() {
         setSelected(b);
         focusBuilding(b);
     };
-    const floatingBottom = useMemo(() => {
-        // base position when popup is closed
-        const base = 120;
 
-        // if popup isn't shown
-        if (!selected || popupIndex === -1) return base;
-
-        // snap 0 (usually "collapsed" / peek)
-        if (popupIndex === 0) return 280;
-
-        // snap 1+ (expanded)
-        return 440;
-    }, [selected, popupIndex]);
+    const floatingBottom = useMemo(
+        () => computeFloatingBottom(!!selected, popupIndex),
+        [selected, popupIndex],
+    );
 
     return (
         <View style={styles.container} testID="campusMap-root">
