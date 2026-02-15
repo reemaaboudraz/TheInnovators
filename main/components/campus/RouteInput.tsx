@@ -33,12 +33,12 @@ export default function RouteInput({
   onClearDestination,
 }: Readonly<Props>) {
   // If a building is selected, show its label; otherwise show whatever user typed.
-    const startValue =
-        start?.id === "USER_LOCATION"
-            ? "Your location"
-            : start
-                ? `${start.code} - ${start.name}`
-                : startText;
+  let startValue = startText;
+
+  if (start) {
+    if (start.id === "USER_LOCATION") startValue = "Your Location";
+    else startValue = `${start.code} - ${start.name}`;
+  }
   const destValue = destination
     ? `${destination.code} - ${destination.name}`
     : destText;
@@ -74,17 +74,17 @@ export default function RouteInput({
             />
 
             {startValue.length > 0 && (
-                <Pressable
-                    onPress={(e) => {
-                        e.stopPropagation?.();
-                        onClearStart();
-                    }}
-                    hitSlop={8}
-                    style={s.clearButton}
-                    testID="clearStart"
-                >
-                    <Text style={s.clearIcon}>✕</Text>
-                </Pressable>
+              <Pressable
+                onPress={(e) => {
+                  e.stopPropagation?.();
+                  onClearStart();
+                }}
+                hitSlop={8}
+                style={s.clearButton}
+                testID="clearStart"
+              >
+                <Text style={s.clearIcon}>✕</Text>
+              </Pressable>
             )}
           </View>
         </Pressable>
@@ -114,17 +114,17 @@ export default function RouteInput({
             />
 
             {destValue.length > 0 && (
-                <Pressable
-                    onPress={(e) => {
-                        e.stopPropagation?.();
-                        onClearDestination();
-                    }}
-                    hitSlop={8}
-                    style={s.clearButton}
-                    testID="clearDestination"
-                >
-                    <Text style={s.clearIcon}>✕</Text>
-                </Pressable>
+              <Pressable
+                onPress={(e) => {
+                  e.stopPropagation?.();
+                  onClearDestination();
+                }}
+                hitSlop={8}
+                style={s.clearButton}
+                testID="clearDestination"
+              >
+                <Text style={s.clearIcon}>✕</Text>
+              </Pressable>
             )}
           </View>
         </Pressable>
