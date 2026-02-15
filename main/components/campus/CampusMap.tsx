@@ -44,6 +44,7 @@ import {
   makeUserLocationBuilding,
 } from "@/components/campus/helper_methods/campusMap.buildings";
 import { computeFloatingBottom } from "@/components/campus/helper_methods/campusMap.ui";
+import type { Region } from "react-native-maps";
 
 // Re-export for backwards compatibility with tests
 export {
@@ -90,20 +91,20 @@ export default function CampusMap() {
 
   // One query drives suggestions (KEEP THIS for tests)
   const [query, setQuery] = useState("");
-
   // Popup selection (normal mode)
   const [selected, setSelected] = useState<Building | null>(null);
-
   // User location
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
 
   const [startText, setStartText] = useState("");
   const [destText, setDestText] = useState("");
-
   const [popupIndex, setPopupIndex] = useState(-1);
 
   const mapRef = useRef<MapView>(null);
   const nav = useNavigation();
+
+  // ✅ Track current map region (for label visibility logic in BuildingShapesLayer)
+  const [region, setRegion] = useState<Region>(INITIAL_REGION);
 
   // Auto fetch user location on mount
   useEffect(() => {
@@ -146,8 +147,8 @@ export default function CampusMap() {
     setSelected(null);
     setPopupIndex(-1);
 
-    const region = campus === "SGW" ? SGW_REGION : LOY_REGION;
-    mapRef.current?.animateToRegion(region, 500);
+    const nextRegion = campus === "SGW" ? SGW_REGION : LOY_REGION;
+    mapRef.current?.animateToRegion(nextRegion, 500);
   };
 
   // Find which building user is inside
@@ -184,8 +185,8 @@ export default function CampusMap() {
     if (b.polygon?.length) {
       const z = b.zoomCategory ?? 2;
       const padding = paddingForZoomCategory(z);
-      const region = regionFromPolygon(b.polygon, padding);
-      mapRef.current?.animateToRegion(region, 600);
+      const r = regionFromPolygon(b.polygon, padding);
+      mapRef.current?.animateToRegion(r, 600);
       return;
     }
 
@@ -228,9 +229,6 @@ export default function CampusMap() {
           ? "Your location"
           : `${startBuilding.code} - ${startBuilding.name}`,
       );
-
-      // optional: focus map on start or destination (up to you)
-      // focusBuilding(destination);
     } catch (e: any) {
       nav.setRouteStart(null);
       setStartText("");
@@ -312,6 +310,9 @@ export default function CampusMap() {
         showsCompass={false}
         toolbarEnabled={false}
         rotateEnabled={false}
+        onRegionChangeComplete={(r) => {
+          if (r?.latitude != null && r?.longitude != null) setRegion(r);
+        }}
         onPress={() => {
           // Only clear popup in normal mode
           if (!nav.isRouteMode && selected) {
@@ -325,6 +326,7 @@ export default function CampusMap() {
           selectedBuildingId={selected?.id ?? null}
           userLocationBuildingId={userLocationBuildingId}
           onPickBuilding={handlePickBuilding}
+          region={region}
         />
 
         {userLocation && !userLocationBuildingId && (
@@ -361,6 +363,7 @@ export default function CampusMap() {
             />
           </Marker>
         )}
+
         {nav.routeDest && (
           <Marker
             testID="destinationPin"

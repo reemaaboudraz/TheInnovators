@@ -2,6 +2,7 @@
 import React from "react";
 import { render, fireEvent, act } from "@testing-library/react-native";
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
+import { Animated } from "react-native";
 
 jest.mock("@expo/vector-icons", () => {
   return new Proxy(
@@ -41,7 +42,8 @@ jest.mock("@/components/Buildings/data/SGW_data.json", () => [
     latitude: 45.4978,
     longitude: -73.5795,
     campus: "SGW",
-    zoomCategory: 3,
+    // ✅ Must be visible at initial region so marker exists in tests
+    zoomCategory: 1,
     aliases: ["nop", "no polygon"],
     polygon: [],
   },
@@ -245,23 +247,43 @@ import {
   LOY_REGION,
 } from "@/components/campus/helper_methods/campusMap.constants";
 
+// Flush microtasks so the async getDeviceLocation effect settles inside act()
+async function renderCampusMap() {
+  const utils = render(<CampusMap />);
+  await act(async () => {
+    await Promise.resolve();
+  });
+  return utils;
+}
+
 beforeEach(() => {
   mockAnimateToRegion.mockClear();
   mockGetDeviceLocation.mockClear();
   mockOnLocationFound = null;
   (global as any).alert = jest.fn();
+
+  // Make Animated operations synchronous/no-op to reduce act warnings
+  jest.spyOn(Animated, "timing").mockImplementation((): any => ({
+    start: (cb?: any) => cb?.(),
+  }));
+  jest.spyOn(Animated, "spring").mockImplementation((): any => ({
+    start: (cb?: any) => cb?.(),
+  }));
+  jest.spyOn(Animated, "decay").mockImplementation((): any => ({
+    start: (cb?: any) => cb?.(),
+  }));
 });
 
 describe("CampusMap - initial region", () => {
-  it("uses INITIAL_REGION as initialRegion", () => {
-    const { getByTestId } = render(<CampusMap />);
+  it("uses INITIAL_REGION as initialRegion", async () => {
+    const { getByTestId } = await renderCampusMap();
     expect(getByTestId("mapView").props.initialRegion).toEqual(INITIAL_REGION);
   });
 });
 
 describe("CampusMap - search bar", () => {
-  it("updates text and clears input", () => {
-    const { getByPlaceholderText, getByTestId } = render(<CampusMap />);
+  it("updates text and clears input", async () => {
+    const { getByPlaceholderText, getByTestId } = await renderCampusMap();
 
     act(() => {
       fireEvent.changeText(getByPlaceholderText("Where to next?"), "hall");
@@ -279,7 +301,7 @@ describe("CampusMap - search bar", () => {
 
 describe("CampusMap - suggestions", () => {
   it("shows suggestions from BOTH campuses based on the query", async () => {
-    const { getByPlaceholderText, findByText } = render(<CampusMap />);
+    const { getByPlaceholderText, findByText } = await renderCampusMap();
 
     act(() => {
       fireEvent.changeText(getByPlaceholderText("Where to next?"), "ad");
@@ -293,9 +315,8 @@ describe("CampusMap - suggestions", () => {
   });
 
   it("pressing a suggestion animates and fills the input", async () => {
-    const { getByPlaceholderText, getByTestId, findByText } = render(
-      <CampusMap />,
-    );
+    const { getByPlaceholderText, getByTestId, findByText } =
+      await renderCampusMap();
 
     act(() => {
       fireEvent.changeText(getByPlaceholderText("Where to next?"), "admin");
@@ -326,8 +347,8 @@ describe("CampusMap - suggestions", () => {
 });
 
 describe("CampusMap - building selection + popup", () => {
-  it("pressing a building marker selects it and shows popup", () => {
-    const { getByTestId, queryByTestId } = render(<CampusMap />);
+  it("pressing a building marker selects it and shows popup", async () => {
+    const { getByTestId, queryByTestId } = await renderCampusMap();
 
     act(() => {
       fireEvent.press(getByTestId("marker-45.458--73.64"));
@@ -337,8 +358,8 @@ describe("CampusMap - building selection + popup", () => {
     expect(queryByTestId("buildingPopup")).toBeTruthy();
   });
 
-  it("closing popup clears the selected building", () => {
-    const { getByTestId, queryByTestId } = render(<CampusMap />);
+  it("closing popup clears the selected building", async () => {
+    const { getByTestId, queryByTestId } = await renderCampusMap();
 
     act(() => {
       fireEvent.press(getByTestId("marker-45.458--73.64"));
@@ -351,8 +372,8 @@ describe("CampusMap - building selection + popup", () => {
     expect(queryByTestId("buildingPopup")).toBeNull();
   });
 
-  it("pressing map clears the selected building", () => {
-    const { getByTestId, queryByTestId } = render(<CampusMap />);
+  it("pressing map clears the selected building", async () => {
+    const { getByTestId, queryByTestId } = await renderCampusMap();
 
     act(() => {
       fireEvent.press(getByTestId("marker-45.458--73.64"));
@@ -365,9 +386,10 @@ describe("CampusMap - building selection + popup", () => {
     expect(queryByTestId("buildingPopup")).toBeNull();
   });
 
-  it("building with empty polygon still renders as marker and uses fixed deltas on select", () => {
-    const { getByTestId } = render(<CampusMap />);
+  it("building with empty polygon still renders as marker and uses fixed deltas on select", async () => {
+    const { getByTestId } = await renderCampusMap();
 
+    // ✅ Now NP is visible at initial zoom (zoomCategory=1), so marker exists
     expect(getByTestId("marker-45.4978--73.5795")).toBeTruthy();
 
     act(() => {
@@ -386,7 +408,8 @@ describe("CampusMap - building selection + popup", () => {
   });
 
   it("Directions from popup enters route mode, sets destination, auto-sets start (inside a building), and clears normal search UI", async () => {
-    const { getByTestId, queryByTestId, findByTestId } = render(<CampusMap />);
+    const { getByTestId, queryByTestId, findByTestId } =
+      await renderCampusMap();
 
     act(() => {
       fireEvent.press(getByTestId("marker-45.458--73.64"));
@@ -402,12 +425,11 @@ describe("CampusMap - building selection + popup", () => {
 
     await act(async () => {
       fireEvent.press(getByTestId("popupDirections"));
+      await Promise.resolve();
     });
 
-    // Popup should be gone because route mode turns ON
     expect(queryByTestId("buildingPopup")).toBeNull();
 
-    // Route UI should now be visible and prefilled
     expect(await findByTestId("routePanel")).toBeTruthy();
     expect(getByTestId("routeDestInput").props.value).toMatch(
       /^AD - Administration Building/i,
@@ -418,7 +440,7 @@ describe("CampusMap - building selection + popup", () => {
   });
 
   it("Directions from popup shows permission alert when auto-setting start fails with PERMISSION_DENIED", async () => {
-    const { getByTestId, findByTestId } = render(<CampusMap />);
+    const { getByTestId, findByTestId } = await renderCampusMap();
 
     act(() => {
       fireEvent.press(getByTestId("marker-45.458--73.64"));
@@ -433,6 +455,7 @@ describe("CampusMap - building selection + popup", () => {
 
     await act(async () => {
       fireEvent.press(getByTestId("popupDirections"));
+      await Promise.resolve();
     });
 
     expect(await findByTestId("routePanel")).toBeTruthy();
@@ -442,7 +465,7 @@ describe("CampusMap - building selection + popup", () => {
   });
 
   it("Directions from popup shows services off alert when auto-setting start fails with SERVICES_OFF", async () => {
-    const { getByTestId, findByTestId } = render(<CampusMap />);
+    const { getByTestId, findByTestId } = await renderCampusMap();
 
     act(() => {
       fireEvent.press(getByTestId("marker-45.458--73.64"));
@@ -457,6 +480,7 @@ describe("CampusMap - building selection + popup", () => {
 
     await act(async () => {
       fireEvent.press(getByTestId("popupDirections"));
+      await Promise.resolve();
     });
 
     expect(await findByTestId("routePanel")).toBeTruthy();
@@ -466,7 +490,7 @@ describe("CampusMap - building selection + popup", () => {
   });
 
   it("Directions from popup shows generic location error alert on unknown error", async () => {
-    const { getByTestId, findByTestId } = render(<CampusMap />);
+    const { getByTestId, findByTestId } = await renderCampusMap();
 
     act(() => {
       fireEvent.press(getByTestId("marker-45.458--73.64"));
@@ -476,6 +500,7 @@ describe("CampusMap - building selection + popup", () => {
 
     await act(async () => {
       fireEvent.press(getByTestId("popupDirections"));
+      await Promise.resolve();
     });
 
     expect(await findByTestId("routePanel")).toBeTruthy();
@@ -486,8 +511,8 @@ describe("CampusMap - building selection + popup", () => {
 });
 
 describe("CampusMap - campus toggle", () => {
-  it("pressing Loyola animates to LOY_REGION", () => {
-    const { getByTestId } = render(<CampusMap />);
+  it("pressing Loyola animates to LOY_REGION", async () => {
+    const { getByTestId } = await renderCampusMap();
 
     act(() => {
       fireEvent.press(getByTestId("campusToggle-Loyola"));
@@ -496,8 +521,8 @@ describe("CampusMap - campus toggle", () => {
     expect(mockAnimateToRegion).toHaveBeenCalledWith(LOY_REGION, 500);
   });
 
-  it("pressing SGW animates to SGW_REGION (after switching away first)", () => {
-    const { getByTestId } = render(<CampusMap />);
+  it("pressing SGW animates to SGW_REGION (after switching away first)", async () => {
+    const { getByTestId } = await renderCampusMap();
 
     act(() => {
       fireEvent.press(getByTestId("campusToggle-Loyola"));
@@ -510,8 +535,8 @@ describe("CampusMap - campus toggle", () => {
     expect(mockAnimateToRegion).toHaveBeenCalledWith(SGW_REGION, 500);
   });
 
-  it("BrandBar backgroundColor updates with campus changes", () => {
-    const { getByTestId } = render(<CampusMap />);
+  it("BrandBar backgroundColor updates with campus changes", async () => {
+    const { getByTestId } = await renderCampusMap();
 
     expect(getByTestId("brandbar").props.backgroundColor).toBe("#912338");
 
@@ -528,8 +553,8 @@ describe("CampusMap - campus toggle", () => {
 });
 
 describe("CampusMap - Current Location button callback", () => {
-  it("calls animateToRegion when CurrentLocationButton reports a location", () => {
-    render(<CampusMap />);
+  it("calls animateToRegion when CurrentLocationButton reports a location", async () => {
+    await renderCampusMap();
     expect(mockOnLocationFound).not.toBeNull();
 
     act(() => {
