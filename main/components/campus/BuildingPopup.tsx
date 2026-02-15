@@ -22,12 +22,14 @@ type Props = {
   building: Building;
   campusTheme: Campus;
   onClose: () => void;
+  onSheetChange?: (index: number) => void;
 };
 
 export default function BuildingPopup({
   building,
   campusTheme,
   onClose,
+  onSheetChange,
 }: Readonly<Props>) {
   const sheetRef = useRef<BottomSheet>(null);
 
@@ -148,6 +150,7 @@ export default function BuildingPopup({
       snapPoints={snapPoints}
       enablePanDownToClose
       onClose={onClose}
+      onChange={(index) => onSheetChange?.(index)}
       handleComponent={Handle}
       topInset={insets.top - 6}
       backgroundStyle={[
@@ -157,7 +160,12 @@ export default function BuildingPopup({
     >
       <View style={styles.header}>
         <View style={styles.headerRow}>
-          <BuildingPin code={building.code} campus={campusTheme} size={46} />
+          <BuildingPin
+            code={building.code}
+            campus={campusTheme}
+            size={46}
+            variant="popup"
+          />
 
           <View style={styles.textBlock}>
             <Text style={styles.title} numberOfLines={1}>

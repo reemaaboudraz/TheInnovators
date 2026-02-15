@@ -23,6 +23,7 @@ import { isPointInPolygon } from "@/components/campus/pointInPolygon";
 
 import BuildingShapesLayer from "@/components/campus/BuildingShapesLayer";
 import ToggleButton from "@/components/campus/ToggleButton";
+import BuildingPin from "@/components/campus/BuildingPin";
 import CurrentLocationButton, {
   UserLocation,
 } from "@/components/campus/CurrentLocationButton";
@@ -30,6 +31,10 @@ import BuildingPopup from "@/components/campus/BuildingPopup";
 
 import BrandBar from "@/components/layout/BrandBar";
 import { styles } from "@/components/Styles/mapStyle";
+
+import { useNavigation } from "@/hooks/useNavigation";
+import RoutePlanner from "@/components/campus/RoutePlanner"; // diamond button only
+import RouteInput from "@/components/campus/RouteInput";
 
 // Re-export for backwards compatibility with tests
 export {
@@ -51,18 +56,63 @@ export const LOY_REGION: Region = {
   longitudeDelta: 0.006,
 };
 
-// Start at SGW (still renders Loyola buildings in the background)
 const INITIAL_REGION: Region = SGW_REGION;
+
+function SuggestionsList({
+  suggestions,
+  onPick,
+  testIdPrefix,
+  containerTestID,
+  containerStyle,
+}: Readonly<{
+  suggestions: Building[];
+  onPick: (b: Building) => void;
+  testIdPrefix: "suggestion" | "routeSuggestion";
+  containerTestID: "suggestions" | "route-suggestions";
+  containerStyle?: any;
+}>) {
+  if (suggestions.length === 0) return null;
+
+  return (
+    <View style={[styles.suggestions, containerStyle]} testID={containerTestID}>
+      {suggestions.map((b) => (
+        <Pressable
+          key={`${b.campus}-${b.id}`}
+          testID={`${testIdPrefix}-${b.campus}-${b.id}`}
+          onPress={() => onPick(b)}
+          style={styles.suggestionRow}
+        >
+          <Text style={styles.suggestionTitle}>
+            {b.code} — {b.name} ({b.campus})
+          </Text>
+          <Text style={styles.suggestionSub}>{b.address}</Text>
+        </Pressable>
+      ))}
+    </View>
+  );
+}
 
 export default function CampusMap() {
   const [focusedCampus, setFocusedCampus] = useState<Campus>("SGW");
+
+  // One query drives suggestions (KEEP THIS for tests)
   const [query, setQuery] = useState("");
+
+  // Popup selection (normal mode)
   const [selected, setSelected] = useState<Building | null>(null);
+
+  // User location
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
 
-  const mapRef = useRef<MapView>(null);
+  const [startText, setStartText] = useState("");
+  const [destText, setDestText] = useState("");
 
-  // Automatically fetch user location on mount
+  const [popupIndex, setPopupIndex] = useState(-1);
+
+  const mapRef = useRef<MapView>(null);
+  const nav = useNavigation();
+
+  // Auto fetch user location on mount
   useEffect(() => {
     let cancelled = false;
 
@@ -71,7 +121,6 @@ export default function CampusMap() {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted" || cancelled) return;
 
-        // Try last-known position first (instant, works on emulators)
         const last = await Location.getLastKnownPositionAsync();
         if (last && !cancelled) {
           setUserLocation({
@@ -81,7 +130,6 @@ export default function CampusMap() {
           return;
         }
 
-        // Fall back to a fresh fix with a timeout
         const location = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Low,
         });
@@ -93,7 +141,7 @@ export default function CampusMap() {
           });
         }
       } catch {
-        // Location unavailable (common on emulators) — silently ignore
+        // ignore
       }
     })();
 
@@ -123,12 +171,13 @@ export default function CampusMap() {
   const handleCampusChange = (campus: Campus) => {
     setFocusedCampus(campus);
     setSelected(null);
+    setPopupIndex(-1);
 
     const region = campus === "SGW" ? SGW_REGION : LOY_REGION;
     mapRef.current?.animateToRegion(region, 500);
   };
 
-  // Find which building the user is currently inside
+  // Find which building user is inside
   const userLocationBuildingId = useMemo(() => {
     if (!userLocation) return null;
 
@@ -147,6 +196,7 @@ export default function CampusMap() {
     return building?.id ?? null;
   }, [userLocation, ALL_BUILDINGS]);
 
+  // KEEP your existing suggestion memo (query-driven)
   const suggestions = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
@@ -166,14 +216,13 @@ export default function CampusMap() {
     }).slice(0, 6);
   }, [query, ALL_BUILDINGS]);
 
-  const onPickBuilding = (b: Building) => {
-    setSelected(b);
+  const focusBuilding = (b: Building) => {
+    // keep your behavior
     setQuery(`${b.code} - ${b.name}`);
     setFocusedCampus(b.campus);
 
-    // Smart zoom if polygon exists + zoomCategory exists
     if (b.polygon?.length) {
-      const z = b.zoomCategory ?? 2; // fallback if any building lacks zoomCategory
+      const z = b.zoomCategory ?? 2;
       const padding = paddingForZoomCategory(z);
       const region = regionFromPolygon(b.polygon, padding);
       mapRef.current?.animateToRegion(region, 600);
@@ -191,6 +240,49 @@ export default function CampusMap() {
     );
   };
 
+  const focusRouteField = (field: "start" | "destination") => {
+    nav.setActiveField(field);
+    setQuery(field === "start" ? startText : destText);
+    nav.setRouteError(null);
+  };
+
+  const handlePickBuilding = (b: Building) => {
+    if (nav.isRouteMode) {
+      // set start/destination based on activeField
+      nav.setFieldFromBuilding(b);
+
+      const label = `${b.code} - ${b.name}`;
+      if (nav.activeField === "start") {
+        setStartText(label);
+        focusRouteField("destination");
+      } else {
+        setDestText(label);
+      }
+
+      // hide suggestions after selecting
+      setQuery("");
+      focusBuilding(b);
+      return;
+    }
+
+    // Normal mode: popup selection
+    setSelected(b);
+    focusBuilding(b);
+  };
+  const floatingBottom = useMemo(() => {
+    // base position when popup is closed
+    const base = 120;
+
+    // if popup isn't shown
+    if (!selected || popupIndex === -1) return base;
+
+    // snap 0 (usually "collapsed" / peek)
+    if (popupIndex === 0) return 280;
+
+    // snap 1+ (expanded)
+    return 440;
+  }, [selected, popupIndex]);
+
   return (
     <View style={styles.container} testID="campusMap-root">
       <StatusBar style="dark" translucent backgroundColor="transparent" />
@@ -206,19 +298,21 @@ export default function CampusMap() {
         showsCompass={false}
         toolbarEnabled={false}
         rotateEnabled={false}
-        // don’t fight building taps: only clear if something is selected
         onPress={() => {
-          if (selected) setSelected(null);
+          // Only clear popup in normal mode
+          if (!nav.isRouteMode && selected) {
+            setSelected(null);
+            setPopupIndex(-1);
+          }
         }}
       >
         <BuildingShapesLayer
           buildings={ALL_BUILDINGS}
           selectedBuildingId={selected?.id ?? null}
           userLocationBuildingId={userLocationBuildingId}
-          onPickBuilding={onPickBuilding}
+          onPickBuilding={handlePickBuilding}
         />
 
-        {/* show user marker only if not inside a building */}
         {userLocation && !userLocationBuildingId && (
           <Marker
             testID="userLocationMarker"
@@ -233,8 +327,47 @@ export default function CampusMap() {
             </View>
           </Marker>
         )}
+
+        {nav.routeStart && (
+          // Start and destination pins (route mode) - building name on pin, size fixed for visibility
+          <Marker
+            testID="startPin"
+            coordinate={{
+              latitude: nav.routeStart.latitude,
+              longitude: nav.routeStart.longitude,
+            }}
+            anchor={{ x: 0.5, y: 1 }}
+            tracksViewChanges={false}
+          >
+            <BuildingPin
+              code={nav.routeStart.code}
+              campus={nav.routeStart.campus}
+              size={48}
+              variant="map"
+            />
+          </Marker>
+        )}
+        {nav.routeDest && (
+          <Marker
+            testID="destinationPin"
+            coordinate={{
+              latitude: nav.routeDest.latitude,
+              longitude: nav.routeDest.longitude,
+            }}
+            anchor={{ x: 0.5, y: 1 }}
+            tracksViewChanges={false}
+          >
+            <BuildingPin
+              code={nav.routeDest.code}
+              campus={nav.routeDest.campus}
+              size={48}
+              variant="map"
+            />
+          </Marker>
+        )}
       </MapView>
 
+      {/* TOP OVERLAY */}
       <View style={styles.topOverlay} testID="topOverlay">
         <Text
           testID="focusedCampusLabel"
@@ -248,65 +381,157 @@ export default function CampusMap() {
           onCampusChange={handleCampusChange}
         />
 
-        <View style={styles.searchBar} testID="searchBar">
-          <Text style={styles.searchIcon}>⌕</Text>
+        {/* NORMAL MODE SEARCH */}
+        {!nav.isRouteMode && (
+          <>
+            <View style={styles.searchBar} testID="searchBar">
+              <Text style={styles.searchIcon}>⌕</Text>
 
-          <TextInput
-            testID="searchInput"
-            value={query}
-            onChangeText={(t) => {
-              setQuery(t);
-              if (selected) setSelected(null);
-            }}
-            placeholder="Where to next?"
-            placeholderTextColor={"rgba(17,17,17,0.55)"}
-            style={styles.searchInput}
-            autoCorrect={false}
-            autoCapitalize="none"
-          />
+              <TextInput
+                testID="searchInput"
+                value={query}
+                onChangeText={(t) => {
+                  setQuery(t);
+                  if (selected) {
+                    setSelected(null);
+                    setPopupIndex(-1);
+                  }
+                }}
+                placeholder="Where to next?"
+                placeholderTextColor={"rgba(17,17,17,0.55)"}
+                style={styles.searchInput}
+                autoCorrect={false}
+                autoCapitalize="none"
+              />
 
-          {query.length > 0 && (
-            <Pressable
-              testID="clearSearch"
-              onPress={() => {
-                setQuery("");
-                setSelected(null);
-              }}
-              hitSlop={8}
-              style={styles.clearButton}
-            >
-              <Text style={styles.clearIcon}>✕</Text>
-            </Pressable>
-          )}
-        </View>
+              {query.length > 0 && (
+                <Pressable
+                  testID="clearSearch"
+                  onPress={() => {
+                    setQuery("");
+                    setSelected(null);
+                    setPopupIndex(-1);
+                  }}
+                  hitSlop={8}
+                  style={styles.clearButton}
+                >
+                  <Text style={styles.clearIcon}>✕</Text>
+                </Pressable>
+              )}
+            </View>
 
-        {suggestions.length > 0 && (
-          <View style={styles.suggestions} testID="suggestions">
-            {suggestions.map((b) => (
-              <Pressable
-                key={`${b.campus}-${b.id}`}
-                testID={`suggestion-${b.campus}-${b.id}`}
-                onPress={() => onPickBuilding(b)}
-                style={styles.suggestionRow}
-              >
-                <Text style={styles.suggestionTitle}>
-                  {b.code} — {b.name} ({b.campus})
-                </Text>
-                <Text style={styles.suggestionSub}>{b.address}</Text>
-              </Pressable>
-            ))}
-          </View>
+            <SuggestionsList
+              suggestions={suggestions}
+              onPick={handlePickBuilding}
+              testIdPrefix="suggestion"
+              containerTestID="suggestions"
+            />
+          </>
+        )}
+
+        {/* ROUTE MODE UI */}
+        {nav.isRouteMode && (
+          <>
+            <View style={routeStyles.routePanel} testID="routePanel">
+              <RouteInput
+                start={nav.routeStart}
+                destination={nav.routeDest}
+                activeField={nav.activeField}
+                onFocusField={focusRouteField}
+                onSwap={() => {
+                  const a = nav.routeStart;
+                  const b = nav.routeDest;
+                  nav.setRouteStart(b);
+                  nav.setRouteDest(a);
+
+                  setStartText(destText);
+                  setDestText(startText);
+
+                  // keep suggestions synced to active field
+                  setQuery(nav.activeField === "start" ? destText : startText);
+                }}
+                startText={startText}
+                destText={destText}
+                onChangeStartText={(t) => {
+                  nav.setActiveField("start");
+                  setStartText(t);
+                  setQuery(t);
+                  nav.setRouteError(null);
+                  if (nav.routeStart) nav.setRouteStart(null);
+                }}
+                onChangeDestText={(t) => {
+                  nav.setActiveField("destination");
+                  setDestText(t);
+                  setQuery(t);
+                  nav.setRouteError(null);
+                  if (nav.routeDest) nav.setRouteDest(null);
+                }}
+                onClearStart={() => {
+                  setStartText("");
+                  nav.setRouteStart(null);
+                  setQuery("");
+                  nav.setRouteError(null);
+                  focusRouteField("start");
+                }}
+                onClearDestination={() => {
+                  setDestText("");
+                  nav.setRouteDest(null);
+                  setQuery("");
+                  nav.setRouteError(null);
+                  focusRouteField("destination");
+                }}
+              />
+            </View>
+
+            <SuggestionsList
+              suggestions={suggestions}
+              onPick={handlePickBuilding}
+              testIdPrefix="routeSuggestion"
+              containerTestID="route-suggestions"
+              containerStyle={routeStyles.routeSuggestions}
+            />
+          </>
         )}
       </View>
 
-      <CurrentLocationButton onLocationFound={handleLocationFound} />
+      {/* FLOATING BUTTONS STACK (now dynamic bottom) */}
+      <View style={[floatingStyles.container, { bottom: floatingBottom }]}>
+        <CurrentLocationButton onLocationFound={handleLocationFound} />
 
-      {/* Popup (only show if selected has details or your popup handles missing details safely) */}
-      {selected && (
+        <RoutePlanner
+          isRouteMode={nav.isRouteMode}
+          onToggle={() => {
+            if (nav.isRouteMode) {
+              // if condition is true, then clear the route start and destination
+              nav.setRouteStart(null);
+              nav.setRouteDest(null);
+              nav.setRouteError(null);
+              setStartText("");
+              setDestText("");
+              setQuery("");
+            }
+
+            nav.toggleRouteMode();
+            setSelected(null);
+            setPopupIndex(-1);
+
+            if (!nav.isRouteMode) {
+              focusRouteField("destination");
+            }
+          }}
+        />
+      </View>
+
+      {/* Popup only in normal mode */}
+      {!nav.isRouteMode && selected && (
         <BuildingPopup
           building={selected}
           campusTheme={focusedCampus}
-          onClose={() => setSelected(null)}
+          onClose={() => {
+            setSelected(null);
+            setPopupIndex(-1);
+          }}
+          onSheetChange={(index: number) => setPopupIndex(index)}
         />
       )}
 
@@ -317,6 +542,29 @@ export default function CampusMap() {
     </View>
   );
 }
+
+const routeStyles = StyleSheet.create({
+  routePanel: {
+    marginTop: 10,
+    width: "100%",
+  },
+  routeSuggestions: {
+    zIndex: 999,
+    elevation: 999,
+  },
+});
+
+const floatingStyles = StyleSheet.create({
+  container: {
+    position: "absolute",
+    right: 16,
+    // bottom is now dynamic via inline style
+    gap: 30,
+    alignItems: "center",
+    zIndex: 999,
+    elevation: 999,
+  },
+});
 
 const locationMarkerStyles = StyleSheet.create({
   container: { alignItems: "center", justifyContent: "center" },
