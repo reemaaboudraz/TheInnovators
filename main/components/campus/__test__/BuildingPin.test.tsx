@@ -1,6 +1,6 @@
 import React from "react";
 import { render } from "@testing-library/react-native";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import BuildingPin from "@/components/campus/BuildingPin";
 
 describe("BuildingPin", () => {
@@ -36,5 +36,18 @@ describe("BuildingPin", () => {
       width: 60,
       height: 60 * 1.5, // size * 1.5
     });
+  });
+
+  it("uses smaller fontSize when label is provided", () => {
+    const size = 50;
+    const { getByText, UNSAFE_getAllByType } = render(
+      <BuildingPin code="H" campus="SGW" size={size} label="Henry Hall" />,
+    );
+
+    getByText("Henry Hall");
+
+    const texts = UNSAFE_getAllByType(Text);
+    const textStyle = StyleSheet.flatten(texts[0].props.style);
+    expect(textStyle.fontSize).toBe(Math.round(size * 0.22));
   });
 });
