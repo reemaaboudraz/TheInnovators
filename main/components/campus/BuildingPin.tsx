@@ -45,7 +45,9 @@ export default function BuildingPin({ code, campus, size = 44, label }: Props) {
           style={[
             styles.code,
             {
-              fontSize: label ? Math.round(size * 0.22) : Math.round(size * 0.3),
+              fontSize: label
+                ? Math.round(size * 0.22)
+                : Math.round(size * 0.3),
             },
           ]}
           numberOfLines={2}
