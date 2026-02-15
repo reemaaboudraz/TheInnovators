@@ -8,8 +8,9 @@ import {
 } from "react-native";
 import type { Campus } from "@/components/Buildings/types";
 
-const SGW_PIN: ImageSourcePropType = require("@/assets/pins/pin_rm.png");
-const LOY_PIN: ImageSourcePropType = require("@/assets/pins/pin_rm.png");
+const SGW_PIN: ImageSourcePropType = require("@/assets/pins/pin_sgw.png");
+const LOY_PIN: ImageSourcePropType = require("@/assets/pins/pin_loyola.png");
+const MAP_PIN: ImageSourcePropType = require("@/assets/pins/pin_rm.png");
 
 type Props = {
   code: string;
@@ -17,10 +18,23 @@ type Props = {
   size?: number; // controls the whole pin size
   /** When set, shown on the pin instead of code (e.g. building name for route pins). */
   label?: string;
+  /** "map" = purple pin for route start/destination; "popup" = campus-specific (SGW/Loyola) for building info */
+  variant?: "map" | "popup";
 };
 
-export default function BuildingPin({ code, campus, size = 44, label }: Props) {
-  const src = campus === "SGW" ? SGW_PIN : LOY_PIN;
+export default function BuildingPin({
+  code,
+  campus,
+  size = 44,
+  label,
+  variant = "popup",
+}: Props) {
+  const src =
+    variant === "map"
+      ? MAP_PIN
+      : campus === "SGW"
+        ? SGW_PIN
+        : LOY_PIN;
   const displayText = label ?? code;
   const pinHeight = size * 1.5;
 

@@ -160,7 +160,12 @@ export default function BuildingPopup({
     >
       <View style={styles.header}>
         <View style={styles.headerRow}>
-          <BuildingPin code={building.code} campus={campusTheme} size={46} />
+          <BuildingPin
+            code={building.code}
+            campus={campusTheme}
+            size={46}
+            variant="popup"
+          />
 
           <View style={styles.textBlock}>
             <Text style={styles.title} numberOfLines={1}>

@@ -343,6 +343,7 @@ export default function CampusMap() {
               code={nav.routeStart.code}
               campus={nav.routeStart.campus}
               size={48}
+              variant="map"
             />
           </Marker>
         )}
@@ -360,6 +361,7 @@ export default function CampusMap() {
               code={nav.routeDest.code}
               campus={nav.routeDest.campus}
               size={48}
+              variant="map"
             />
           </Marker>
         )}
