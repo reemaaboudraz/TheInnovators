@@ -308,7 +308,9 @@ export default function CampusMap() {
                 showsCompass={false}
                 toolbarEnabled={false}
                 rotateEnabled={false}
-                onRegionChangeComplete={(r) => setRegion(r)}
+                onRegionChangeComplete={(r) => {
+                    if (r?.latitude != null && r?.longitude != null) setRegion(r);
+                }}
                 onPress={() => {
                     // Only clear popup in normal mode
                     if (!nav.isRouteMode && selected) {
