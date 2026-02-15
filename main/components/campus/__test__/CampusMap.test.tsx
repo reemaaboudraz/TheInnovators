@@ -71,6 +71,14 @@ jest.mock("expo-status-bar", () => ({ StatusBar: () => null }));
 
 const mockGetDeviceLocation = jest.fn(async () => null);
 jest.mock("@/components/campus/helper_methods/locationUtils", () => ({
+  // Keep LocationError here so CampusMap's `instanceof LocationError` works in tests
+  LocationError: class LocationError extends Error {
+    code: string;
+    constructor(code: string, message?: string) {
+      super(message ?? code);
+      this.code = code;
+    }
+  },
   getDeviceLocation: () => mockGetDeviceLocation(),
 }));
 
@@ -91,6 +99,14 @@ jest.mock("@/components/campus/BuildingPopup", () => {
           Text,
           null,
           `Popup: ${props?.building?.code ?? "?"}`,
+        ),
+        ReactActual.createElement(
+          Pressable,
+          {
+            testID: "popupDirections",
+            onPress: () => props.onGetDirections?.(props.building),
+          },
+          ReactActual.createElement(Text, null, "Directions"),
         ),
         ReactActual.createElement(
           Pressable,
@@ -220,6 +236,7 @@ jest.mock("react-native-maps", () => {
   };
 });
 
+//  Import AFTER mocks
 import CampusMap from "../CampusMap";
 
 import {
@@ -232,6 +249,7 @@ beforeEach(() => {
   mockAnimateToRegion.mockClear();
   mockGetDeviceLocation.mockClear();
   mockOnLocationFound = null;
+  (global as any).alert = jest.fn();
 });
 
 describe("CampusMap - initial region", () => {
@@ -364,6 +382,105 @@ describe("CampusMap - building selection + popup", () => {
         longitudeDelta: 0.0025,
       },
       600,
+    );
+  });
+
+  it("Directions from popup enters route mode, sets destination, auto-sets start (inside a building), and clears normal search UI", async () => {
+    const { getByTestId, queryByTestId, findByTestId } = render(<CampusMap />);
+
+    act(() => {
+      fireEvent.press(getByTestId("marker-45.458--73.64"));
+    });
+    expect(getByTestId("buildingPopup")).toBeTruthy();
+
+    // Device location inside SGW H polygon
+    // @ts-ignore
+    mockGetDeviceLocation.mockResolvedValueOnce({
+      latitude: 45.4975,
+      longitude: -73.579,
+    });
+
+    await act(async () => {
+      fireEvent.press(getByTestId("popupDirections"));
+    });
+
+    // Popup should be gone because route mode turns ON
+    expect(queryByTestId("buildingPopup")).toBeNull();
+
+    // Route UI should now be visible and prefilled
+    expect(await findByTestId("routePanel")).toBeTruthy();
+    expect(getByTestId("routeDestInput").props.value).toMatch(
+      /^AD - Administration Building/i,
+    );
+    expect(getByTestId("routeStartInput").props.value).toMatch(
+      /^H - Henry F\. Hall Building/i,
+    );
+  });
+
+  it("Directions from popup shows permission alert when auto-setting start fails with PERMISSION_DENIED", async () => {
+    const { getByTestId, findByTestId } = render(<CampusMap />);
+
+    act(() => {
+      fireEvent.press(getByTestId("marker-45.458--73.64"));
+    });
+
+    const {
+      LocationError,
+    } = require("@/components/campus/helper_methods/locationUtils");
+    mockGetDeviceLocation.mockRejectedValueOnce(
+      new LocationError("PERMISSION_DENIED"),
+    );
+
+    await act(async () => {
+      fireEvent.press(getByTestId("popupDirections"));
+    });
+
+    expect(await findByTestId("routePanel")).toBeTruthy();
+    expect((global as any).alert).toHaveBeenCalledWith(
+      expect.stringContaining("Location Permission Required"),
+    );
+  });
+
+  it("Directions from popup shows services off alert when auto-setting start fails with SERVICES_OFF", async () => {
+    const { getByTestId, findByTestId } = render(<CampusMap />);
+
+    act(() => {
+      fireEvent.press(getByTestId("marker-45.458--73.64"));
+    });
+
+    const {
+      LocationError,
+    } = require("@/components/campus/helper_methods/locationUtils");
+    mockGetDeviceLocation.mockRejectedValueOnce(
+      new LocationError("SERVICES_OFF"),
+    );
+
+    await act(async () => {
+      fireEvent.press(getByTestId("popupDirections"));
+    });
+
+    expect(await findByTestId("routePanel")).toBeTruthy();
+    expect((global as any).alert).toHaveBeenCalledWith(
+      expect.stringContaining("Location Services Off"),
+    );
+  });
+
+  it("Directions from popup shows generic location error alert on unknown error", async () => {
+    const { getByTestId, findByTestId } = render(<CampusMap />);
+
+    act(() => {
+      fireEvent.press(getByTestId("marker-45.458--73.64"));
+    });
+
+    mockGetDeviceLocation.mockRejectedValueOnce(new Error("boom"));
+
+    await act(async () => {
+      fireEvent.press(getByTestId("popupDirections"));
+    });
+
+    expect(await findByTestId("routePanel")).toBeTruthy();
+    expect((global as any).alert).toHaveBeenCalledWith(
+      expect.stringContaining("Location Error"),
     );
   });
 });
