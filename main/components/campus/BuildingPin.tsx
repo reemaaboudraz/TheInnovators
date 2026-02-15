@@ -8,17 +8,21 @@ import {
 } from "react-native";
 import type { Campus } from "@/components/Buildings/types";
 
-const SGW_PIN: ImageSourcePropType = require("@/assets/pins/pin_sgw.png");
-const LOY_PIN: ImageSourcePropType = require("@/assets/pins/pin_loyola.png");
+const SGW_PIN: ImageSourcePropType = require("@/assets/pins/pin_rm.png");
+const LOY_PIN: ImageSourcePropType = require("@/assets/pins/pin_rm.png");
 
 type Props = {
   code: string;
   campus: Campus;
   size?: number; // controls the whole pin size
+  /** When set, shown on the pin instead of code (e.g. building name for route pins). */
+  label?: string;
 };
 
-export default function BuildingPin({ code, campus, size = 44 }: Props) {
+export default function BuildingPin({ code, campus, size = 44, label }: Props) {
   const src = campus === "SGW" ? SGW_PIN : LOY_PIN;
+  const displayText = label ?? code;
+  const pinHeight = size * 1.50
 
   return (
     <View
@@ -26,24 +30,28 @@ export default function BuildingPin({ code, campus, size = 44 }: Props) {
         styles.wrap,
         {
           width: size,
-          height: size * 1.25, // ⬅️ taller pin = more breathing room
+          height: pinHeight,
         },
       ]}
     >
-      <Image source={src} style={styles.pin} />
+      <Image
+        source={src}
+        style={[styles.pin, { width: size, height: pinHeight }]}
+        resizeMode="contain"
+      />
 
       <View style={styles.textOverlay} pointerEvents="none">
         <Text
           style={[
             styles.code,
             {
-              fontSize: Math.round(size * 0.3), // ⬅️ slightly bigger text
+              fontSize: label ? Math.round(size * 0.22) : Math.round(size * 0.3),
             },
           ]}
-          numberOfLines={1}
+          numberOfLines={2}
           adjustsFontSizeToFit
         >
-          {code}
+          {displayText}
         </Text>
       </View>
     </View>

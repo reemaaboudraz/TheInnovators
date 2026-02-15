@@ -23,6 +23,7 @@ import { isPointInPolygon } from "@/components/campus/pointInPolygon";
 
 import BuildingShapesLayer from "@/components/campus/BuildingShapesLayer";
 import ToggleButton from "@/components/campus/ToggleButton";
+import BuildingPin from "@/components/campus/BuildingPin";
 import CurrentLocationButton, {
   UserLocation,
 } from "@/components/campus/CurrentLocationButton";
@@ -326,6 +327,42 @@ export default function CampusMap() {
             </View>
           </Marker>
         )}
+
+        {nav.routeStart && (
+          // Start and destination pins (route mode) - building name on pin, size fixed for visibility
+          <Marker
+            testID="startPin"
+            coordinate={{
+              latitude: nav.routeStart.latitude,
+              longitude: nav.routeStart.longitude,
+            }}
+            anchor={{ x: 0.5, y: 1 }}
+            tracksViewChanges={false}
+          >
+            <BuildingPin
+              code={nav.routeStart.code}
+              campus={nav.routeStart.campus}
+              size={48}
+            />
+          </Marker>
+        )}
+        {nav.routeDest && (
+          <Marker
+            testID="destinationPin"
+            coordinate={{
+              latitude: nav.routeDest.latitude,
+              longitude: nav.routeDest.longitude,
+            }}
+            anchor={{ x: 0.5, y: 1 }}
+            tracksViewChanges={false}
+          >
+            <BuildingPin
+              code={nav.routeDest.code}
+              campus={nav.routeDest.campus}
+              size={48}
+            />
+          </Marker>
+        )}
       </MapView>
 
       {/* TOP OVERLAY */}
@@ -462,13 +499,21 @@ export default function CampusMap() {
         <RoutePlanner
           isRouteMode={nav.isRouteMode}
           onToggle={() => {
+            if (nav.isRouteMode) {
+              // if condition is true, then clear the route start and destination
+              nav.setRouteStart(null);
+              nav.setRouteDest(null);
+              nav.setRouteError(null);
+              setStartText("");
+              setDestText("");
+              setQuery("");
+            }
+
             nav.toggleRouteMode();
             setSelected(null);
             setPopupIndex(-1);
 
-            if (nav.isRouteMode) {
-              setQuery("");
-            } else {
+            if (!nav.isRouteMode) {
               focusRouteField("destination");
             }
           }}

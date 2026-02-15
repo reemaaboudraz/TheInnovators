@@ -18,7 +18,7 @@ describe("BuildingPin", () => {
 
     expect(flat).toMatchObject({
       width: 44,
-      height: 55, // height = size * 1.25
+      height: 44 * 1.5, // height = size * 1.5
     });
   });
 
@@ -34,7 +34,7 @@ describe("BuildingPin", () => {
 
     expect(flat).toMatchObject({
       width: 60,
-      height: 75, // 60 * 1.25
+      height: 60 * 1.5, // size * 1.5
     });
   });
 });
