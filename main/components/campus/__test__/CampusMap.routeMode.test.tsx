@@ -281,4 +281,34 @@ describe("CampusMap - Route mode integration", () => {
     expect(getByTestId("routeStartInput").props.value).toBe(destBefore);
     expect(getByTestId("routeDestInput").props.value).toBe(startBefore);
   });
+
+  it("turning off route mode while in route mode clears start and destination", async () => {
+    const { getByTestId, queryByTestId, findByText } = render(<CampusMap />);
+
+    fireEvent.press(getByTestId("routeModeButton"));
+    expect(getByTestId("routePanel")).toBeTruthy();
+
+    fireEvent.changeText(getByTestId("routeStartInput"), "hall");
+    await findByText(/H — Henry F\. Hall Building/i);
+    fireEvent.press(getByTestId(SGW_H));
+
+    fireEvent.changeText(getByTestId("routeDestInput"), "admin");
+    await findByText(/AD — Administration Building/i);
+    fireEvent.press(getByTestId(LOY_AD));
+
+    expect(getByTestId("routeStartInput").props.value).toMatch(
+      /^H - Henry F\. Hall Building/i,
+    );
+    expect(getByTestId("routeDestInput").props.value).toMatch(
+      /^AD - Administration Building/i,
+    );
+
+    fireEvent.press(getByTestId("routeModeButton"));
+    expect(queryByTestId("routePanel")).toBeNull();
+
+    fireEvent.press(getByTestId("routeModeButton"));
+    expect(getByTestId("routePanel")).toBeTruthy();
+    expect(getByTestId("routeStartInput").props.value).toBe("");
+    expect(getByTestId("routeDestInput").props.value).toBe("");
+  });
 });
