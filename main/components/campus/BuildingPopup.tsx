@@ -23,6 +23,7 @@ type Props = {
   campusTheme: Campus;
   onClose: () => void;
   onSheetChange?: (index: number) => void;
+  onGetDirections: (destination: Building) => void;
 };
 
 export default function BuildingPopup({
@@ -30,6 +31,7 @@ export default function BuildingPopup({
   campusTheme,
   onClose,
   onSheetChange,
+  onGetDirections,
 }: Readonly<Props>) {
   const sheetRef = useRef<BottomSheet>(null);
 
@@ -176,12 +178,12 @@ export default function BuildingPopup({
             </Text>
 
             <Pressable
-              onPress={() => {}}
+              onPress={() => onGetDirections(building)}
               style={[styles.directionsBtn, { borderColor: theme.cardBorder }]}
               testID="directionsButton"
             >
               <Text style={[styles.directionsText, { color: theme.brand }]}>
-                Directions
+                Get Directions
               </Text>
             </Pressable>
           </View>

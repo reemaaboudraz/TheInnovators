@@ -41,6 +41,7 @@ export const BUILDING_IMAGES: Record<string, any> = {
   JR: require("../../../assets/buildings/JR_Building.jpg"),
   LS: require("../../../assets/buildings/LS_Building.jpg"),
   MU: require("../../../assets/buildings/MU_Annex.jpg"),
+  PT: require("../../../assets/buildings/PT_Building.jpg"),
   PY: require("../../../assets/buildings/PY_Building.jpg"),
   QA: require("../../../assets/buildings/QA.jpg"),
   SB: require("../../../assets/buildings/SB_Building.jpg"),
