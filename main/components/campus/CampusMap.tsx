@@ -6,7 +6,6 @@ import {
   Pressable,
   Platform,
   StyleSheet,
-  Image,
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 import {

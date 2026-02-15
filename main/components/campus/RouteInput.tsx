@@ -75,8 +75,8 @@ export default function RouteInput({
 
             {startValue.length > 0 && (
               <Pressable
-                onPress={(e) => {
-                  e.stopPropagation?.();
+                onPress={(e?: any) => {
+                  e?.stopPropagation?.();
                   onClearStart();
                 }}
                 hitSlop={8}
@@ -115,8 +115,8 @@ export default function RouteInput({
 
             {destValue.length > 0 && (
               <Pressable
-                onPress={(e) => {
-                  e.stopPropagation?.();
+                onPress={(e?: any) => {
+                  e?.stopPropagation?.();
                   onClearDestination();
                 }}
                 hitSlop={8}

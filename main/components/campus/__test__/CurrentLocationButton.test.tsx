@@ -7,8 +7,15 @@ import { Alert } from "react-native";
 const mockRequestForegroundPermissionsAsync = jest.fn();
 const mockGetCurrentPositionAsync = jest.fn();
 const mockGetLastKnownPositionAsync = jest.fn();
+const mockHasServicesEnabledAsync = jest.fn();
+
+// Silence async icon internal setState warnings
+jest.mock("@expo/vector-icons", () => ({
+  MaterialIcons: () => null,
+}));
 
 jest.mock("expo-location", () => ({
+  hasServicesEnabledAsync: () => mockHasServicesEnabledAsync(),
   requestForegroundPermissionsAsync: () =>
     mockRequestForegroundPermissionsAsync(),
   getCurrentPositionAsync: () => mockGetCurrentPositionAsync(),
@@ -20,13 +27,14 @@ jest.mock("expo-location", () => ({
 }));
 
 // Mock Alert
-jest.spyOn(Alert, "alert");
+jest.spyOn(Alert as any, "alert").mockImplementation(() => {});
 
 // Import AFTER mocks
 import CurrentLocationButton from "../CurrentLocationButton";
 
 beforeEach(() => {
   jest.clearAllMocks();
+  (mockHasServicesEnabledAsync as any).mockResolvedValue(true);
 });
 
 describe("CurrentLocationButton", () => {
@@ -155,7 +163,7 @@ describe("CurrentLocationButton", () => {
     // @ts-ignore
     mockGetLastKnownPositionAsync.mockResolvedValueOnce(null);
     // @ts-ignore
-    mockGetCurrentPositionAsync.mockRejectedValueOnce(
+    (mockGetCurrentPositionAsync as any).mockRejectedValueOnce(
       new Error("Location error"),
     );
 
@@ -185,28 +193,25 @@ describe("CurrentLocationButton", () => {
     });
 
     mockRequestForegroundPermissionsAsync.mockReturnValueOnce(
-      permissionPromise,
+      permissionPromise as any,
     );
 
     const { getByTestId } = render(
       <CurrentLocationButton onLocationFound={jest.fn()} />,
     );
 
-    // before press: not busy
     expect(
       getByTestId("currentLocationButton").props.accessibilityState,
     ).toEqual({ busy: false });
 
     fireEvent.press(getByTestId("currentLocationButton"));
 
-    // after press: busy
     await waitFor(() => {
       expect(
         getByTestId("currentLocationButton").props.accessibilityState,
       ).toEqual({ busy: true });
     });
 
-    // resolve to let the component proceed and finish
     resolvePermission({ status: "denied" });
 
     await waitFor(() => {
