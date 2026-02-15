@@ -1,5 +1,6 @@
 import React from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 
 type Props = {
   isRouteMode: boolean;
@@ -19,7 +20,13 @@ export default function RoutePlanner({
       accessibilityRole="button"
       accessibilityLabel="Toggle route mode"
     >
-      <Text style={s.arrow}>↱</Text>
+      <MaterialIcons
+        testID="routeModeArrowIcon"
+        name="arrow-forward"
+        size={35}
+        color="#B46BFF"
+        style={{ transform: [{ rotate: "-45deg" }] }}
+      />
     </Pressable>
   );
 }
@@ -39,15 +46,14 @@ const s = StyleSheet.create({
     elevation: 6,
   },
   on: {
-    backgroundColor: "#912338",
+    backgroundColor: "rgba(255,255,255)",
+    borderColor: "#ffffff",
+    borderWidth: 1.5,
   },
+
   off: {
-    backgroundColor: "#912338",
-  },
-  arrow: {
-    color: "white",
-    fontSize: 20,
-    transform: [{ rotate: "-45deg" }],
-    fontWeight: "800",
+    backgroundColor: "rgba(255,255,255)",
+    borderColor: "#ffffff",
+    borderWidth: 1.5,
   },
 });

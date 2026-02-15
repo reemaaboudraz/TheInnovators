@@ -512,7 +512,7 @@ const floatingStyles = StyleSheet.create({
     position: "absolute",
     right: 16,
     // bottom is now dynamic via inline style
-    gap: 12,
+    gap: 30,
     alignItems: "center",
     zIndex: 999,
     elevation: 999,

@@ -22,11 +22,13 @@ describe("RoutePlanner", () => {
     expect(onToggle).toHaveBeenCalledTimes(1);
   });
 
-  it("renders the arrow icon", () => {
-    const { getByText } = render(
-      <RoutePlanner isRouteMode={false} onToggle={jest.fn()} />,
+  it("calls onToggle when pressed", () => {
+    const onToggle = jest.fn();
+    const { getByTestId } = render(
+      <RoutePlanner isRouteMode={false} onToggle={onToggle} />,
     );
 
-    getByText("↱");
+    fireEvent.press(getByTestId("routeModeButton"));
+    expect(onToggle).toHaveBeenCalledTimes(1);
   });
 });

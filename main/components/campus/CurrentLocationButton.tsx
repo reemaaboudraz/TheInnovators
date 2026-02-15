@@ -83,7 +83,7 @@ export default function CurrentLocationButton({
       {status === "loading" ? (
         <ActivityIndicator size="small" color="#007AFF" />
       ) : (
-        <MaterialIcons name="my-location" size={24} color="#007AFF" />
+        <MaterialIcons name="near-me" size={26} color="#007AFF" />
       )}
     </Pressable>
   );
@@ -91,8 +91,8 @@ export default function CurrentLocationButton({
 
 const styles = StyleSheet.create({
   button: {
-    width: 48,
-    height: 48,
+    width: 50,
+    height: 50,
     borderRadius: 24,
     backgroundColor: "rgba(255,255,255,0.95)",
     alignItems: "center",

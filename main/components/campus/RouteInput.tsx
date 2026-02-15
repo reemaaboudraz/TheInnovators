@@ -199,7 +199,7 @@ const s = StyleSheet.create({
   },
 
   clearButton: {
-    marginLeft: 6,
+    marginLeft: "auto",
   },
 
   clearIcon: {
