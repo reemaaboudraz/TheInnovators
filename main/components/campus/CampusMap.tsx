@@ -240,7 +240,110 @@ export default function CampusMap() {
     );
   };
 
-  const focusRouteField = (field: "start" | "destination") => {
+    const makeUserLocationBuilding = (lat: number, lng: number): Building => ({
+        id: "USER_LOCATION",
+        campus: focusedCampus,
+        code: "",
+        name: "Your location",
+        address: "",
+        latitude: lat,
+        longitude: lng,
+        aliases: [],
+        polygon: [],
+        zoomCategory: 2,
+    });
+
+    const getFreshLocationOrThrow = async () => {
+        const servicesEnabled = await Location.hasServicesEnabledAsync();
+        if (!servicesEnabled) throw new Error("SERVICES_OFF");
+
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") throw new Error("PERMISSION_DENIED");
+
+        const last = await Location.getLastKnownPositionAsync();
+        if (last) {
+            return {
+                latitude: last.coords.latitude,
+                longitude: last.coords.longitude,
+            };
+        }
+
+        const pos = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Low,
+        });
+
+        return {
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+        };
+    };
+
+    const getBuildingContainingPoint = (lat: number, lng: number) => {
+        return ALL_BUILDINGS.find(
+            (b) =>
+                b.polygon?.length &&
+                isPointInPolygon({ latitude: lat, longitude: lng }, b.polygon),
+        );
+    };
+
+    const handleGetDirectionsFromPopup = async (destination: Building) => {
+        // 1) Enter route mode immediately (UX feels instant)
+        if (!nav.isRouteMode) nav.toggleRouteMode();
+
+        // 2) Set destination
+        nav.setRouteDest(destination);
+        setDestText(`${destination.code} - ${destination.name}`);
+
+        // 3) Try to auto-set start
+        try {
+            const loc = await getFreshLocationOrThrow();
+
+            const buildingInside = getBuildingContainingPoint(
+                loc.latitude,
+                loc.longitude,
+            );
+
+            const startBuilding = buildingInside
+                ? buildingInside
+                : makeUserLocationBuilding(loc.latitude, loc.longitude);
+
+            nav.setRouteStart(startBuilding);
+            setStartText(
+                startBuilding.id === "USER_LOCATION"
+                    ? "Your location"
+                    : `${startBuilding.code} - ${startBuilding.name}`,
+            );
+
+            // optional: focus map on start or destination (up to you)
+            // focusBuilding(destination);
+
+        } catch (e: any) {
+            // Don’t auto-set start on failures (matches acceptance criteria)
+            nav.setRouteStart(null);
+            setStartText("");
+
+            if (e?.message === "PERMISSION_DENIED") {
+                // keep it simple + clear
+                alert(
+                    "Location Permission Required\n\nEnable location permission to use your current location as the start point.",
+                );
+            } else if (e?.message === "SERVICES_OFF") {
+                alert(
+                    "Location Services Off\n\nPlease enable location services to use your current location.",
+                );
+            } else {
+                alert("Location Error\n\nUnable to get your current location. Try again.");
+            }
+        }
+
+        // 4) Close popup and clear normal search UI state
+        setSelected(null);
+        setPopupIndex(-1);
+        setQuery("");
+    };
+
+
+    const focusRouteField = (field: "start" | "destination") => {
     nav.setActiveField(field);
     setQuery(field === "start" ? startText : destText);
     nav.setRouteError(null);
@@ -524,15 +627,16 @@ export default function CampusMap() {
 
       {/* Popup only in normal mode */}
       {!nav.isRouteMode && selected && (
-        <BuildingPopup
-          building={selected}
-          campusTheme={focusedCampus}
-          onClose={() => {
-            setSelected(null);
-            setPopupIndex(-1);
-          }}
-          onSheetChange={(index: number) => setPopupIndex(index)}
-        />
+          <BuildingPopup
+              building={selected}
+              campusTheme={focusedCampus}
+              onClose={() => {
+                  setSelected(null);
+                  setPopupIndex(-1);
+              }}
+              onSheetChange={(index: number) => setPopupIndex(index)}
+              onGetDirections={handleGetDirectionsFromPopup}
+          />
       )}
 
       <BrandBar

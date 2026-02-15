@@ -33,7 +33,12 @@ export default function RouteInput({
   onClearDestination,
 }: Readonly<Props>) {
   // If a building is selected, show its label; otherwise show whatever user typed.
-  const startValue = start ? `${start.code} - ${start.name}` : startText;
+    const startValue =
+        start?.id === "USER_LOCATION"
+            ? "Your location"
+            : start
+                ? `${start.code} - ${start.name}`
+                : startText;
   const destValue = destination
     ? `${destination.code} - ${destination.name}`
     : destText;
