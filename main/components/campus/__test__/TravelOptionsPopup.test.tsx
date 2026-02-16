@@ -1,5 +1,4 @@
 import React from "react";
-import { View } from "react-native";
 import { render, fireEvent } from "@testing-library/react-native";
 import TravelOptionsPopup from "@/components/campus/TravelOptionsPopup";
 import type {
@@ -8,6 +7,9 @@ import type {
 } from "@/components/campus/helper_methods/googleDirections";
 
 jest.mock("@gorhom/bottom-sheet", () => {
+  const React = require("react");
+  const { View } = require("react-native");
+
   const MockBottomSheet = React.forwardRef((props: any, _ref: any) => (
     <View testID="mock-bottom-sheet">
       {props.handleComponent?.({} as any)}
@@ -27,6 +29,7 @@ jest.mock("@gorhom/bottom-sheet", () => {
     BottomSheetScrollView,
   };
 });
+
 
 function makeRoute(
   durationText: string,
