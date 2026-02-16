@@ -28,8 +28,6 @@ jest.mock("@gorhom/bottom-sheet", () => {
   };
 });
 
-
-
 function makeRoute(
   durationText: string,
   distanceText: string,

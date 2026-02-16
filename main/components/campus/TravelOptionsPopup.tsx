@@ -1,5 +1,11 @@
 import React, { useCallback, useMemo, useRef } from "react";
-import { Pressable, StyleSheet, Text, View , useWindowDimensions } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+} from "react-native";
 import BottomSheet, {
   BottomSheetScrollView,
   BottomSheetHandleProps,
