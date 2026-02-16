@@ -1,11 +1,17 @@
 import React, { useCallback, useMemo, useRef } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import BottomSheet, { BottomSheetScrollView, BottomSheetHandleProps } from "@gorhom/bottom-sheet";
+import BottomSheet, {
+  BottomSheetScrollView,
+  BottomSheetHandleProps,
+} from "@gorhom/bottom-sheet";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useWindowDimensions } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import type { DirectionRoute, TravelMode } from "@/components/campus/helper_methods/googleDirections";
+import type {
+  DirectionRoute,
+  TravelMode,
+} from "@/components/campus/helper_methods/googleDirections";
 
 type ModeData = {
   mode: TravelMode;
@@ -64,14 +70,18 @@ export default function TravelOptionsPopup({
 
   const expandSheet = useCallback(() => sheetRef.current?.snapToIndex(1), []);
   const closeSheet = useCallback(() => {
-     sheetRef.current?.close();
-     onClose(); // make state update immediate + testable
-    }, [onClose]);
+    sheetRef.current?.close();
+    onClose(); // make state update immediate + testable
+  }, [onClose]);
 
   const Handle = useCallback(
     (_props: BottomSheetHandleProps) => (
       <View style={s.handleWrap}>
-        <Pressable onPress={expandSheet} style={s.handleTapArea} testID="travelPopup-handle">
+        <Pressable
+          onPress={expandSheet}
+          style={s.handleTapArea}
+          testID="travelPopup-handle"
+        >
           <View style={s.handleIndicator} />
         </Pressable>
 
@@ -94,78 +104,80 @@ export default function TravelOptionsPopup({
   if (!visible) return null;
 
   return (
-  <BottomSheet
-    ref={sheetRef}
-    index={0}
-    snapPoints={snapPoints}
-    enablePanDownToClose
-    onClose={onClose}
-    handleComponent={Handle}
-    topInset={Math.max(0, insets.top - 6)}
-    backgroundStyle={[s.sheetBackground, { borderColor: theme.border }]}
-  >
-    <View style={s.header}>
-      <Text style={s.headerTitle}>Directions</Text>
-    </View>
+    <BottomSheet
+      ref={sheetRef}
+      index={0}
+      snapPoints={snapPoints}
+      enablePanDownToClose
+      onClose={onClose}
+      handleComponent={Handle}
+      topInset={Math.max(0, insets.top - 6)}
+      backgroundStyle={[s.sheetBackground, { borderColor: theme.border }]}
+    >
+      <View style={s.header}>
+        <Text style={s.headerTitle}>Directions</Text>
+      </View>
 
-    <View style={s.modeBar}>
-      {modes.map((m) => {
-        const fastest = m.routes[0];
-        const active = m.mode === selectedMode;
+      <View style={s.modeBar}>
+        {modes.map((m) => {
+          const fastest = m.routes[0];
+          const active = m.mode === selectedMode;
 
-        return (
-          <Pressable
-            key={m.mode}
-            onPress={() => onSelectMode(m.mode)}
-            style={[s.modeChip, active && s.modeChipActive]}
-            testID={`mode-${m.mode}`}
-          >
-            <MaterialIcons
-              name={iconForMode(m.mode) as any}
-              size={18}
-              color={active ? "#111" : "rgba(17,17,17,0.55)"}
-            />
-            <Text style={[s.modeChipTime, active && s.modeChipTimeActive]}>
-              {fastest?.durationText ?? "--"}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
-
-    <BottomSheetScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-      {routes.map((r, idx) => {
-        const active = idx === selectedRouteIndex;
-
-        return (
-          <Pressable
-            key={`${selectedMode}-${idx}`}
-            onPress={() => onSelectRouteIndex(idx)}
-            style={[s.routeCard, active && s.routeCardActive]}
-            testID={`route-${selectedMode}-${idx}`}
-          >
-            <View style={{ flex: 1 }}>
-              <Text style={s.routeBig}>{r.durationText}</Text>
-              <Text style={s.routeMeta}>{r.distanceText}</Text>
-              {!!r.summary && <Text style={s.routeSummary}>{r.summary}</Text>}
-            </View>
-
+          return (
             <Pressable
-              onPress={(e: any) => {
-                e?.stopPropagation?.();
-            }}
-              style={s.goBtn}
-              testID={`go-${selectedMode}-${idx}`}
+              key={m.mode}
+              onPress={() => onSelectMode(m.mode)}
+              style={[s.modeChip, active && s.modeChipActive]}
+              testID={`mode-${m.mode}`}
             >
-              <Text style={s.goText}>GO</Text>
+              <MaterialIcons
+                name={iconForMode(m.mode) as any}
+                size={18}
+                color={active ? "#111" : "rgba(17,17,17,0.55)"}
+              />
+              <Text style={[s.modeChipTime, active && s.modeChipTimeActive]}>
+                {fastest?.durationText ?? "--"}
+              </Text>
             </Pressable>
-          </Pressable>
-        );
-      })}
-    </BottomSheetScrollView>
-  </BottomSheet>
-);
+          );
+        })}
+      </View>
 
+      <BottomSheetScrollView
+        contentContainerStyle={s.content}
+        showsVerticalScrollIndicator={false}
+      >
+        {routes.map((r, idx) => {
+          const active = idx === selectedRouteIndex;
+
+          return (
+            <Pressable
+              key={`${selectedMode}-${idx}`}
+              onPress={() => onSelectRouteIndex(idx)}
+              style={[s.routeCard, active && s.routeCardActive]}
+              testID={`route-${selectedMode}-${idx}`}
+            >
+              <View style={{ flex: 1 }}>
+                <Text style={s.routeBig}>{r.durationText}</Text>
+                <Text style={s.routeMeta}>{r.distanceText}</Text>
+                {!!r.summary && <Text style={s.routeSummary}>{r.summary}</Text>}
+              </View>
+
+              <Pressable
+                onPress={(e: any) => {
+                  e?.stopPropagation?.();
+                }}
+                style={s.goBtn}
+                testID={`go-${selectedMode}-${idx}`}
+              >
+                <Text style={s.goText}>GO</Text>
+              </Pressable>
+            </Pressable>
+          );
+        })}
+      </BottomSheetScrollView>
+    </BottomSheet>
+  );
 }
 
 const s = StyleSheet.create({
@@ -175,34 +187,34 @@ const s = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.98)",
   },
   header: {
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "space-between",
-  paddingHorizontal: 18,
-  paddingTop: 8,
-  paddingBottom: 10,
-},
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 18,
+    paddingTop: 8,
+    paddingBottom: 10,
+  },
 
-headerTitle: {
-  fontSize: 20,
-  fontWeight: "700",
-  color: "#111",
-},
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#111",
+  },
 
-headerClose: {
-  width: 36,
-  height: 36,
-  borderRadius: 18,
-  backgroundColor: "rgba(0,0,0,0.05)",
-  alignItems: "center",
-  justifyContent: "center",
-},
+  headerClose: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "rgba(0,0,0,0.05)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 
-headerCloseText: {
-  fontSize: 18,
-  fontWeight: "700",
-  color: "#111",
-},
+  headerCloseText: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#111",
+  },
 
   handleWrap: {
     paddingTop: 6,
@@ -221,43 +233,43 @@ headerCloseText: {
   handleCloseText: { fontSize: 18, fontWeight: "700" },
 
   modeBar: {
-  marginHorizontal: 16,
-  marginBottom: 6,
-  padding: 6,
-  borderRadius: 22,
-  backgroundColor: "rgba(0,0,0,0.06)",
-  flexDirection: "row",
-  justifyContent: "space-between",
-},
+    marginHorizontal: 16,
+    marginBottom: 6,
+    padding: 6,
+    borderRadius: 22,
+    backgroundColor: "rgba(0,0,0,0.06)",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
 
-modeChip: {
-  flex: 1,
-  marginHorizontal: 4,
-  paddingVertical: 10,
-  borderRadius: 16,
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: 6,
-},
-modeChipActive: {
-  backgroundColor: "white",
-  borderRadius: 18,
-  shadowColor: "#000",
-  shadowOpacity: 0.08,
-  shadowRadius: 6,
-  shadowOffset: { width: 0, height: 2 },
-  elevation: 2,
-},
+  modeChip: {
+    flex: 1,
+    marginHorizontal: 4,
+    paddingVertical: 10,
+    borderRadius: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+  },
+  modeChipActive: {
+    backgroundColor: "white",
+    borderRadius: 18,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
 
-modeChipTime: {
-  fontSize: 13,
-  fontWeight: "800",
-  color: "rgba(17,17,17,0.55)",
-},
-modeChipTimeActive: {
-  color: "#111",
-},
+  modeChipTime: {
+    fontSize: 13,
+    fontWeight: "800",
+    color: "rgba(17,17,17,0.55)",
+  },
+  modeChipTimeActive: {
+    color: "#111",
+  },
 
   modeRow: {
     flexDirection: "row",
@@ -283,32 +295,32 @@ modeChipTimeActive: {
   content: { padding: 14, gap: 10, paddingBottom: 30 },
 
   routeCard: {
-  flexDirection: "row",
-  alignItems: "center",
-  borderRadius: 18,
-  padding: 14,
-  backgroundColor: "rgba(17,17,17,0.05)",
-},
-routeCardActive: {
-  backgroundColor: "rgba(17,17,17,0.08)",
-},
-routeBig: {
-  fontSize: 20,
-  fontWeight: "900",
-  color: "#111",
-},
-routeMeta: {
-  marginTop: 2,
-  fontSize: 13,
-  fontWeight: "700",
-  color: "rgba(17,17,17,0.55)",
-},
-routeSummary: {
-  marginTop: 2,
-  fontSize: 13,
-  fontWeight: "700",
-  color: "rgba(17,17,17,0.55)",
-},
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 18,
+    padding: 14,
+    backgroundColor: "rgba(17,17,17,0.05)",
+  },
+  routeCardActive: {
+    backgroundColor: "rgba(17,17,17,0.08)",
+  },
+  routeBig: {
+    fontSize: 20,
+    fontWeight: "900",
+    color: "#111",
+  },
+  routeMeta: {
+    marginTop: 2,
+    fontSize: 13,
+    fontWeight: "700",
+    color: "rgba(17,17,17,0.55)",
+  },
+  routeSummary: {
+    marginTop: 2,
+    fontSize: 13,
+    fontWeight: "700",
+    color: "rgba(17,17,17,0.55)",
+  },
 
   routeRow: {
     flexDirection: "row",
@@ -324,16 +336,15 @@ routeSummary: {
   routeSub: { fontSize: 12, color: "rgba(17,17,17,0.55)", marginTop: 2 },
 
   goBtn: {
-  marginLeft: 12,
-  backgroundColor: "#22C55E",
-  paddingHorizontal: 18,
-  paddingVertical: 10,
-  borderRadius: 14,
-},
+    marginLeft: 12,
+    backgroundColor: "#22C55E",
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 14,
+  },
   goText: {
-  color: "white",
-  fontWeight: "900",
-  fontSize: 16,
-},
-
-})
+    color: "white",
+    fontWeight: "900",
+    fontSize: 16,
+  },
+});

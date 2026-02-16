@@ -174,32 +174,29 @@ describe("googleDirections", () => {
     });
 
     it("throws when googleMapsApiKey is missing in expo config", async () => {
-  jest.resetModules();
+      jest.resetModules();
 
-  // Re-mock expo-constants for THIS isolated import
-  jest.doMock("expo-constants", () => ({
-    __esModule: true,
-    default: { expoConfig: { extra: {} } },
-  }));
+      // Re-mock expo-constants for THIS isolated import
+      jest.doMock("expo-constants", () => ({
+        __esModule: true,
+        default: { expoConfig: { extra: {} } },
+      }));
 
-  let fetchDirectionsFn: any;
+      let fetchDirectionsFn: any;
 
-  // Load the module fresh with the new mock
-  jest.isolateModules(() => {
-    const mod = require("@/components/campus/helper_methods/googleDirections");
-    fetchDirectionsFn = mod.fetchDirections;
+      // Load the module fresh with the new mock
+      jest.isolateModules(() => {
+        const mod = require("@/components/campus/helper_methods/googleDirections");
+        fetchDirectionsFn = mod.fetchDirections;
+      });
+
+      await expect(
+        fetchDirectionsFn({
+          origin: { latitude: 1, longitude: 2 },
+          destination: { latitude: 3, longitude: 4 },
+          mode: "walking",
+        }),
+      ).rejects.toThrow("Missing Google Maps API key");
+    });
   });
-
-  await expect(
-    fetchDirectionsFn({
-      origin: { latitude: 1, longitude: 2 },
-      destination: { latitude: 3, longitude: 4 },
-      mode: "walking",
-    }),
-  ).rejects.toThrow("Missing Google Maps API key");
-});
-
-  
-
-});
 });

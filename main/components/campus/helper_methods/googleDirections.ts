@@ -15,7 +15,10 @@ export type DirectionRoute = {
 
 function getGoogleMapsKey(): string {
   const key = (Constants.expoConfig?.extra as any)?.googleMapsApiKey;
-  if (!key) throw new Error("Missing Google Maps API key in expoConfig.extra.googleMapsApiKey");
+  if (!key)
+    throw new Error(
+      "Missing Google Maps API key in expoConfig.extra.googleMapsApiKey",
+    );
   return key;
 }
 
@@ -40,7 +43,7 @@ export function decodePolyline(encoded: string): LatLng[] {
       shift += 5;
     } while (b >= 0x20);
 
-    const dlat = (result & 1) ? ~(result >> 1) : result >> 1;
+    const dlat = result & 1 ? ~(result >> 1) : result >> 1;
     lat += dlat;
 
     shift = 0;
@@ -52,7 +55,7 @@ export function decodePolyline(encoded: string): LatLng[] {
       shift += 5;
     } while (b >= 0x20);
 
-    const dlng = (result & 1) ? ~(result >> 1) : result >> 1;
+    const dlng = result & 1 ? ~(result >> 1) : result >> 1;
     lng += dlng;
 
     coordinates.push({
@@ -91,7 +94,9 @@ export async function fetchDirections(params: {
 
   if (json.status !== "OK") {
     // e.g. ZERO_RESULTS, REQUEST_DENIED
-    throw new Error(`Directions API status: ${json.status} ${json.error_message ?? ""}`.trim());
+    throw new Error(
+      `Directions API status: ${json.status} ${json.error_message ?? ""}`.trim(),
+    );
   }
 
   const routes = (json.routes ?? []) as any[];
@@ -117,7 +122,9 @@ export async function fetchDirections(params: {
 /**
  * Returns the fastest route (shortest travel time) from a list.
  */
-export function pickFastestRoute(routes: DirectionRoute[]): DirectionRoute | null {
+export function pickFastestRoute(
+  routes: DirectionRoute[],
+): DirectionRoute | null {
   if (!routes.length) return null;
   return [...routes].sort((a, b) => a.durationSec - b.durationSec)[0];
 }
