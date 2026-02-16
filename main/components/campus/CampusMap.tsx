@@ -45,6 +45,7 @@ import {
 } from "@/components/campus/helper_methods/campusMap.buildings";
 import { computeFloatingBottom } from "@/components/campus/helper_methods/campusMap.ui";
 import type { Region } from "react-native-maps";
+import DirectionsLoadError from "../ui/DirectionLoadError";
 
 // Re-export for backwards compatibility with tests
 export {
@@ -99,6 +100,9 @@ export default function CampusMap() {
   const [startText, setStartText] = useState("");
   const [destText, setDestText] = useState("");
   const [popupIndex, setPopupIndex] = useState(-1);
+
+  const [directionsError, setDirectionsError] = useState<string | null>(null);
+  const [directionRetryTick, setDirectionsRetryTick] = useState(0);
 
   const mapRef = useRef<MapView>(null);
   const nav = useNavigation();
