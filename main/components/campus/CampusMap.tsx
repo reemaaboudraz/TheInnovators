@@ -100,6 +100,20 @@ function SuggestionsList({
   );
 }
 
+function sortRoutesByFastest(a: DirectionRoute, b: DirectionRoute) {
+  return a.durationSec - b.durationSec;
+}
+
+async function fetchAndSortRoutes(
+  origin: { latitude: number; longitude: number },
+  destination: { latitude: number; longitude: number },
+  mode: TravelMode,
+): Promise<readonly [TravelMode, DirectionRoute[]]> {
+  const routes = await fetchDirections({ origin, destination, mode });
+  const sorted = [...routes].sort(sortRoutesByFastest);
+  return [mode, sorted] as const;
+}
+
 export default function CampusMap() {
   const [focusedCampus, setFocusedCampus] = useState<Campus>("SGW");
 
@@ -228,15 +242,11 @@ export default function CampusMap() {
     async function loadAllModes() {
       try {
         const results = await Promise.all(
-          MODES.map(async (mode) => {
-            const routes = await fetchDirections({ origin, destination, mode });
-            // sort by fastest (shortest travel time) = highlighted by default
-            const sorted = [...routes].sort(
-              (a, b) => a.durationSec - b.durationSec,
-            );
-            return [mode, sorted] as const;
-          }),
+          MODES.map((mode) =>
+          fetchAndSortRoutes(origin, destination, mode),
+          ),
         );
+
 
         if (cancelled) return;
 
