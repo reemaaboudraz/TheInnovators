@@ -242,11 +242,8 @@ export default function CampusMap() {
     async function loadAllModes() {
       try {
         const results = await Promise.all(
-          MODES.map((mode) =>
-          fetchAndSortRoutes(origin, destination, mode),
-          ),
+          MODES.map((mode) => fetchAndSortRoutes(origin, destination, mode)),
         );
-
 
         if (cancelled) return;
 
