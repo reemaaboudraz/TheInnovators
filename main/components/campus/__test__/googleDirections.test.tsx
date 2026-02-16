@@ -1,5 +1,11 @@
 import type { DirectionRoute } from "@/components/campus/helper_methods/googleDirections";
 
+import {
+  decodePolyline,
+  fetchDirections,
+  pickFastestRoute,
+} from "@/components/campus/helper_methods/googleDirections";
+
 // Default mock: expo-constants has a valid key
 jest.mock("expo-constants", () => ({
   __esModule: true,
@@ -11,12 +17,6 @@ jest.mock("expo-constants", () => ({
     },
   },
 }));
-
-import {
-  decodePolyline,
-  fetchDirections,
-  pickFastestRoute,
-} from "@/components/campus/helper_methods/googleDirections";
 
 describe("googleDirections", () => {
   beforeEach(() => {

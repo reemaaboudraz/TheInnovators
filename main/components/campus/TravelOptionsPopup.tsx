@@ -1,11 +1,10 @@
 import React, { useCallback, useMemo, useRef } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View , useWindowDimensions } from "react-native";
 import BottomSheet, {
   BottomSheetScrollView,
   BottomSheetHandleProps,
 } from "@gorhom/bottom-sheet";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useWindowDimensions } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
 import type {
