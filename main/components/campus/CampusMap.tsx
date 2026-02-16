@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,7 @@ import {
   Platform,
   StyleSheet,
 } from "react-native";
-import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE, Marker, Polyline  } from "react-native-maps";
 import {
   getDeviceLocation,
   LocationError,
@@ -45,6 +45,15 @@ import {
 } from "@/components/campus/helper_methods/campusMap.buildings";
 import { computeFloatingBottom } from "@/components/campus/helper_methods/campusMap.ui";
 import type { Region } from "react-native-maps";
+import TravelOptionsPopup from "@/components/campus/TravelOptionsPopup";
+import {
+  decodePolyline,
+  fetchDirections,
+  pickFastestRoute,
+  type DirectionRoute,
+  type TravelMode,
+} from "@/components/campus/helper_methods/googleDirections";
+
 
 // Re-export for backwards compatibility with tests
 export {
@@ -105,6 +114,23 @@ export default function CampusMap() {
 
   // ✅ Track current map region (for label visibility logic in BuildingShapesLayer)
   const [region, setRegion] = useState<Region>(INITIAL_REGION);
+  
+  const MODES: TravelMode[] = ["driving", "transit", "walking", "bicycling"];
+
+  const [routesByMode, setRoutesByMode] = useState<Record<TravelMode, DirectionRoute[]>>({
+    driving: [],
+    transit: [],
+    walking: [],
+    bicycling: [],
+  });
+
+  const [selectedMode, setSelectedMode] = useState<TravelMode>("driving");
+  const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
+  const [travelPopupVisible, setTravelPopupVisible] = useState(false);
+  const [selectedRouteCoords, setSelectedRouteCoords] = useState<
+    { latitude: number; longitude: number }[]
+  >([]);
+
 
   // Auto fetch user location on mount
   useEffect(() => {
@@ -123,6 +149,7 @@ export default function CampusMap() {
       cancelled = true;
     };
   }, []);
+
 
   const ALL_BUILDINGS = useMemo(
     () => buildAllBuildings(SGW_BUILDINGS, LOYOLA_BUILDINGS),
@@ -176,6 +203,97 @@ export default function CampusMap() {
       );
     }).slice(0, 6);
   }, [query, ALL_BUILDINGS]);
+
+  useEffect(() => {
+    const start = nav.routeStart;
+    const dest = nav.routeDest;
+
+  // Only run in route mode and only when both points exist
+    if (!nav.isRouteMode || !start || !dest) {
+      setTravelPopupVisible(false);
+      setSelectedRouteCoords([]);
+    return;
+    }
+
+    let cancelled = false;
+
+    const origin = { latitude: start.latitude, longitude: start.longitude };
+    const destination = { latitude: dest.latitude, longitude: dest.longitude };
+
+    async function loadAllModes() {
+      try {
+        const results = await Promise.all(
+          MODES.map(async (mode) => {
+            const routes = await fetchDirections({ origin, destination, mode });
+          // sort by fastest (shortest travel time) = highlighted by default
+            const sorted = [...routes].sort((a, b) => a.durationSec - b.durationSec);
+            return [mode, sorted] as const;
+          }),
+        );
+
+        if (cancelled) return;
+
+        const next: Record<TravelMode, DirectionRoute[]> = {
+          driving: [],
+          transit: [],
+          walking: [],
+          bicycling: [],
+        };
+
+        for (const [mode, routes] of results) next[mode] = routes;
+
+        setRoutesByMode(next);
+
+      // Default mode selection: keep current mode if it has routes, else first that has routes
+        const bestMode =
+          next[selectedMode].length > 0
+            ? selectedMode
+            : (MODES.find((m) => next[m].length > 0) ?? "driving");
+
+        const fastest = pickFastestRoute(next[bestMode]);
+        const fastestIndex =
+          fastest ? next[bestMode].findIndex((r) => r.polyline === fastest.polyline) : 0;
+
+        setSelectedMode(bestMode);
+        setSelectedRouteIndex(Math.max(0, fastestIndex));
+        setTravelPopupVisible(true);
+
+        const chosen = next[bestMode][Math.max(0, fastestIndex)];
+        const coords = decodePolyline(chosen?.polyline ?? "");
+        setSelectedRouteCoords(coords);
+
+      // Fit map to route
+        if (coords.length >= 2) {
+          mapRef.current?.fitToCoordinates(coords, {
+            edgePadding: { top: 90, right: 70, bottom: 260, left: 70 },
+            animated: true,
+         });
+        }
+    } catch (e) {
+        if (!cancelled) {
+        // Don’t break existing UX; just hide travel popup if directions fail
+          setTravelPopupVisible(false);
+          setSelectedRouteCoords([]);
+        }
+      }
+    }
+
+  loadAllModes();
+
+  return () => {
+    cancelled = true;
+  };
+  // IMPORTANT: depend on IDs/coords to avoid infinite refetch
+  }, [
+    nav.isRouteMode,
+    nav.routeStart?.id,
+    nav.routeDest?.id,
+    nav.routeStart?.latitude,
+    nav.routeStart?.longitude,
+    nav.routeDest?.latitude,
+    nav.routeDest?.longitude,
+  ]);
+
 
   const focusBuilding = (b: Building) => {
     // keep your behavior
@@ -290,6 +408,29 @@ export default function CampusMap() {
     focusBuilding(b);
   };
 
+  const applySelection = useCallback(
+    (mode: TravelMode, routeIndex: number) => {
+      const routes = routesByMode[mode] ?? [];
+      const chosen = routes[routeIndex];
+      if (!chosen) return;
+
+      setSelectedMode(mode);
+      setSelectedRouteIndex(routeIndex);
+
+      const coords = decodePolyline(chosen.polyline);
+      setSelectedRouteCoords(coords);
+
+      if (coords.length >= 2) {
+        mapRef.current?.fitToCoordinates(coords, {
+          edgePadding: { top: 90, right: 70, bottom: 260, left: 70 },
+          animated: true,
+        });
+      }
+    },
+    [routesByMode],
+  );
+
+
   const floatingBottom = useMemo(
     () => computeFloatingBottom(!!selected, popupIndex),
     [selected, popupIndex],
@@ -342,6 +483,17 @@ export default function CampusMap() {
               <View style={locationMarkerStyles.marker} />
             </View>
           </Marker>
+        )}
+
+    
+        {selectedRouteCoords.length > 0 && (
+          <Polyline
+            key={`${selectedMode}-${selectedRouteIndex}`}
+            coordinates={selectedRouteCoords}
+            strokeWidth={7}
+            strokeColor="#0B57D0"
+            lineDashPattern={selectedMode === "walking" ? [10, 8] : undefined}
+          />
         )}
 
         {nav.routeStart && (
@@ -489,13 +641,22 @@ export default function CampusMap() {
                   setQuery("");
                   nav.setRouteError(null);
                   focusRouteField("start");
+
+                  setTravelPopupVisible(false);
+                  setSelectedRouteCoords([]);
+                  setRoutesByMode({ driving: [], transit: [], walking: [], bicycling: [] });
                 }}
+
                 onClearDestination={() => {
                   setDestText("");
                   nav.setRouteDest(null);
                   setQuery("");
                   nav.setRouteError(null);
                   focusRouteField("destination");
+
+                  setTravelPopupVisible(false);
+                  setSelectedRouteCoords([]);
+                  setRoutesByMode({ driving: [], transit: [], walking: [], bicycling: [] });
                 }}
               />
             </View>
@@ -558,6 +719,28 @@ export default function CampusMap() {
           onSheetChange={(index: number) => setPopupIndex(index)}
           onGetDirections={handleGetDirectionsFromPopup}
         />
+      )}
+      
+      {/* Travel options popup only in route mode */}
+      {nav.isRouteMode && ( 
+        <TravelOptionsPopup
+          campusTheme={focusedCampus}
+          visible={travelPopupVisible}
+          modes={[
+            { mode: "driving", routes: routesByMode.driving },
+            { mode: "transit", routes: routesByMode.transit },
+            { mode: "walking", routes: routesByMode.walking },
+            { mode: "bicycling", routes: routesByMode.bicycling },
+      ]}
+          selectedMode={selectedMode}
+          selectedRouteIndex={selectedRouteIndex}
+          onSelectMode={(mode) => {
+      // when switching mode, default to fastest = index 0 (since we sorted)
+          applySelection(mode, 0);
+          }}
+          onSelectRouteIndex={(index) => applySelection(selectedMode, index)}
+          onClose={() => setTravelPopupVisible(false)}
+    />
       )}
 
       <BrandBar

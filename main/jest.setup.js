@@ -2,6 +2,29 @@
 /* global jest */
 import "@testing-library/jest-native/extend-expect";
 
+// Fix: "No safe area value available"
+import mockSafeAreaContext from "react-native-safe-area-context/jest/mock";
+jest.mock("react-native-safe-area-context", () => mockSafeAreaContext);
+
+jest.mock("@gorhom/bottom-sheet", () => {
+  const React = require("react");
+  const { View, ScrollView } = require("react-native");
+
+  const BottomSheet = React.forwardRef(({ children }, ref) => (
+    <View ref={ref}>{children}</View>
+  ));
+
+  const BottomSheetScrollView = ({ children, ...props }) => (
+    <ScrollView {...props}>{children}</ScrollView>
+  );
+
+  return {
+    __esModule: true,
+    default: BottomSheet,
+    BottomSheetScrollView,
+  };
+});
+
 // Mock expo-router
 jest.mock("expo-router", () => ({
   router: {
