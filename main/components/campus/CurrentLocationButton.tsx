@@ -1,6 +1,11 @@
 import React, { useCallback, useState } from "react";
-import { Pressable, Text, Alert, StyleSheet } from "react-native";
-import * as Location from "expo-location";
+import { Pressable, Alert, StyleSheet, ActivityIndicator } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+
+import {
+  getDeviceLocation,
+  LocationError,
+} from "@/components/campus/helper_methods/locationUtils";
 
 export type LocationStatus = "idle" | "loading" | "granted" | "denied";
 
@@ -12,53 +17,52 @@ export interface UserLocation {
 interface CurrentLocationButtonProps {
   onLocationFound: (location: UserLocation) => void;
   onPermissionDenied?: () => void;
+  style?: any;
 }
 
 export default function CurrentLocationButton({
   onLocationFound,
   onPermissionDenied,
-}: CurrentLocationButtonProps) {
+  style,
+}: Readonly<CurrentLocationButtonProps>) {
   const [status, setStatus] = useState<LocationStatus>("idle");
 
   const handlePress = useCallback(async () => {
     setStatus("loading");
 
     try {
-      // Request permission
-      const { status: permissionStatus } =
-        await Location.requestForegroundPermissionsAsync();
-
-      if (permissionStatus !== "granted") {
-        setStatus("denied");
-        Alert.alert(
-          "Location Permission Required",
-          "Please enable location services in your device settings to use this feature.",
-          [{ text: "OK" }],
-        );
-        onPermissionDenied?.();
-        return;
-      }
+      const loc = await getDeviceLocation();
 
       setStatus("granted");
+      onLocationFound({
+        latitude: loc.latitude,
+        longitude: loc.longitude,
+      });
+    } catch (error: any) {
+      // Keep your status behavior consistent
+      if (error instanceof LocationError) {
+        if (error.code === "PERMISSION_DENIED") {
+          setStatus("denied");
+          Alert.alert(
+            "Location Permission Required",
+            "Please enable location services in your device settings to use this feature.",
+            [{ text: "OK" }],
+          );
+          onPermissionDenied?.();
+          return;
+        }
 
-      const last = await Location.getLastKnownPositionAsync();
-      if (last) {
-        onLocationFound({
-          latitude: last.coords.latitude,
-          longitude: last.coords.longitude,
-        });
-        return;
+        if (error.code === "SERVICES_OFF") {
+          setStatus("idle");
+          Alert.alert(
+            "Location Services Off",
+            "Please enable location services on your device to use this feature.",
+            [{ text: "OK" }],
+          );
+          return;
+        }
       }
 
-      const location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Low,
-      });
-
-      onLocationFound({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
-    } catch (error) {
       setStatus("idle");
       Alert.alert(
         "Location Error",
@@ -71,24 +75,25 @@ export default function CurrentLocationButton({
   return (
     <Pressable
       testID="currentLocationButton"
-      style={styles.button}
+      style={[styles.button, style]}
       onPress={handlePress}
       accessibilityRole="button"
       accessibilityLabel="Center map on current location"
       accessibilityState={{ busy: status === "loading" }}
     >
-      <Text style={styles.icon}>{status === "loading" ? "..." : "◎"}</Text>
+      {status === "loading" ? (
+        <ActivityIndicator size="small" color="#007AFF" />
+      ) : (
+        <MaterialIcons name="near-me" size={26} color="#007AFF" />
+      )}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    position: "absolute",
-    bottom: 100,
-    right: 14,
-    width: 48,
-    height: 48,
+    width: 50,
+    height: 50,
     borderRadius: 24,
     backgroundColor: "rgba(255,255,255,0.95)",
     alignItems: "center",
@@ -98,10 +103,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 4,
-  },
-  icon: {
-    fontSize: 24,
-    color: "#007AFF",
-    fontWeight: "600",
   },
 });

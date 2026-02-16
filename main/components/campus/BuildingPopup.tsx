@@ -22,12 +22,16 @@ type Props = {
   building: Building;
   campusTheme: Campus;
   onClose: () => void;
+  onSheetChange?: (index: number) => void;
+  onGetDirections: (destination: Building) => void;
 };
 
 export default function BuildingPopup({
   building,
   campusTheme,
   onClose,
+  onSheetChange,
+  onGetDirections,
 }: Readonly<Props>) {
   const sheetRef = useRef<BottomSheet>(null);
 
@@ -148,6 +152,7 @@ export default function BuildingPopup({
       snapPoints={snapPoints}
       enablePanDownToClose
       onClose={onClose}
+      onChange={(index) => onSheetChange?.(index)}
       handleComponent={Handle}
       topInset={insets.top - 6}
       backgroundStyle={[
@@ -157,7 +162,12 @@ export default function BuildingPopup({
     >
       <View style={styles.header}>
         <View style={styles.headerRow}>
-          <BuildingPin code={building.code} campus={campusTheme} size={46} />
+          <BuildingPin
+            code={building.code}
+            campus={campusTheme}
+            size={46}
+            variant="popup"
+          />
 
           <View style={styles.textBlock}>
             <Text style={styles.title} numberOfLines={1}>
@@ -168,12 +178,12 @@ export default function BuildingPopup({
             </Text>
 
             <Pressable
-              onPress={() => {}}
+              onPress={() => onGetDirections(building)}
               style={[styles.directionsBtn, { borderColor: theme.cardBorder }]}
               testID="directionsButton"
             >
               <Text style={[styles.directionsText, { color: theme.brand }]}>
-                Directions
+                Get Directions
               </Text>
             </Pressable>
           </View>

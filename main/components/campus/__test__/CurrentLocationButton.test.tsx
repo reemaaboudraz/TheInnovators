@@ -1,14 +1,21 @@
+/* eslint-disable import/first */
 import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
 import { Alert } from "react-native";
 
-// Mock expo-location
 const mockRequestForegroundPermissionsAsync = jest.fn();
 const mockGetCurrentPositionAsync = jest.fn();
 const mockGetLastKnownPositionAsync = jest.fn();
+const mockHasServicesEnabledAsync = jest.fn();
+
+// Silence async icon internal setState warnings
+jest.mock("@expo/vector-icons", () => ({
+  MaterialIcons: () => null,
+}));
 
 jest.mock("expo-location", () => ({
+  hasServicesEnabledAsync: () => mockHasServicesEnabledAsync(),
   requestForegroundPermissionsAsync: () =>
     mockRequestForegroundPermissionsAsync(),
   getCurrentPositionAsync: () => mockGetCurrentPositionAsync(),
@@ -20,162 +27,54 @@ jest.mock("expo-location", () => ({
 }));
 
 // Mock Alert
-jest.spyOn(Alert, "alert");
+jest.spyOn(Alert as any, "alert").mockImplementation(() => {});
 
+// Import AFTER mocks
 import CurrentLocationButton from "../CurrentLocationButton";
 
 beforeEach(() => {
   jest.clearAllMocks();
+  (mockHasServicesEnabledAsync as any).mockResolvedValue(true);
 });
 
 describe("CurrentLocationButton", () => {
   it("renders the location button", () => {
-    const onLocationFound = jest.fn();
     const { getByTestId } = render(
-      <CurrentLocationButton onLocationFound={onLocationFound} />,
+      <CurrentLocationButton onLocationFound={jest.fn()} />,
     );
 
     expect(getByTestId("currentLocationButton")).toBeTruthy();
   });
 
   it("requests location permission when pressed", async () => {
+    // @ts-ignore
     mockRequestForegroundPermissionsAsync.mockResolvedValueOnce({
       status: "granted",
     });
+    // @ts-ignore
+    mockGetLastKnownPositionAsync.mockResolvedValueOnce(null);
+    // @ts-ignore
     mockGetCurrentPositionAsync.mockResolvedValueOnce({
       coords: { latitude: 45.5, longitude: -73.6 },
     });
 
-    const onLocationFound = jest.fn();
     const { getByTestId } = render(
-      <CurrentLocationButton onLocationFound={onLocationFound} />,
+      <CurrentLocationButton onLocationFound={jest.fn()} />,
     );
 
     fireEvent.press(getByTestId("currentLocationButton"));
 
     await waitFor(() => {
-      expect(mockRequestForegroundPermissionsAsync).toHaveBeenCalled();
+      expect(mockRequestForegroundPermissionsAsync).toHaveBeenCalledTimes(1);
     });
   });
 
-  it("calls onLocationFound with coordinates when permission granted", async () => {
+  it("calls onLocationFound with last known position when available", async () => {
+    // @ts-ignore
     mockRequestForegroundPermissionsAsync.mockResolvedValueOnce({
       status: "granted",
     });
-    mockGetCurrentPositionAsync.mockResolvedValueOnce({
-      coords: { latitude: 45.5, longitude: -73.6 },
-    });
-
-    const onLocationFound = jest.fn();
-    const { getByTestId } = render(
-      <CurrentLocationButton onLocationFound={onLocationFound} />,
-    );
-
-    fireEvent.press(getByTestId("currentLocationButton"));
-
-    await waitFor(() => {
-      expect(onLocationFound).toHaveBeenCalledWith({
-        latitude: 45.5,
-        longitude: -73.6,
-      });
-    });
-  });
-
-  it("shows alert when permission denied", async () => {
-    mockRequestForegroundPermissionsAsync.mockResolvedValueOnce({
-      status: "denied",
-    });
-
-    const onLocationFound = jest.fn();
-    const onPermissionDenied = jest.fn();
-    const { getByTestId } = render(
-      <CurrentLocationButton
-        onLocationFound={onLocationFound}
-        onPermissionDenied={onPermissionDenied}
-      />,
-    );
-
-    fireEvent.press(getByTestId("currentLocationButton"));
-
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith(
-        "Location Permission Required",
-        "Please enable location services in your device settings to use this feature.",
-        [{ text: "OK" }],
-      );
-    });
-
-    expect(onPermissionDenied).toHaveBeenCalled();
-    expect(onLocationFound).not.toHaveBeenCalled();
-  });
-
-  it("shows alert when location fetch fails", async () => {
-    mockRequestForegroundPermissionsAsync.mockResolvedValueOnce({
-      status: "granted",
-    });
-    mockGetCurrentPositionAsync.mockRejectedValueOnce(
-      new Error("Location error"),
-    );
-
-    const onLocationFound = jest.fn();
-    const { getByTestId } = render(
-      <CurrentLocationButton onLocationFound={onLocationFound} />,
-    );
-
-    fireEvent.press(getByTestId("currentLocationButton"));
-
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith(
-        "Location Error",
-        "Unable to get your current location. Please try again.",
-        [{ text: "OK" }],
-      );
-    });
-
-    expect(onLocationFound).not.toHaveBeenCalled();
-  });
-
-  it("shows loading state while fetching location", async () => {
-    // Create a promise that we can control
-    let resolvePermission: (value: { status: string }) => void;
-    const permissionPromise = new Promise<{ status: string }>((resolve) => {
-      resolvePermission = resolve;
-    });
-
-    mockRequestForegroundPermissionsAsync.mockReturnValueOnce(
-      permissionPromise,
-    );
-
-    const onLocationFound = jest.fn();
-    const { getByTestId, getByText } = render(
-      <CurrentLocationButton onLocationFound={onLocationFound} />,
-    );
-
-    // Initially shows the location icon
-    expect(getByText("◎")).toBeTruthy();
-
-    // Press the button
-    fireEvent.press(getByTestId("currentLocationButton"));
-
-    // Should show loading state
-    await waitFor(() => {
-      expect(getByText("...")).toBeTruthy();
-    });
-
-    // Resolve the permission
-    resolvePermission!({ status: "denied" });
-
-    await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalled();
-    });
-  });
-});
-
-describe("CurrentLocationButton - last known position fallback", () => {
-  it("uses last known position when available", async () => {
-    mockRequestForegroundPermissionsAsync.mockResolvedValueOnce({
-      status: "granted",
-    });
+    // @ts-ignore
     mockGetLastKnownPositionAsync.mockResolvedValueOnce({
       coords: { latitude: 45.49, longitude: -73.58 },
     });
@@ -198,10 +97,13 @@ describe("CurrentLocationButton - last known position fallback", () => {
   });
 
   it("falls back to getCurrentPositionAsync when last known is null", async () => {
+    // @ts-ignore
     mockRequestForegroundPermissionsAsync.mockResolvedValueOnce({
       status: "granted",
     });
+    // @ts-ignore
     mockGetLastKnownPositionAsync.mockResolvedValueOnce(null);
+    // @ts-ignore
     mockGetCurrentPositionAsync.mockResolvedValueOnce({
       coords: { latitude: 45.5, longitude: -73.6 },
     });
@@ -214,21 +116,112 @@ describe("CurrentLocationButton - last known position fallback", () => {
     fireEvent.press(getByTestId("currentLocationButton"));
 
     await waitFor(() => {
-      expect(mockGetLastKnownPositionAsync).toHaveBeenCalled();
-      expect(mockGetCurrentPositionAsync).toHaveBeenCalled();
+      expect(mockGetLastKnownPositionAsync).toHaveBeenCalledTimes(1);
+      expect(mockGetCurrentPositionAsync).toHaveBeenCalledTimes(1);
       expect(onLocationFound).toHaveBeenCalledWith({
         latitude: 45.5,
         longitude: -73.6,
       });
     });
   });
-});
 
-describe("CurrentLocationButton - accessibility", () => {
-  it("has correct accessibility attributes", () => {
+  it("shows alert + calls onPermissionDenied when permission denied", async () => {
+    // @ts-ignore
+    mockRequestForegroundPermissionsAsync.mockResolvedValueOnce({
+      status: "denied",
+    });
+
+    const onLocationFound = jest.fn();
+    const onPermissionDenied = jest.fn();
+
+    const { getByTestId } = render(
+      <CurrentLocationButton
+        onLocationFound={onLocationFound}
+        onPermissionDenied={onPermissionDenied}
+      />,
+    );
+
+    fireEvent.press(getByTestId("currentLocationButton"));
+
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith(
+        "Location Permission Required",
+        "Please enable location services in your device settings to use this feature.",
+        [{ text: "OK" }],
+      );
+    });
+
+    expect(onPermissionDenied).toHaveBeenCalledTimes(1);
+    expect(onLocationFound).not.toHaveBeenCalled();
+  });
+
+  it("shows alert when location fetch fails", async () => {
+    // @ts-ignore
+    mockRequestForegroundPermissionsAsync.mockResolvedValueOnce({
+      status: "granted",
+    });
+    // @ts-ignore
+    mockGetLastKnownPositionAsync.mockResolvedValueOnce(null);
+    // @ts-ignore
+    (mockGetCurrentPositionAsync as any).mockRejectedValueOnce(
+      new Error("Location error"),
+    );
+
     const onLocationFound = jest.fn();
     const { getByTestId } = render(
       <CurrentLocationButton onLocationFound={onLocationFound} />,
+    );
+
+    fireEvent.press(getByTestId("currentLocationButton"));
+
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith(
+        "Location Error",
+        "Unable to get your current location. Please try again.",
+        [{ text: "OK" }],
+      );
+    });
+
+    expect(onLocationFound).not.toHaveBeenCalled();
+  });
+
+  it("sets accessibilityState.busy=true while fetching location", async () => {
+    let resolvePermission!: (value: { status: string }) => void;
+
+    const permissionPromise = new Promise<{ status: string }>((resolve) => {
+      resolvePermission = resolve;
+    });
+
+    mockRequestForegroundPermissionsAsync.mockReturnValueOnce(
+      permissionPromise as any,
+    );
+
+    const { getByTestId } = render(
+      <CurrentLocationButton onLocationFound={jest.fn()} />,
+    );
+
+    expect(
+      getByTestId("currentLocationButton").props.accessibilityState,
+    ).toEqual({ busy: false });
+
+    fireEvent.press(getByTestId("currentLocationButton"));
+
+    await waitFor(() => {
+      expect(
+        getByTestId("currentLocationButton").props.accessibilityState,
+      ).toEqual({ busy: true });
+    });
+
+    resolvePermission({ status: "denied" });
+
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalled();
+    });
+  });
+
+  it("has correct accessibility attributes", () => {
+    const { getByTestId } = render(
+      <CurrentLocationButton onLocationFound={jest.fn()} />,
     );
 
     const button = getByTestId("currentLocationButton");
