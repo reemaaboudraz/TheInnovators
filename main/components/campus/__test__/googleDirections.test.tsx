@@ -56,16 +56,8 @@ describe("googleDirections", () => {
       expect(pickFastestRoute([])).toBeNull();
     });
 
-    it("returns the route with the smallest durationSec", () => {
+    it("returns the first route when routes are pre-sorted by durationSec", () => {
       const routes: DirectionRoute[] = [
-        {
-          summary: "A",
-          polyline: "abc",
-          durationSec: 500,
-          durationText: "8 mins",
-          distanceMeters: 1200,
-          distanceText: "1.2 km",
-        },
         {
           summary: "B",
           polyline: "def",
@@ -73,6 +65,14 @@ describe("googleDirections", () => {
           durationText: "3 mins",
           distanceMeters: 900,
           distanceText: "0.9 km",
+        },
+        {
+          summary: "A",
+          polyline: "abc",
+          durationSec: 500,
+          durationText: "8 mins",
+          distanceMeters: 1200,
+          distanceText: "1.2 km",
         },
       ];
 

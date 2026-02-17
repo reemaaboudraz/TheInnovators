@@ -101,17 +101,13 @@ function SuggestionsList({
   );
 }
 
-function sortRoutesByFastest(a: DirectionRoute, b: DirectionRoute) {
-  return a.durationSec - b.durationSec;
-}
-
 async function fetchAndSortRoutes(
   origin: { latitude: number; longitude: number },
   destination: { latitude: number; longitude: number },
   mode: TravelMode,
 ): Promise<readonly [TravelMode, DirectionRoute[]]> {
   const routes = await fetchDirections({ origin, destination, mode });
-  const sorted = [...routes].sort(sortRoutesByFastest);
+  const sorted = [...routes].sort((a, b) => a.durationSec - b.durationSec);
   return [mode, sorted] as const;
 }
 
@@ -167,8 +163,19 @@ export default function CampusMap() {
   const mapRef = useRef<MapView>(null);
   const nav = useNavigation();
 
-  // ✅ Track current map region (for label visibility logic in BuildingShapesLayer)
   const [region, setRegion] = useState<Region>(INITIAL_REGION);
+
+  const routeStrokeWidth = useMemo(() => {
+    const d = region?.latitudeDelta ?? 0.1;
+
+    // Larger latitudeDelta = zoomed out -> thinner line
+    if (d > 0.6) return 2;
+    if (d > 0.3) return 3;
+    if (d > 0.15) return 4;
+    if (d > 0.08) return 5;
+    if (d > 0.04) return 6;
+    return 7; // zoomed in
+  }, [region?.latitudeDelta]);
 
   const MODES: TravelMode[] = ["driving", "transit", "walking", "bicycling"];
 
@@ -271,6 +278,18 @@ export default function CampusMap() {
     }
     
     setDirectionsError(null);
+
+    //clears out old routes
+
+    setTravelPopupVisible(false);
+    setSelectedRouteCoords([]);
+    setRoutesByMode({
+      driving: [],
+      transit: [],
+      walking: [],
+      bicycling: [],
+    });
+    setSelectedRouteIndex(0);
 
     let cancelled = false;
 
@@ -552,8 +571,8 @@ export default function CampusMap() {
           <Polyline
             key={`${selectedMode}-${selectedRouteIndex}`}
             coordinates={selectedRouteCoords}
-            strokeWidth={7}
-            strokeColor="#0B57D0"
+            strokeWidth={routeStrokeWidth}
+            strokeColor="#4286f5"
             lineDashPattern={selectedMode === "walking" ? [10, 8] : undefined}
           />
         )}
