@@ -115,6 +115,38 @@ async function fetchAndSortRoutes(
   return [mode, sorted] as const;
 }
 
+function toDirectionsErrorMessage(err: unknown): string{
+  const msg = err instanceof Error ? err.message : String(err);
+
+  if(msg.includes("Missing Google Maps API key")){
+    return "Google Maps API is missing. Please contact the team."
+  }
+
+  if(msg.includes("Directions HTTP")){
+    return "Direction service error. Please try again."
+  }
+
+  if(msg.includes("ZERO_RESULTS")){
+    return "No results found for this search. Please try another route or mode."
+  }
+
+  if(msg.includes("NOT_FOUND")){
+    return "Start or destination could not be found. Try selecting again"
+  }
+
+  if(msg.includes("UNKNOWN_ERROR")){
+    return "Direction service is currently unavailable. Please retry."
+  }
+
+  const lower = msg.toLowerCase();
+  if (lower.includes("network") || lower.includes("failed to fetch")) {
+    return "Network error. Check your connection and try again.";
+  }
+
+  return "Unable to load directions. Please try again.";
+  
+}
+
 export default function CampusMap() {
   const [focusedCampus, setFocusedCampus] = useState<Campus>("SGW");
 
@@ -237,6 +269,8 @@ export default function CampusMap() {
       setSelectedRouteCoords([]);
       return;
     }
+    
+    setDirectionsError(null);
 
     let cancelled = false;
 
@@ -261,6 +295,15 @@ export default function CampusMap() {
         for (const [mode, routes] of results) next[mode] = routes;
 
         setRoutesByMode(next);
+
+        const totalRoutes = MODES.reduce((sum, m) => sum + next[m].length,0);
+        if(totalRoutes === 0){
+          setTravelPopupVisible(false);
+          setSelectedRouteCoords([]);
+          setDirectionsError("No route found for this selection. Try another mode");
+          return;
+
+        }
 
         // Default mode selection: keep current mode if it has routes, else first that has routes
         const bestMode =
@@ -293,6 +336,8 @@ export default function CampusMap() {
           // Don’t break existing UX; just hide travel popup if directions fail
           setTravelPopupVisible(false);
           setSelectedRouteCoords([]);
+
+          setDirectionsError(toDirectionsErrorMessage(e));
         }
       }
     }
@@ -311,6 +356,7 @@ export default function CampusMap() {
     nav.routeStart?.longitude,
     nav.routeDest?.latitude,
     nav.routeDest?.longitude,
+    directionRetryTick,
   ]);
 
   const focusBuilding = (b: Building) => {
@@ -767,6 +813,17 @@ export default function CampusMap() {
           onClose={() => setTravelPopupVisible(false)}
         />
       )}
+
+      
+      <DirectionsLoadError
+        visible={!!directionsError}
+        message={directionsError ?? ""}
+        onRefresh={() => {
+          setDirectionsError(null);
+          setDirectionsRetryTick((x) => x + 1);
+        }}
+        accentColor={focusedCampus === "SGW" ? "#912338" : "#E0B100"}
+      />
 
       <BrandBar
         testID="brandbar"
