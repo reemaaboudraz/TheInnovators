@@ -126,5 +126,5 @@ export function pickFastestRoute(
   routes: DirectionRoute[],
 ): DirectionRoute | null {
   if (!routes.length) return null;
-  return [...routes].sort((a, b) => a.durationSec - b.durationSec)[0];
+  return routes[0];
 }
