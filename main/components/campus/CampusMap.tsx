@@ -7,20 +7,24 @@ import {
   Platform,
   StyleSheet,
 } from "react-native";
-import MapView, { PROVIDER_GOOGLE, Region, Marker } from "react-native-maps";
-import * as Location from "expo-location";
+import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
+import {
+  getDeviceLocation,
+  LocationError,
+} from "@/components/campus/helper_methods/locationUtils";
 import { StatusBar } from "expo-status-bar";
-
 import { SGW_BUILDINGS } from "@/components/Buildings/SGW/SGWBuildings";
 import { LOYOLA_BUILDINGS } from "@/components/Buildings/Loyola/LoyolaBuildings";
+import {
+  SGW_REGION,
+  LOY_REGION,
+  INITIAL_REGION,
+} from "@/components/campus/helper_methods/campusMap.constants";
 import type { Building, Campus } from "@/components/Buildings/types";
-
 import {
   regionFromPolygon,
   paddingForZoomCategory,
 } from "@/components/Buildings/mapZoom";
-import { isPointInPolygon } from "@/components/campus/pointInPolygon";
-
 import BuildingShapesLayer from "@/components/campus/BuildingShapesLayer";
 import ToggleButton from "@/components/campus/ToggleButton";
 import BuildingPin from "@/components/campus/BuildingPin";
@@ -28,35 +32,25 @@ import CurrentLocationButton, {
   UserLocation,
 } from "@/components/campus/CurrentLocationButton";
 import BuildingPopup from "@/components/campus/BuildingPopup";
-
 import BrandBar from "@/components/layout/BrandBar";
 import { styles } from "@/components/Styles/mapStyle";
-
 import { useNavigation } from "@/hooks/useNavigation";
 import RoutePlanner from "@/components/campus/RoutePlanner"; // diamond button only
 import RouteInput from "@/components/campus/RouteInput";
+import {
+  buildAllBuildings,
+  getUserLocationBuildingId,
+  getBuildingContainingPoint,
+  makeUserLocationBuilding,
+} from "@/components/campus/helper_methods/campusMap.buildings";
+import { computeFloatingBottom } from "@/components/campus/helper_methods/campusMap.ui";
+import type { Region } from "react-native-maps";
 
 // Re-export for backwards compatibility with tests
 export {
   calculatePanValue,
   determineCampusFromPan,
 } from "@/components/campus/ToggleButton";
-
-export const SGW_REGION: Region = {
-  latitude: 45.4973,
-  longitude: -73.5794,
-  latitudeDelta: 0.006,
-  longitudeDelta: 0.006,
-};
-
-export const LOY_REGION: Region = {
-  latitude: 45.457984,
-  longitude: -73.639834,
-  latitudeDelta: 0.006,
-  longitudeDelta: 0.006,
-};
-
-const INITIAL_REGION: Region = SGW_REGION;
 
 function SuggestionsList({
   suggestions,
@@ -97,20 +91,20 @@ export default function CampusMap() {
 
   // One query drives suggestions (KEEP THIS for tests)
   const [query, setQuery] = useState("");
-
   // Popup selection (normal mode)
   const [selected, setSelected] = useState<Building | null>(null);
-
   // User location
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
 
   const [startText, setStartText] = useState("");
   const [destText, setDestText] = useState("");
-
   const [popupIndex, setPopupIndex] = useState(-1);
 
   const mapRef = useRef<MapView>(null);
   const nav = useNavigation();
+
+  // ✅ Track current map region (for label visibility logic in BuildingShapesLayer)
+  const [region, setRegion] = useState<Region>(INITIAL_REGION);
 
   // Auto fetch user location on mount
   useEffect(() => {
@@ -118,28 +112,8 @@ export default function CampusMap() {
 
     (async () => {
       try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted" || cancelled) return;
-
-        const last = await Location.getLastKnownPositionAsync();
-        if (last && !cancelled) {
-          setUserLocation({
-            latitude: last.coords.latitude,
-            longitude: last.coords.longitude,
-          });
-          return;
-        }
-
-        const location = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Low,
-        });
-
-        if (!cancelled) {
-          setUserLocation({
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          });
-        }
+        const loc = await getDeviceLocation();
+        if (!cancelled) setUserLocation(loc);
       } catch {
         // ignore
       }
@@ -151,7 +125,7 @@ export default function CampusMap() {
   }, []);
 
   const ALL_BUILDINGS = useMemo(
-    () => [...SGW_BUILDINGS, ...LOYOLA_BUILDINGS],
+    () => buildAllBuildings(SGW_BUILDINGS, LOYOLA_BUILDINGS),
     [],
   );
 
@@ -173,28 +147,15 @@ export default function CampusMap() {
     setSelected(null);
     setPopupIndex(-1);
 
-    const region = campus === "SGW" ? SGW_REGION : LOY_REGION;
-    mapRef.current?.animateToRegion(region, 500);
+    const nextRegion = campus === "SGW" ? SGW_REGION : LOY_REGION;
+    mapRef.current?.animateToRegion(nextRegion, 500);
   };
 
   // Find which building user is inside
-  const userLocationBuildingId = useMemo(() => {
-    if (!userLocation) return null;
-
-    const building = ALL_BUILDINGS.find(
-      (b) =>
-        b.polygon?.length &&
-        isPointInPolygon(
-          {
-            latitude: userLocation.latitude,
-            longitude: userLocation.longitude,
-          },
-          b.polygon,
-        ),
-    );
-
-    return building?.id ?? null;
-  }, [userLocation, ALL_BUILDINGS]);
+  const userLocationBuildingId = useMemo(
+    () => getUserLocationBuildingId(ALL_BUILDINGS, userLocation),
+    [ALL_BUILDINGS, userLocation],
+  );
 
   // KEEP your existing suggestion memo (query-driven)
   const suggestions = useMemo(() => {
@@ -224,8 +185,8 @@ export default function CampusMap() {
     if (b.polygon?.length) {
       const z = b.zoomCategory ?? 2;
       const padding = paddingForZoomCategory(z);
-      const region = regionFromPolygon(b.polygon, padding);
-      mapRef.current?.animateToRegion(region, 600);
+      const r = regionFromPolygon(b.polygon, padding);
+      mapRef.current?.animateToRegion(r, 600);
       return;
     }
 
@@ -238,6 +199,65 @@ export default function CampusMap() {
       },
       600,
     );
+  };
+
+  const handleGetDirectionsFromPopup = async (destination: Building) => {
+    // 1) Enter route mode immediately (UX feels instant)
+    if (!nav.isRouteMode) nav.toggleRouteMode();
+
+    // 2) Set destination
+    nav.setRouteDest(destination);
+    setDestText(`${destination.code} - ${destination.name}`);
+
+    // 3) Try to auto-set start
+    try {
+      const loc = await getDeviceLocation();
+
+      const buildingInside = getBuildingContainingPoint(
+        ALL_BUILDINGS,
+        loc.latitude,
+        loc.longitude,
+      );
+
+      const startBuilding =
+        buildingInside ??
+        makeUserLocationBuilding(loc.latitude, loc.longitude, focusedCampus);
+
+      nav.setRouteStart(startBuilding);
+      setStartText(
+        startBuilding.id === "USER_LOCATION"
+          ? "Your location"
+          : `${startBuilding.code} - ${startBuilding.name}`,
+      );
+    } catch (e: any) {
+      nav.setRouteStart(null);
+      setStartText("");
+
+      if (e instanceof LocationError) {
+        if (e.code === "PERMISSION_DENIED") {
+          alert(
+            "Location Permission Required\n\nEnable location permission to use your current location as the start point.",
+          );
+          return;
+        }
+
+        if (e.code === "SERVICES_OFF") {
+          alert(
+            "Location Services Off\n\nPlease enable location services to use your current location.",
+          );
+          return;
+        }
+      }
+
+      alert(
+        "Location Error\n\nUnable to get your current location. Try again.",
+      );
+    }
+
+    // 4) Close popup and clear normal search UI state
+    setSelected(null);
+    setPopupIndex(-1);
+    setQuery("");
   };
 
   const focusRouteField = (field: "start" | "destination") => {
@@ -269,19 +289,11 @@ export default function CampusMap() {
     setSelected(b);
     focusBuilding(b);
   };
-  const floatingBottom = useMemo(() => {
-    // base position when popup is closed
-    const base = 120;
 
-    // if popup isn't shown
-    if (!selected || popupIndex === -1) return base;
-
-    // snap 0 (usually "collapsed" / peek)
-    if (popupIndex === 0) return 280;
-
-    // snap 1+ (expanded)
-    return 440;
-  }, [selected, popupIndex]);
+  const floatingBottom = useMemo(
+    () => computeFloatingBottom(!!selected, popupIndex),
+    [selected, popupIndex],
+  );
 
   return (
     <View style={styles.container} testID="campusMap-root">
@@ -298,6 +310,9 @@ export default function CampusMap() {
         showsCompass={false}
         toolbarEnabled={false}
         rotateEnabled={false}
+        onRegionChangeComplete={(r) => {
+          if (r?.latitude != null && r?.longitude != null) setRegion(r);
+        }}
         onPress={() => {
           // Only clear popup in normal mode
           if (!nav.isRouteMode && selected) {
@@ -311,6 +326,7 @@ export default function CampusMap() {
           selectedBuildingId={selected?.id ?? null}
           userLocationBuildingId={userLocationBuildingId}
           onPickBuilding={handlePickBuilding}
+          region={region}
         />
 
         {userLocation && !userLocationBuildingId && (
@@ -347,6 +363,7 @@ export default function CampusMap() {
             />
           </Marker>
         )}
+
         {nav.routeDest && (
           <Marker
             testID="destinationPin"
@@ -501,23 +518,30 @@ export default function CampusMap() {
         <RoutePlanner
           isRouteMode={nav.isRouteMode}
           onToggle={() => {
-            if (nav.isRouteMode) {
-              // if condition is true, then clear the route start and destination
-              nav.setRouteStart(null);
-              nav.setRouteDest(null);
-              nav.setRouteError(null);
-              setStartText("");
-              setDestText("");
-              setQuery("");
-            }
+            const nextMode = !nav.isRouteMode;
 
-            nav.toggleRouteMode();
+            // Always close popup UI when switching modes
             setSelected(null);
             setPopupIndex(-1);
 
-            if (!nav.isRouteMode) {
-              focusRouteField("destination");
+            if (nextMode) {
+              // entering route mode
+              nav.toggleRouteMode();
+              nav.setActiveField("destination");
+              setQuery(destText); // keep your behavior (destination focused)
+              nav.setRouteError(null);
+              return;
             }
+
+            // leaving route mode: clear route state BEFORE leaving UI
+            nav.setRouteStart(null);
+            nav.setRouteDest(null);
+            nav.setRouteError(null);
+            setStartText("");
+            setDestText("");
+            setQuery("");
+
+            nav.toggleRouteMode();
           }}
         />
       </View>
@@ -532,6 +556,7 @@ export default function CampusMap() {
             setPopupIndex(-1);
           }}
           onSheetChange={(index: number) => setPopupIndex(index)}
+          onGetDirections={handleGetDirectionsFromPopup}
         />
       )}
 

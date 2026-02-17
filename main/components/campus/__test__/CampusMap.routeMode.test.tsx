@@ -282,6 +282,40 @@ describe("CampusMap - Route mode integration", () => {
     expect(getByTestId("routeDestInput").props.value).toBe(startBefore);
   });
 
+  it("clear buttons reset start/destination and hide their clear buttons", async () => {
+    const { getByTestId, queryByTestId, findByText } = render(<CampusMap />);
+
+    fireEvent.press(getByTestId("routeModeButton"));
+
+    // Set START
+    fireEvent.changeText(getByTestId("routeStartInput"), "hall");
+    await findByText(/H — Henry F\. Hall Building/i);
+    fireEvent.press(getByTestId(SGW_H));
+    expect(getByTestId("routeStartInput").props.value).toMatch(
+      /^H - Henry F\. Hall Building/i,
+    );
+    expect(getByTestId("clearStart")).toBeTruthy();
+
+    // Set DESTINATION
+    fireEvent.changeText(getByTestId("routeDestInput"), "admin");
+    await findByText(/AD — Administration Building/i);
+    fireEvent.press(getByTestId(LOY_AD));
+    expect(getByTestId("routeDestInput").props.value).toMatch(
+      /^AD - Administration Building/i,
+    );
+    expect(getByTestId("clearDestination")).toBeTruthy();
+
+    // Clear START
+    fireEvent.press(getByTestId("clearStart"));
+    expect(getByTestId("routeStartInput").props.value).toBe("");
+    expect(queryByTestId("clearStart")).toBeNull();
+
+    // Clear DESTINATION
+    fireEvent.press(getByTestId("clearDestination"));
+    expect(getByTestId("routeDestInput").props.value).toBe("");
+    expect(queryByTestId("clearDestination")).toBeNull();
+  });
+
   it("turning off route mode while in route mode clears start and destination", async () => {
     const { getByTestId, queryByTestId, findByText } = render(<CampusMap />);
 

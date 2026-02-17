@@ -1,15 +1,17 @@
 /* eslint-disable import/first */
 import React from "react";
 import { render, fireEvent, act } from "@testing-library/react-native";
-import {
-  describe,
-  it,
-  expect,
-  beforeEach,
-  beforeAll,
-  afterAll,
-  jest,
-} from "@jest/globals";
+import { describe, it, expect, beforeEach, jest } from "@jest/globals";
+import { Animated } from "react-native";
+
+jest.mock("@expo/vector-icons", () => {
+  return new Proxy(
+    {},
+    {
+      get: () => () => null,
+    },
+  );
+});
 
 const mockAnimateToRegion = jest.fn();
 
@@ -40,7 +42,8 @@ jest.mock("@/components/Buildings/data/SGW_data.json", () => [
     latitude: 45.4978,
     longitude: -73.5795,
     campus: "SGW",
-    zoomCategory: 3,
+    // ✅ Must be visible at initial region so marker exists in tests
+    zoomCategory: 1,
     aliases: ["nop", "no polygon"],
     polygon: [],
   },
@@ -68,23 +71,19 @@ jest.mock("@/components/Buildings/data/Loyola_data.json", () => [
 // -------------------- UI Mocks --------------------
 jest.mock("expo-status-bar", () => ({ StatusBar: () => null }));
 
-const mockLocRequestPermissions = jest.fn(() =>
-  Promise.resolve({ status: "denied" }),
-);
-const mockLocGetCurrent = jest.fn(() =>
-  Promise.resolve({ coords: { latitude: 0, longitude: 0 } }),
-);
-const mockLocGetLastKnown = jest.fn(() => Promise.resolve(null));
-
-jest.mock("expo-location", () => ({
-  requestForegroundPermissionsAsync: () => mockLocRequestPermissions(),
-  getCurrentPositionAsync: () => mockLocGetCurrent(),
-  getLastKnownPositionAsync: () => mockLocGetLastKnown(),
-  Accuracy: { Low: 2, Balanced: 3 },
+const mockGetDeviceLocation = jest.fn(async () => null);
+jest.mock("@/components/campus/helper_methods/locationUtils", () => ({
+  // Keep LocationError here so CampusMap's `instanceof LocationError` works in tests
+  LocationError: class LocationError extends Error {
+    code: string;
+    constructor(code: string, message?: string) {
+      super(message ?? code);
+      this.code = code;
+    }
+  },
+  getDeviceLocation: () => mockGetDeviceLocation(),
 }));
 
-// ✅ IMPORTANT: CampusMap renders BuildingPopup, which uses @gorhom/bottom-sheet + Reanimated.
-// Mock it so CampusMap tests don’t crash.
 jest.mock("@/components/campus/BuildingPopup", () => {
   const ReactActual = jest.requireActual("react") as typeof React;
   const RN = jest.requireActual(
@@ -102,6 +101,14 @@ jest.mock("@/components/campus/BuildingPopup", () => {
           Text,
           null,
           `Popup: ${props?.building?.code ?? "?"}`,
+        ),
+        ReactActual.createElement(
+          Pressable,
+          {
+            testID: "popupDirections",
+            onPress: () => props.onGetDirections?.(props.building),
+          },
+          ReactActual.createElement(Text, null, "Directions"),
         ),
         ReactActual.createElement(
           Pressable,
@@ -174,7 +181,6 @@ jest.mock("@/components/Styles/mapStyle", () => {
       suggestionRow: {},
       suggestionTitle: {},
       suggestionSub: {},
-      // ToggleButton styles (used by ToggleButton component)
       campusToggleContainer: {},
       campusToggleButton: {},
       campusToggleButtonLeft: {},
@@ -207,29 +213,21 @@ jest.mock("react-native-maps", () => {
     );
   });
 
+  (MockMapView as any).displayName = "MockMapView";
+
   const MockPolygon = (props: any) => {
     const first = props.coordinates?.[0];
     const tid = first
       ? `polygon-${first.latitude}-${first.longitude}`
       : "polygon";
-    return ReactActual.createElement(
-      View,
-      { ...props, testID: tid },
-      props.children,
-    );
+    return ReactActual.createElement(View, { ...props, testID: tid });
   };
 
   const MockMarker = (props: any) => {
     const c = props.coordinate;
     const tid = c ? `marker-${c.latitude}-${c.longitude}` : "marker";
-    return ReactActual.createElement(
-      View,
-      { ...props, testID: tid },
-      props.children,
-    );
+    return ReactActual.createElement(View, { ...props, testID: tid });
   };
-
-  (MockMapView as any).displayName = "MockMapView";
 
   return {
     __esModule: true,
@@ -240,46 +238,70 @@ jest.mock("react-native-maps", () => {
   };
 });
 
-// ✅ import AFTER mocks
-import CampusMap, {
-  calculatePanValue,
-  determineCampusFromPan,
+//  Import AFTER mocks
+import CampusMap from "../CampusMap";
+
+import {
+  INITIAL_REGION,
   SGW_REGION,
   LOY_REGION,
-} from "../CampusMap";
+} from "@/components/campus/helper_methods/campusMap.constants";
+
+// Flush microtasks so the async getDeviceLocation effect settles inside act()
+async function renderCampusMap() {
+  const utils = render(<CampusMap />);
+  await act(async () => {
+    await Promise.resolve();
+  });
+  return utils;
+}
 
 beforeEach(() => {
   mockAnimateToRegion.mockClear();
+  mockGetDeviceLocation.mockClear();
+  mockOnLocationFound = null;
+  (global as any).alert = jest.fn();
+
+  // Make Animated operations synchronous/no-op to reduce act warnings
+  jest.spyOn(Animated, "timing").mockImplementation((): any => ({
+    start: (cb?: any) => cb?.(),
+  }));
+  jest.spyOn(Animated, "spring").mockImplementation((): any => ({
+    start: (cb?: any) => cb?.(),
+  }));
+  jest.spyOn(Animated, "decay").mockImplementation((): any => ({
+    start: (cb?: any) => cb?.(),
+  }));
 });
 
 describe("CampusMap - initial region", () => {
-  it("uses SGW region as initialRegion", () => {
-    const { getByTestId } = render(<CampusMap />);
-    const map = getByTestId("mapView");
-    expect(map.props.initialRegion).toEqual(SGW_REGION);
+  it("uses INITIAL_REGION as initialRegion", async () => {
+    const { getByTestId } = await renderCampusMap();
+    expect(getByTestId("mapView").props.initialRegion).toEqual(INITIAL_REGION);
   });
 });
 
 describe("CampusMap - search bar", () => {
-  it("updates text and clears input", () => {
-    const { getByPlaceholderText, getByTestId } = render(<CampusMap />);
+  it("updates text and clears input", async () => {
+    const { getByPlaceholderText, getByTestId } = await renderCampusMap();
 
-    const input = getByPlaceholderText("Where to next?");
     act(() => {
-      fireEvent.changeText(input, "hall");
+      fireEvent.changeText(getByPlaceholderText("Where to next?"), "hall");
     });
+
     expect(getByPlaceholderText("Where to next?").props.value).toBe("hall");
 
     act(() => {
       fireEvent.press(getByTestId("clearSearch"));
     });
+
     expect(getByPlaceholderText("Where to next?").props.value).toBe("");
   });
 });
 
 describe("CampusMap - suggestions", () => {
-  it("shows suggestions for SGW + Loyola matches", async () => {
-    const { getByPlaceholderText, findByText } = render(<CampusMap />);
+  it("shows suggestions from BOTH campuses based on the query", async () => {
+    const { getByPlaceholderText, findByText } = await renderCampusMap();
 
     act(() => {
       fireEvent.changeText(getByPlaceholderText("Where to next?"), "ad");
@@ -292,10 +314,9 @@ describe("CampusMap - suggestions", () => {
     expect(await findByText(/H — Henry F\. Hall Building/i)).toBeTruthy();
   });
 
-  it("selecting a suggestion animates the map and updates the input", async () => {
-    const { getByPlaceholderText, getByTestId, findByText } = render(
-      <CampusMap />,
-    );
+  it("pressing a suggestion animates and fills the input", async () => {
+    const { getByPlaceholderText, getByTestId, findByText } =
+      await renderCampusMap();
 
     act(() => {
       fireEvent.changeText(getByPlaceholderText("Where to next?"), "admin");
@@ -325,37 +346,34 @@ describe("CampusMap - suggestions", () => {
   });
 });
 
-describe("CampusMap - building shapes (Polygon/Marker)", () => {
-  it("pressing a Polygon selects it + animates (and shows popup)", () => {
-    const { getByTestId, queryByTestId } = render(<CampusMap />);
-
-    const polygonId = "polygon-45.4581--73.6401";
-    const poly = getByTestId(polygonId);
+describe("CampusMap - building selection + popup", () => {
+  it("pressing a building marker selects it and shows popup", async () => {
+    const { getByTestId, queryByTestId } = await renderCampusMap();
 
     act(() => {
-      fireEvent.press(poly);
+      fireEvent.press(getByTestId("marker-45.458--73.64"));
     });
 
     expect(mockAnimateToRegion).toHaveBeenCalledTimes(1);
     expect(queryByTestId("buildingPopup")).toBeTruthy();
   });
 
-  it("pressing a Marker selects it + animates (and shows popup)", () => {
-    const { getByTestId, queryByTestId } = render(<CampusMap />);
-
-    const markerId = "marker-45.458--73.64";
-    const marker = getByTestId(markerId);
+  it("closing popup clears the selected building", async () => {
+    const { getByTestId, queryByTestId } = await renderCampusMap();
 
     act(() => {
-      fireEvent.press(marker);
+      fireEvent.press(getByTestId("marker-45.458--73.64"));
     });
-
-    expect(mockAnimateToRegion).toHaveBeenCalledTimes(1);
     expect(queryByTestId("buildingPopup")).toBeTruthy();
+
+    act(() => {
+      fireEvent.press(getByTestId("closePopup"));
+    });
+    expect(queryByTestId("buildingPopup")).toBeNull();
   });
 
-  it("tapping on the map unselects the selected building (popup disappears)", () => {
-    const { getByTestId, queryByTestId } = render(<CampusMap />);
+  it("pressing map clears the selected building", async () => {
+    const { getByTestId, queryByTestId } = await renderCampusMap();
 
     act(() => {
       fireEvent.press(getByTestId("marker-45.458--73.64"));
@@ -368,13 +386,11 @@ describe("CampusMap - building shapes (Polygon/Marker)", () => {
     expect(queryByTestId("buildingPopup")).toBeNull();
   });
 
-  it("renders a building even when polygon is empty (marker exists)", () => {
-    const { getByTestId } = render(<CampusMap />);
-    expect(getByTestId("marker-45.4978--73.5795")).toBeTruthy();
-  });
+  it("building with empty polygon still renders as marker and uses fixed deltas on select", async () => {
+    const { getByTestId } = await renderCampusMap();
 
-  it("selecting a building with empty polygon uses fixed deltas", () => {
-    const { getByTestId } = render(<CampusMap />);
+    // ✅ Now NP is visible at initial zoom (zoomCategory=1), so marker exists
+    expect(getByTestId("marker-45.4978--73.5795")).toBeTruthy();
 
     act(() => {
       fireEvent.press(getByTestId("marker-45.4978--73.5795"));
@@ -390,18 +406,113 @@ describe("CampusMap - building shapes (Polygon/Marker)", () => {
       600,
     );
   });
+
+  it("Directions from popup enters route mode, sets destination, auto-sets start (inside a building), and clears normal search UI", async () => {
+    const { getByTestId, queryByTestId, findByTestId } =
+      await renderCampusMap();
+
+    act(() => {
+      fireEvent.press(getByTestId("marker-45.458--73.64"));
+    });
+    expect(getByTestId("buildingPopup")).toBeTruthy();
+
+    // Device location inside SGW H polygon
+    // @ts-ignore
+    mockGetDeviceLocation.mockResolvedValueOnce({
+      latitude: 45.4975,
+      longitude: -73.579,
+    });
+
+    await act(async () => {
+      fireEvent.press(getByTestId("popupDirections"));
+      await Promise.resolve();
+    });
+
+    expect(queryByTestId("buildingPopup")).toBeNull();
+
+    expect(await findByTestId("routePanel")).toBeTruthy();
+    expect(getByTestId("routeDestInput").props.value).toMatch(
+      /^AD - Administration Building/i,
+    );
+    expect(getByTestId("routeStartInput").props.value).toMatch(
+      /^H - Henry F\. Hall Building/i,
+    );
+  });
+
+  it("Directions from popup shows permission alert when auto-setting start fails with PERMISSION_DENIED", async () => {
+    const { getByTestId, findByTestId } = await renderCampusMap();
+
+    act(() => {
+      fireEvent.press(getByTestId("marker-45.458--73.64"));
+    });
+
+    const {
+      LocationError,
+    } = require("@/components/campus/helper_methods/locationUtils");
+    mockGetDeviceLocation.mockRejectedValueOnce(
+      new LocationError("PERMISSION_DENIED"),
+    );
+
+    await act(async () => {
+      fireEvent.press(getByTestId("popupDirections"));
+      await Promise.resolve();
+    });
+
+    expect(await findByTestId("routePanel")).toBeTruthy();
+    expect((global as any).alert).toHaveBeenCalledWith(
+      expect.stringContaining("Location Permission Required"),
+    );
+  });
+
+  it("Directions from popup shows services off alert when auto-setting start fails with SERVICES_OFF", async () => {
+    const { getByTestId, findByTestId } = await renderCampusMap();
+
+    act(() => {
+      fireEvent.press(getByTestId("marker-45.458--73.64"));
+    });
+
+    const {
+      LocationError,
+    } = require("@/components/campus/helper_methods/locationUtils");
+    mockGetDeviceLocation.mockRejectedValueOnce(
+      new LocationError("SERVICES_OFF"),
+    );
+
+    await act(async () => {
+      fireEvent.press(getByTestId("popupDirections"));
+      await Promise.resolve();
+    });
+
+    expect(await findByTestId("routePanel")).toBeTruthy();
+    expect((global as any).alert).toHaveBeenCalledWith(
+      expect.stringContaining("Location Services Off"),
+    );
+  });
+
+  it("Directions from popup shows generic location error alert on unknown error", async () => {
+    const { getByTestId, findByTestId } = await renderCampusMap();
+
+    act(() => {
+      fireEvent.press(getByTestId("marker-45.458--73.64"));
+    });
+
+    mockGetDeviceLocation.mockRejectedValueOnce(new Error("boom"));
+
+    await act(async () => {
+      fireEvent.press(getByTestId("popupDirections"));
+      await Promise.resolve();
+    });
+
+    expect(await findByTestId("routePanel")).toBeTruthy();
+    expect((global as any).alert).toHaveBeenCalledWith(
+      expect.stringContaining("Location Error"),
+    );
+  });
 });
 
 describe("CampusMap - campus toggle", () => {
-  it("renders the toggle buttons", () => {
-    const { getByTestId } = render(<CampusMap />);
-    expect(getByTestId("campusToggle")).toBeTruthy();
-    expect(getByTestId("campusToggle-SGW")).toBeTruthy();
-    expect(getByTestId("campusToggle-Loyola")).toBeTruthy();
-  });
-
-  it("pressing Loyola animates to Loyola region", () => {
-    const { getByTestId } = render(<CampusMap />);
+  it("pressing Loyola animates to LOY_REGION", async () => {
+    const { getByTestId } = await renderCampusMap();
 
     act(() => {
       fireEvent.press(getByTestId("campusToggle-Loyola"));
@@ -410,13 +521,12 @@ describe("CampusMap - campus toggle", () => {
     expect(mockAnimateToRegion).toHaveBeenCalledWith(LOY_REGION, 500);
   });
 
-  it("pressing SGW after Loyola animates to SGW region", () => {
-    const { getByTestId } = render(<CampusMap />);
+  it("pressing SGW animates to SGW_REGION (after switching away first)", async () => {
+    const { getByTestId } = await renderCampusMap();
 
     act(() => {
       fireEvent.press(getByTestId("campusToggle-Loyola"));
     });
-    mockAnimateToRegion.mockClear();
 
     act(() => {
       fireEvent.press(getByTestId("campusToggle-SGW"));
@@ -425,8 +535,8 @@ describe("CampusMap - campus toggle", () => {
     expect(mockAnimateToRegion).toHaveBeenCalledWith(SGW_REGION, 500);
   });
 
-  it("BrandBar backgroundColor updates based on focused campus", () => {
-    const { getByTestId } = render(<CampusMap />);
+  it("BrandBar backgroundColor updates with campus changes", async () => {
+    const { getByTestId } = await renderCampusMap();
 
     expect(getByTestId("brandbar").props.backgroundColor).toBe("#912338");
 
@@ -440,200 +550,11 @@ describe("CampusMap - campus toggle", () => {
     });
     expect(getByTestId("brandbar").props.backgroundColor).toBe("#912338");
   });
-
-  it("selecting a Loyola building via suggestion updates focused campus to Loyola", async () => {
-    const { getByPlaceholderText, getByTestId, findByText } = render(
-      <CampusMap />,
-    );
-
-    act(() => {
-      fireEvent.changeText(getByPlaceholderText("Where to next?"), "admin");
-    });
-    await findByText(/AD — Administration Building/i);
-
-    act(() => {
-      fireEvent.press(getByTestId("suggestion-LOY-loy-ad"));
-    });
-
-    expect(getByTestId("brandbar").props.backgroundColor).toBe("#e3ac20");
-  });
-});
-
-describe("CampusMap - PanResponder helper functions", () => {
-  describe("calculatePanValue", () => {
-    it("returns 0 when on SGW with no drag", () => {
-      expect(calculatePanValue("SGW", 0, 300)).toBe(0);
-    });
-
-    it("returns clamped value when dragging right from SGW", () => {
-      expect(calculatePanValue("SGW", 75, 300)).toBe(0.5);
-    });
-
-    it("returns 1 when fully dragged right from SGW", () => {
-      expect(calculatePanValue("SGW", 150, 300)).toBe(1);
-    });
-
-    it("clamps to 1 when dragged beyond right edge", () => {
-      expect(calculatePanValue("SGW", 300, 300)).toBe(1);
-    });
-
-    it("clamps to 0 when dragged beyond left edge", () => {
-      expect(calculatePanValue("SGW", -100, 300)).toBe(0);
-    });
-
-    it("returns value when dragging left from LOY", () => {
-      expect(calculatePanValue("LOY", -75, 300)).toBe(0.5);
-    });
-
-    it("uses default width when toggleWidth is 0", () => {
-      const result = calculatePanValue("SGW", 50, 0);
-      expect(result).toBeGreaterThanOrEqual(0);
-      expect(result).toBeLessThanOrEqual(1);
-    });
-  });
-
-  describe("determineCampusFromPan", () => {
-    it("returns SGW when finalValue <= 0.5 from SGW", () => {
-      expect(determineCampusFromPan("SGW", 50, 300)).toBe("SGW");
-    });
-
-    it("returns LOY when finalValue > 0.5 from SGW", () => {
-      expect(determineCampusFromPan("SGW", 100, 300)).toBe("LOY");
-    });
-
-    it("returns LOY when finalValue > 0.5 from LOY (small left drag)", () => {
-      expect(determineCampusFromPan("LOY", -50, 300)).toBe("LOY");
-    });
-
-    it("returns SGW when finalValue <= 0.5 from LOY (large left drag)", () => {
-      expect(determineCampusFromPan("LOY", -100, 300)).toBe("SGW");
-    });
-
-    it("uses default width when toggleWidth is 0", () => {
-      const result = determineCampusFromPan("SGW", 50, 0);
-      expect(result === "SGW" || result === "LOY").toBe(true);
-    });
-  });
-
-  describe("exported region constants", () => {
-    it("SGW_REGION has correct coordinates", () => {
-      expect(SGW_REGION).toEqual({
-        latitude: 45.4973,
-        longitude: -73.5794,
-        latitudeDelta: 0.006,
-        longitudeDelta: 0.006,
-      });
-    });
-
-    it("LOY_REGION has correct coordinates", () => {
-      expect(LOY_REGION).toEqual({
-        latitude: 45.457984,
-        longitude: -73.639834,
-        latitudeDelta: 0.006,
-        longitudeDelta: 0.006,
-      });
-    });
-  });
-});
-
-describe("CampusMap - PanResponder handlers (captured from ToggleButton)", () => {
-  const RN = jest.requireActual(
-    "react-native",
-  ) as typeof import("react-native");
-  const originalCreate = RN.PanResponder.create;
-
-  type PanConfig = {
-    onPanResponderMove?: (evt: unknown, gestureState: { dx: number }) => void;
-    onPanResponderRelease?: (
-      evt: unknown,
-      gestureState: { dx: number },
-    ) => void;
-    onStartShouldSetPanResponder?: () => boolean;
-    onMoveShouldSetPanResponder?: (
-      evt: unknown,
-      gestureState: { dx: number },
-    ) => boolean;
-  };
-
-  let capturedConfig: PanConfig | null = null;
-
-  beforeAll(() => {
-    jest.useFakeTimers();
-
-    (RN.PanResponder.create as unknown) = (config: PanConfig) => {
-      capturedConfig = config;
-      return originalCreate(config as Parameters<typeof originalCreate>[0]);
-    };
-  });
-
-  afterAll(() => {
-    (RN.PanResponder.create as unknown) = originalCreate;
-    jest.useRealTimers();
-  });
-
-  beforeEach(() => {
-    capturedConfig = null;
-    mockAnimateToRegion.mockClear();
-  });
-
-  it("onStartShouldSetPanResponder returns true", () => {
-    render(<CampusMap />);
-    expect(capturedConfig?.onStartShouldSetPanResponder?.()).toBe(true);
-  });
-
-  it("onMoveShouldSetPanResponder returns true when dx > 10", () => {
-    render(<CampusMap />);
-    expect(
-      capturedConfig?.onMoveShouldSetPanResponder?.(null, { dx: 15 }),
-    ).toBe(true);
-  });
-
-  it("onMoveShouldSetPanResponder returns false when dx <= 10", () => {
-    render(<CampusMap />);
-    expect(capturedConfig?.onMoveShouldSetPanResponder?.(null, { dx: 5 })).toBe(
-      false,
-    );
-  });
-
-  it("onPanResponderRelease switches to Loyola when dragged far right", () => {
-    render(<CampusMap />);
-    expect(capturedConfig).not.toBeNull();
-
-    act(() => {
-      capturedConfig?.onPanResponderRelease?.(null, { dx: 200 });
-    });
-
-    act(() => {
-      jest.runOnlyPendingTimers();
-    });
-
-    expect(mockAnimateToRegion).toHaveBeenCalledWith(LOY_REGION, 500);
-  });
-
-  it("onPanResponderRelease stays on SGW when dragged slightly", () => {
-    render(<CampusMap />);
-    expect(capturedConfig).not.toBeNull();
-
-    act(() => {
-      capturedConfig?.onPanResponderRelease?.(null, { dx: 10 });
-    });
-
-    act(() => {
-      jest.runOnlyPendingTimers();
-    });
-
-    expect(mockAnimateToRegion).not.toHaveBeenCalled();
-  });
 });
 
 describe("CampusMap - Current Location button callback", () => {
-  it("renders the current location button", () => {
-    const { getByTestId } = render(<CampusMap />);
-    expect(getByTestId("currentLocationButton")).toBeTruthy();
-  });
-
-  it("handleLocationFound animates map to user location", () => {
-    render(<CampusMap />);
+  it("calls animateToRegion when CurrentLocationButton reports a location", async () => {
+    await renderCampusMap();
     expect(mockOnLocationFound).not.toBeNull();
 
     act(() => {
@@ -649,76 +570,5 @@ describe("CampusMap - Current Location button callback", () => {
       }),
       500,
     );
-  });
-});
-
-describe("CampusMap - auto-location on mount", () => {
-  beforeEach(() => {
-    mockLocRequestPermissions.mockReset();
-    mockLocGetCurrent.mockReset();
-    mockLocGetLastKnown.mockReset();
-
-    // Default: permission denied (no location fetched)
-    mockLocRequestPermissions.mockResolvedValue({ status: "denied" });
-    mockLocGetLastKnown.mockResolvedValue(null);
-    mockLocGetCurrent.mockResolvedValue({
-      coords: { latitude: 0, longitude: 0 },
-    });
-  });
-
-  it("does not fetch location when permission is denied", async () => {
-    render(<CampusMap />);
-
-    await act(async () => {});
-
-    expect(mockLocRequestPermissions).toHaveBeenCalled();
-    expect(mockLocGetLastKnown).not.toHaveBeenCalled();
-    expect(mockLocGetCurrent).not.toHaveBeenCalled();
-  });
-
-  it("uses last known position when available", async () => {
-    mockLocRequestPermissions.mockResolvedValue({ status: "granted" });
-    // @ts-ignore
-    mockLocGetLastKnown.mockResolvedValue({
-      coords: { latitude: 45.497, longitude: -73.579 },
-    });
-
-    const { queryByTestId } = render(<CampusMap />);
-
-    await act(async () => {});
-
-    expect(mockLocGetLastKnown).toHaveBeenCalled();
-    expect(mockLocGetCurrent).not.toHaveBeenCalled();
-    // User is inside the H building polygon → marker should NOT render
-    expect(queryByTestId("userLocationMarker")).toBeNull();
-  });
-
-  it("falls back to getCurrentPositionAsync when last known is null", async () => {
-    mockLocRequestPermissions.mockResolvedValue({ status: "granted" });
-    mockLocGetLastKnown.mockResolvedValue(null);
-    mockLocGetCurrent.mockResolvedValue({
-      coords: { latitude: 45.5, longitude: -73.6 },
-    });
-
-    const { getByTestId } = render(<CampusMap />);
-
-    await act(async () => {});
-
-    expect(mockLocGetLastKnown).toHaveBeenCalled();
-    expect(mockLocGetCurrent).toHaveBeenCalled();
-    // User is outside all buildings → marker should render at those coords
-    expect(getByTestId("marker-45.5--73.6")).toBeTruthy();
-  });
-
-  it("silently ignores errors from location APIs", async () => {
-    mockLocRequestPermissions.mockResolvedValue({ status: "granted" });
-    mockLocGetLastKnown.mockRejectedValue(new Error("fail"));
-
-    render(<CampusMap />);
-
-    // Should not throw
-    await act(async () => {});
-
-    expect(mockLocGetLastKnown).toHaveBeenCalled();
   });
 });

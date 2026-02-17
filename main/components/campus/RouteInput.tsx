@@ -33,7 +33,12 @@ export default function RouteInput({
   onClearDestination,
 }: Readonly<Props>) {
   // If a building is selected, show its label; otherwise show whatever user typed.
-  const startValue = start ? `${start.code} - ${start.name}` : startText;
+  let startValue = startText;
+
+  if (start) {
+    if (start.id === "USER_LOCATION") startValue = "Your Location";
+    else startValue = `${start.code} - ${start.name}`;
+  }
   const destValue = destination
     ? `${destination.code} - ${destination.name}`
     : destText;
@@ -70,7 +75,10 @@ export default function RouteInput({
 
             {startValue.length > 0 && (
               <Pressable
-                onPress={onClearStart}
+                onPress={(e?: any) => {
+                  e?.stopPropagation?.();
+                  onClearStart();
+                }}
                 hitSlop={8}
                 style={s.clearButton}
                 testID="clearStart"
@@ -107,7 +115,10 @@ export default function RouteInput({
 
             {destValue.length > 0 && (
               <Pressable
-                onPress={onClearDestination}
+                onPress={(e?: any) => {
+                  e?.stopPropagation?.();
+                  onClearDestination();
+                }}
                 hitSlop={8}
                 style={s.clearButton}
                 testID="clearDestination"
