@@ -57,31 +57,29 @@ describe("googleDirections", () => {
     });
 
     it("returns the first route when routes are pre-sorted by durationSec", () => {
-  const routes: DirectionRoute[] = [
-    {
-      summary: "B",
-      polyline: "def",
-      durationSec: 200,
-      durationText: "3 mins",
-      distanceMeters: 900,
-      distanceText: "0.9 km",
-    },
-    {
-      summary: "A",
-      polyline: "abc",
-      durationSec: 500,
-      durationText: "8 mins",
-      distanceMeters: 1200,
-      distanceText: "1.2 km",
-    },
-  ];
+      const routes: DirectionRoute[] = [
+        {
+          summary: "B",
+          polyline: "def",
+          durationSec: 200,
+          durationText: "3 mins",
+          distanceMeters: 900,
+          distanceText: "0.9 km",
+        },
+        {
+          summary: "A",
+          polyline: "abc",
+          durationSec: 500,
+          durationText: "8 mins",
+          distanceMeters: 1200,
+          distanceText: "1.2 km",
+        },
+      ];
 
-  const fastest = pickFastestRoute(routes);
-  expect(fastest?.summary).toBe("B");
-  expect(fastest?.durationSec).toBe(200);
-});
-
-
+      const fastest = pickFastestRoute(routes);
+      expect(fastest?.summary).toBe("B");
+      expect(fastest?.durationSec).toBe(200);
+    });
   });
 
   describe("fetchDirections", () => {
