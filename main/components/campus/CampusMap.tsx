@@ -131,8 +131,19 @@ export default function CampusMap() {
   const mapRef = useRef<MapView>(null);
   const nav = useNavigation();
 
-  // ✅ Track current map region (for label visibility logic in BuildingShapesLayer)
   const [region, setRegion] = useState<Region>(INITIAL_REGION);
+
+  const routeStrokeWidth = useMemo(() => {
+    const d = region?.latitudeDelta ?? 0.1;
+
+    // Larger latitudeDelta = zoomed out -> thinner line
+    if (d > 0.6) return 2;
+    if (d > 0.3) return 3;
+    if (d > 0.15) return 4;
+    if (d > 0.08) return 5;
+    if (d > 0.04) return 6;
+    return 7; // zoomed in
+  }, [region?.latitudeDelta]);
 
   const MODES: TravelMode[] = ["driving", "transit", "walking", "bicycling"];
 
@@ -233,6 +244,18 @@ export default function CampusMap() {
       setSelectedRouteCoords([]);
       return;
     }
+
+    //clears out old routes
+
+    setTravelPopupVisible(false);
+    setSelectedRouteCoords([]);
+    setRoutesByMode({
+      driving: [],
+      transit: [],
+      walking: [],
+      bicycling: [],
+    });
+    setSelectedRouteIndex(0);
 
     let cancelled = false;
 
@@ -502,8 +525,8 @@ export default function CampusMap() {
           <Polyline
             key={`${selectedMode}-${selectedRouteIndex}`}
             coordinates={selectedRouteCoords}
-            strokeWidth={7}
-            strokeColor="#0B57D0"
+            strokeWidth={routeStrokeWidth}
+            strokeColor="#4286f5"
             lineDashPattern={selectedMode === "walking" ? [10, 8] : undefined}
           />
         )}
