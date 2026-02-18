@@ -150,10 +150,12 @@ export default function TravelOptionsPopup({
                 size={18}
                 color={active ? "#111" : "rgba(17,17,17,0.55)"}
               />
-              <Text style={[s.modeChipTime, active && s.modeChipTimeActive]}
+              <Text
+                style={[s.modeChipTime, active && s.modeChipTimeActive]}
                 numberOfLines={1}
                 testID={`mode-${m.mode}-time`}
-                ellipsizeMode="tail">
+                ellipsizeMode="tail"
+              >
                 {formatDuration(fastest?.durationText)}
               </Text>
             </Pressable>
