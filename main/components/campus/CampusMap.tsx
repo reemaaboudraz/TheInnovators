@@ -195,6 +195,11 @@ export default function CampusMap() {
     { latitude: number; longitude: number }[]
   >([]);
 
+  const [allRouteCoords, setAllRouteCoords] = useState<
+  { latitude: number; longitude: number }[][]
+>([]);
+
+
   // Auto fetch user location on mount
   useEffect(() => {
     let cancelled = false;
@@ -274,6 +279,7 @@ export default function CampusMap() {
     if (!nav.isRouteMode || !start || !dest) {
       setTravelPopupVisible(false);
       setSelectedRouteCoords([]);
+      setAllRouteCoords([]);
       return;
     }
     
@@ -283,6 +289,7 @@ export default function CampusMap() {
 
     setTravelPopupVisible(false);
     setSelectedRouteCoords([]);
+    setAllRouteCoords([]);
     setRoutesByMode({
       driving: [],
       transit: [],
@@ -319,6 +326,7 @@ export default function CampusMap() {
         if(totalRoutes === 0){
           setTravelPopupVisible(false);
           setSelectedRouteCoords([]);
+          setAllRouteCoords([]);
           setDirectionsError("No route found for this selection. Try another mode");
           return;
 
@@ -339,13 +347,20 @@ export default function CampusMap() {
         setSelectedRouteIndex(Math.max(0, fastestIndex));
         setTravelPopupVisible(true);
 
-        const chosen = next[bestMode][Math.max(0, fastestIndex)];
-        const coords = decodePolyline(chosen?.polyline ?? "");
-        setSelectedRouteCoords(coords);
+        const routesForMode = next[bestMode] ?? [];
+        const decodedAll = routesForMode.map((r) => decodePolyline(r.polyline));
+
+        setAllRouteCoords(decodedAll);
+
+        const safeIndex = Math.max(0, fastestIndex);
+        const selectedCoords = decodedAll[safeIndex] ?? [];
+
+        setSelectedRouteCoords(selectedCoords);
+
 
         // Fit map to route
-        if (coords.length >= 2) {
-          mapRef.current?.fitToCoordinates(coords, {
+        if (selectedCoords.length >= 2) {
+          mapRef.current?.fitToCoordinates(selectedCoords, {
             edgePadding: { top: 90, right: 70, bottom: 260, left: 70 },
             animated: true,
           });
@@ -355,6 +370,7 @@ export default function CampusMap() {
           // Don’t break existing UX; just hide travel popup if directions fail
           setTravelPopupVisible(false);
           setSelectedRouteCoords([]);
+          setAllRouteCoords([]);
 
           setDirectionsError(toDirectionsErrorMessage(e));
         }
@@ -494,15 +510,21 @@ export default function CampusMap() {
   const applySelection = useCallback(
     (mode: TravelMode, routeIndex: number) => {
       const routes = routesByMode[mode] ?? [];
+      if (routes.length === 0) return;
+  
+      // Keep map routes in sync with the mode
+      const decodedAll = routes.map((r) => decodePolyline(r.polyline));
+      setAllRouteCoords(decodedAll);
+  
       const chosen = routes[routeIndex];
       if (!chosen) return;
-
+  
       setSelectedMode(mode);
       setSelectedRouteIndex(routeIndex);
-
-      const coords = decodePolyline(chosen.polyline);
+  
+      const coords = decodedAll[routeIndex] ?? [];
       setSelectedRouteCoords(coords);
-
+  
       if (coords.length >= 2) {
         mapRef.current?.fitToCoordinates(coords, {
           edgePadding: { top: 90, right: 70, bottom: 260, left: 70 },
@@ -512,6 +534,7 @@ export default function CampusMap() {
     },
     [routesByMode],
   );
+  
 
   const floatingBottom = useMemo(
     () => computeFloatingBottom(!!selected, popupIndex),
@@ -567,17 +590,28 @@ export default function CampusMap() {
           </Marker>
         )}
 
-        {selectedRouteCoords.length > 0 && (
-          <Polyline
-            key={`${selectedMode}-${selectedRouteIndex}`}
-            coordinates={selectedRouteCoords}
-            strokeWidth={routeStrokeWidth}
-            strokeColor="#4286f5"
-            lineDashPattern={selectedMode === "walking" ? [10, 8] : undefined}
-            lineCap="round"
-            lineJoin="round"
-          />
-        )}
+        {allRouteCoords.map((coords, index) => {
+          if (coords.length === 0) return null;
+
+          const isSelected = index === selectedRouteIndex;
+
+          return (
+            <Polyline
+              key={`${selectedMode}-${index}`}
+              coordinates={coords}
+              tappable
+              onPress={() => applySelection(selectedMode, index)}
+              strokeWidth={
+                isSelected ? routeStrokeWidth : Math.max(2, routeStrokeWidth - 2)
+              }
+              strokeColor={isSelected ? "#4286f5" : "#8FB5FF"}
+              lineDashPattern={selectedMode === "walking" ? [10, 8] : undefined}
+              lineCap="round"
+              lineJoin="round"
+            />
+          );
+        })}
+
 
         {nav.routeStart && (
           // Start and destination pins (route mode) - building name on pin, size fixed for visibility
@@ -727,6 +761,7 @@ export default function CampusMap() {
 
                   setTravelPopupVisible(false);
                   setSelectedRouteCoords([]);
+                  setAllRouteCoords([]);
                   setRoutesByMode({
                     driving: [],
                     transit: [],
@@ -743,6 +778,7 @@ export default function CampusMap() {
 
                   setTravelPopupVisible(false);
                   setSelectedRouteCoords([]);
+                  setAllRouteCoords([]);
                   setRoutesByMode({
                     driving: [],
                     transit: [],
