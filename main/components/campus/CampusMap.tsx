@@ -60,6 +60,7 @@ import {
   type TravelMode,
 } from "@/components/campus/helper_methods/googleDirections";
 import DirectionsLoadError from "../ui/DirectionLoadError";
+import { toDirectionsErrorMessage } from "@/components/campus/helper_methods/directionErrors";
 
 // Re-export for backwards compatibility with tests
 export {
@@ -111,37 +112,6 @@ async function fetchAndSortRoutes(
   return [mode, sorted] as const;
 }
 
-function toDirectionsErrorMessage(err: unknown): string {
-  const msg = err instanceof Error ? err.message : String(err);
-
-  if (msg.includes("Missing Google Maps API key")) {
-    return "Google Maps API is missing. Please contact the team.";
-  }
-
-  if (msg.includes("Directions HTTP")) {
-    return "Direction service error. Please try again.";
-  }
-
-  if (msg.includes("ZERO_RESULTS")) {
-    return "No results found for this search. Please try another route or mode.";
-  }
-
-  if (msg.includes("NOT_FOUND")) {
-    return "Start or destination could not be found. Try selecting again";
-  }
-
-  if (msg.includes("UNKNOWN_ERROR")) {
-    return "Direction service is currently unavailable. Please retry.";
-  }
-
-  const lower = msg.toLowerCase();
-  if (lower.includes("network") || lower.includes("failed to fetch")) {
-    return "Network error. Check your connection and try again.";
-  }
-
-  return "Unable to load directions. Please try again.";
-}
-
 export default function CampusMap() {
   const [focusedCampus, setFocusedCampus] = useState<Campus>("SGW");
 
@@ -190,13 +160,12 @@ export default function CampusMap() {
   const [selectedMode, setSelectedMode] = useState<TravelMode>("driving");
   const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
   const [travelPopupVisible, setTravelPopupVisible] = useState(false);
-  const [selectedRouteCoords, setSelectedRouteCoords] = useState<
-    { latitude: number; longitude: number }[]
-  >([]);
 
   const [allRouteCoords, setAllRouteCoords] = useState<
     { latitude: number; longitude: number }[][]
   >([]);
+
+  const selectedRouteCoords = allRouteCoords[selectedRouteIndex] ?? [];
 
   // Auto fetch user location on mount
   useEffect(() => {
@@ -276,7 +245,6 @@ export default function CampusMap() {
     // Only run in route mode and only when both points exist
     if (!nav.isRouteMode || !start || !dest) {
       setTravelPopupVisible(false);
-      setSelectedRouteCoords([]);
       setAllRouteCoords([]);
       return;
     }
@@ -286,7 +254,6 @@ export default function CampusMap() {
     //clears out old routes
 
     setTravelPopupVisible(false);
-    setSelectedRouteCoords([]);
     setAllRouteCoords([]);
     setRoutesByMode({
       driving: [],
@@ -323,7 +290,6 @@ export default function CampusMap() {
         const totalRoutes = MODES.reduce((sum, m) => sum + next[m].length, 0);
         if (totalRoutes === 0) {
           setTravelPopupVisible(false);
-          setSelectedRouteCoords([]);
           setAllRouteCoords([]);
           setDirectionsError(
             "No route found for this selection. Try another mode",
@@ -354,8 +320,6 @@ export default function CampusMap() {
         const safeIndex = Math.max(0, fastestIndex);
         const selectedCoords = decodedAll[safeIndex] ?? [];
 
-        setSelectedRouteCoords(selectedCoords);
-
         // Fit map to route
         if (selectedCoords.length >= 2) {
           mapRef.current?.fitToCoordinates(selectedCoords, {
@@ -367,7 +331,6 @@ export default function CampusMap() {
         if (!cancelled) {
           // Don’t break existing UX; just hide travel popup if directions fail
           setTravelPopupVisible(false);
-          setSelectedRouteCoords([]);
           setAllRouteCoords([]);
 
           setDirectionsError(toDirectionsErrorMessage(e));
@@ -521,7 +484,6 @@ export default function CampusMap() {
       setSelectedRouteIndex(routeIndex);
 
       const coords = decodedAll[routeIndex] ?? [];
-      setSelectedRouteCoords(coords);
 
       if (coords.length >= 2) {
         mapRef.current?.fitToCoordinates(coords, {
@@ -537,6 +499,14 @@ export default function CampusMap() {
     () => computeFloatingBottom(!!selected, popupIndex),
     [selected, popupIndex],
   );
+
+  const selectedCoordsForRender = allRouteCoords[selectedRouteIndex] ?? [];
+
+  const otherRoutes = allRouteCoords
+    .map((coords, index) => ({ coords, index }))
+    .filter(
+      ({ coords, index }) => coords.length > 0 && index !== selectedRouteIndex,
+    );
 
   return (
     <View style={styles.container} testID="campusMap-root">
@@ -587,29 +557,33 @@ export default function CampusMap() {
           </Marker>
         )}
 
-        {allRouteCoords.map((coords, index) => {
-          if (coords.length === 0) return null;
+        {otherRoutes.map(({ coords, index }) => (
+          <Polyline
+            key={`${selectedMode}-${index}`}
+            coordinates={coords}
+            tappable
+            onPress={() => applySelection(selectedMode, index)}
+            strokeWidth={Math.max(2, routeStrokeWidth - 2)}
+            strokeColor="#8FB5FF"
+            lineDashPattern={selectedMode === "walking" ? [10, 8] : undefined}
+            lineCap="round"
+            lineJoin="round"
+          />
+        ))}
 
-          const isSelected = index === selectedRouteIndex;
-
-          return (
-            <Polyline
-              key={`${selectedMode}-${index}`}
-              coordinates={coords}
-              tappable
-              onPress={() => applySelection(selectedMode, index)}
-              strokeWidth={
-                isSelected
-                  ? routeStrokeWidth
-                  : Math.max(2, routeStrokeWidth - 2)
-              }
-              strokeColor={isSelected ? "#4286f5" : "#8FB5FF"}
-              lineDashPattern={selectedMode === "walking" ? [10, 8] : undefined}
-              lineCap="round"
-              lineJoin="round"
-            />
-          );
-        })}
+        {selectedCoordsForRender.length > 0 && (
+          <Polyline
+            key={`${selectedMode}-selected-${selectedRouteIndex}`}
+            coordinates={selectedCoordsForRender}
+            tappable
+            onPress={() => applySelection(selectedMode, selectedRouteIndex)}
+            strokeWidth={routeStrokeWidth}
+            strokeColor="#4286f5"
+            lineDashPattern={selectedMode === "walking" ? [10, 8] : undefined}
+            lineCap="round"
+            lineJoin="round"
+          />
+        )}
 
         {nav.routeStart && (
           // Start and destination pins (route mode) - building name on pin, size fixed for visibility
@@ -758,7 +732,6 @@ export default function CampusMap() {
                   focusRouteField("start");
 
                   setTravelPopupVisible(false);
-                  setSelectedRouteCoords([]);
                   setAllRouteCoords([]);
                   setRoutesByMode({
                     driving: [],
@@ -775,7 +748,6 @@ export default function CampusMap() {
                   focusRouteField("destination");
 
                   setTravelPopupVisible(false);
-                  setSelectedRouteCoords([]);
                   setAllRouteCoords([]);
                   setRoutesByMode({
                     driving: [],
