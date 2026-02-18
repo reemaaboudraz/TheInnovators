@@ -4,6 +4,15 @@ export type TravelMode = "driving" | "walking" | "transit" | "bicycling";
 
 export type LatLng = { latitude: number; longitude: number };
 
+/*this type will allow us to fetch and store/display the transit details on the 
+routes summary for better UI experience when selecting a route*/
+export type TransitLine = {
+  name: string;          // e.g. "51"
+  vehicleType?: string;  // e.g. "BUS", "SUBWAY"
+  headsign?: string;     // direction text if available
+  agency?: string;       // e.g. "STM"
+};
+
 export type DirectionRoute = {
   summary: string;
   polyline: string;
@@ -11,6 +20,7 @@ export type DirectionRoute = {
   durationText: string;
   distanceMeters: number;
   distanceText: string;
+  transitLines?: TransitLine[];
 };
 
 function getGoogleMapsKey(): string {
