@@ -174,7 +174,7 @@ export default function CampusMap() {
     if (d > 0.08) return 5;
     if (d > 0.04) return 6;
     return 7; // zoomed in
-  }, [region.latitudeDelta]);
+  }, [region?.latitudeDelta]);
 
   const MODES: TravelMode[] = ["driving", "transit", "walking", "bicycling"];
 
