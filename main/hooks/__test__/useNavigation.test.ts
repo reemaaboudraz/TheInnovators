@@ -1,8 +1,8 @@
 import { renderHook, act } from "@testing-library/react-native";
 
-jest.mock("@/components/Buildings/types", () => ({}));
-
 import { useNavigation } from "@/hooks/useNavigation";
+
+jest.mock("@/components/Buildings/types", () => ({}));
 
 describe("useNavigation", () => {
   const B1 = { code: "H", name: "Hall" } as any;
