@@ -17,6 +17,7 @@ import type {
   DirectionRoute,
   TravelMode,
 } from "@/components/campus/helper_methods/googleDirections";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 type ModeData = {
   mode: TravelMode;
@@ -33,6 +34,34 @@ type Props = {
   onSelectRouteIndex: (index: number) => void;
   onClose: () => void;
 };
+
+//formatting the transitDetails we extracted from the directions response to be more user friendly when displayed on the UI
+//i.e. show the bus number of the buses used to create the routes given to the user instead of simple duration
+function getBusDetails(route: DirectionRoute): string[] {
+  const set = new Set<string>();
+
+  for (const line of route.transitLines ?? []) {
+    if (line.vehicleType?.toLowerCase() === "bus" && line.name) {
+      set.add(line.name);
+    }
+  }
+  return [...set];
+}
+
+function getMetroDetails(route: DirectionRoute): string[] {
+  const set = new Set<string>();
+
+  for (const line of route.transitLines ?? []) {
+    if ((line.vehicleType?.toLowerCase() === "subway" || line.vehicleType?.toLowerCase() === "metro") && line.name) {
+      set.add(line.name);
+    }
+  }
+  return [...set];
+}
+
+function hasMetroFromRoute(route: DirectionRoute): boolean {
+  return getMetroDetails(route).length > 0;
+}
 
 function formatDuration(text?: string): string {
   if (!text) return "--";
@@ -183,6 +212,28 @@ export default function TravelOptionsPopup({
                 {!!r.summary && <Text style={s.routeSummary}>{r.summary}</Text>}
               </View>
 
+              {/*Rendering the bus and metro chips in the summary*/}
+              {selectedMode === "transit" && (r.transitLines?.length ?? 0) > 0 && (
+                <View style={s.transitRow}>
+                  {getBusDetails(r).slice(0, 4).map((bus) => (
+                    <View key={bus} style={s.busChip}>
+                      <Text style={s.busChipText}>{bus}</Text>
+                    </View>
+                  ))}
+
+                  {getBusDetails(r).length > 4 && (
+                    <Text style={s.moreText}>+{getBusDetails(r).length - 4}</Text>
+                  )}
+
+                  {getMetroDetails(r).slice(0, 2).map((metro) => (
+                    <View key={`metro-${metro}`} style={s.metroChip}>
+                      <Text style={s.metroChipText}>{metro}</Text>
+                    </View>
+                  ))}
+
+                </View>
+              )}
+
               <Pressable
                 onPress={(e: any) => {
                   e?.stopPropagation?.();
@@ -201,6 +252,46 @@ export default function TravelOptionsPopup({
 }
 
 const s = StyleSheet.create({
+  transitRow: {
+    marginTop: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    flexWrap: "wrap",
+  },
+
+  busChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: "rgba(17,17,17,0.10)",
+  },
+
+  busChipText: {
+    fontSize: 12,
+    fontWeight: "900",
+    color: "#111",
+  },
+
+  metroChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: "rgba(145,35,56,0.12)", // optional; can theme later
+  },
+
+  metroChipText: {
+    fontSize: 12,
+    fontWeight: "900",
+    color: "#111",
+  },
+
+  moreText: {
+    fontSize: 12,
+    fontWeight: "900",
+    color: "rgba(17,17,17,0.55)",
+  },
+
   sheetBackground: {
     borderWidth: 1,
     borderRadius: 18,

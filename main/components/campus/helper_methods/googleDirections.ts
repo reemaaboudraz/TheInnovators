@@ -7,9 +7,9 @@ export type LatLng = { latitude: number; longitude: number };
 /*this type will allow us to fetch and store/display the transit details on the 
 routes summary for better UI experience when selecting a route*/
 export type TransitLine = {
-  name: string;          // e.g. "51"
+  name: string;          // e.g. "211"
   vehicleType?: string;  // e.g. "BUS", "SUBWAY"
-  headsign?: string;     // direction text if available
+  headsign?: string;     // e.g. "WEST"
   agency?: string;       // e.g. "STM"
 };
 
@@ -22,6 +22,44 @@ export type DirectionRoute = {
   distanceText: string;
   transitLines?: TransitLine[];
 };
+
+function getTransitLinesFromLeg(leg: any): TransitLine[] {
+  const transitLines: TransitLine[] = [];
+  const extracted = new Set<string>(); // To not store duplicate transit lines details
+
+
+  for (const step of leg.steps ?? []) {
+    //We only want to extract the transit details of the part of the trip (step) that is done by transit
+    //Therefore, if the mode is not transit then we skip it and move on to the next step
+    if (step?.travel_mode !== "TRANSIT") continue;
+
+    const transitDetails = step.transit_details;
+    const line = transitDetails?.line;
+
+    if (!line) { continue; }
+    
+    const lineName : string = String(line?.short_name ?? line?.name ?? "").trim();
+    const vehicleType : string | undefined = line?.vehicle?.type;
+    const headsign : string | undefined = transitDetails?.headsign?.trim();
+    const agencyName : string | undefined = Array.isArray(line?.agencies) ? line?.agencies[0]?.name?.trim() : undefined; //some lines might have multiple agencies, so we will only use the first one as reference
+
+    //we create a unique key for each transit line based on its name, vehicle type, headsign and agency name to store it in our extracted set to use as reference to avoid duplication
+    const key = `${lineName}|${vehicleType}|${headsign}|${agencyName}`;
+
+    //we check the set, if the transitDetails' key is already stored, we move to the next step without storing it in our TransitLines array
+    if (extracted.has(key)) continue;
+    extracted.add(key);
+
+    transitLines.push({
+      name: lineName,
+      vehicleType: vehicleType,
+      headsign: headsign,
+      agency: agencyName,
+    });
+
+  }
+  return transitLines;
+}
 
 function getGoogleMapsKey(): string {
   const key = (Constants.expoConfig?.extra as any)?.googleMapsApiKey;
@@ -116,6 +154,8 @@ export async function fetchDirections(params: {
       const leg = r.legs?.[0];
       const duration = leg?.duration;
       const distance = leg?.distance;
+      //for transit routes' details
+      const transitLines = leg ? getTransitLinesFromLeg(leg) : undefined;
 
       return {
         summary: r.summary ?? "",
@@ -124,6 +164,7 @@ export async function fetchDirections(params: {
         durationText: duration?.text ?? "",
         distanceMeters: distance?.value ?? 0,
         distanceText: distance?.text ?? "",
+        transitLines,
       } as DirectionRoute;
     })
     .filter((r) => !!r.polyline);
