@@ -34,6 +34,16 @@ type Props = {
   onClose: () => void;
 };
 
+function formatDuration(text?: string): string {
+  if (!text) return "--";
+
+  return text
+    .replace(/hours?/gi, "h")
+    .replace(/mins?/gi, "m")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function iconForMode(mode: TravelMode) {
   switch (mode) {
     case "driving":
@@ -140,8 +150,13 @@ export default function TravelOptionsPopup({
                 size={18}
                 color={active ? "#111" : "rgba(17,17,17,0.55)"}
               />
-              <Text style={[s.modeChipTime, active && s.modeChipTimeActive]}>
-                {fastest?.durationText ?? "--"}
+              <Text
+                style={[s.modeChipTime, active && s.modeChipTimeActive]}
+                numberOfLines={1}
+                testID={`mode-${m.mode}-time`}
+                ellipsizeMode="tail"
+              >
+                {formatDuration(fastest?.durationText)}
               </Text>
             </Pressable>
           );
@@ -271,6 +286,7 @@ const s = StyleSheet.create({
     fontSize: 13,
     fontWeight: "800",
     color: "rgba(17,17,17,0.55)",
+    maxWidth: 60,
   },
   modeChipTimeActive: {
     color: "#111",
