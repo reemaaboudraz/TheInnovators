@@ -28,7 +28,7 @@ function getTransitLinesFromLeg(leg: any): TransitLine[] {
   const extracted = new Set<string>(); // To not store duplicate transit lines details
 
 
-  for (const step of leg.steps ?? []) {
+  for (const step of leg?.steps ?? []) {
     //We only want to extract the transit details of the part of the trip (step) that is done by transit
     //Therefore, if the mode is not transit then we skip it and move on to the next step
     if (step?.travel_mode !== "TRANSIT") continue;
@@ -37,11 +37,17 @@ function getTransitLinesFromLeg(leg: any): TransitLine[] {
     const line = transitDetails?.line;
 
     if (!line) { continue; }
-    
-    const lineName : string = String(line?.short_name ?? line?.name ?? "").trim();
-    const vehicleType : string | undefined = line?.vehicle?.type;
-    const headsign : string | undefined = transitDetails?.headsign?.trim();
-    const agencyName : string | undefined = Array.isArray(line?.agencies) ? line?.agencies[0]?.name?.trim() : undefined; //some lines might have multiple agencies, so we will only use the first one as reference
+
+    const lineName: string = String(line?.short_name ?? line?.name ?? "").trim();
+    const vehicleType: string | undefined = line?.vehicle?.type;
+    const headsign: string | undefined =
+      typeof transitDetails?.headsign === "string"
+        ? transitDetails.headsign.trim()
+        : undefined;
+    const agencyName: string | undefined =
+      Array.isArray(line?.agencies) && typeof line.agencies[0]?.name === "string"
+        ? line.agencies[0].name.trim()
+        : undefined; //some lines might have multiple agencies, so we will only use the first one as reference
 
     //we create a unique key for each transit line based on its name, vehicle type, headsign and agency name to store it in our extracted set to use as reference to avoid duplication
     const key = `${lineName}|${vehicleType}|${headsign}|${agencyName}`;
@@ -155,7 +161,9 @@ export async function fetchDirections(params: {
       const duration = leg?.duration;
       const distance = leg?.distance;
       //for transit routes' details
-      const transitLines = leg ? getTransitLinesFromLeg(leg) : undefined;
+      const transitLines =
+        mode === "transit" && leg ? getTransitLinesFromLeg(leg) : undefined;
+
 
       return {
         summary: r.summary ?? "",

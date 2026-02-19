@@ -17,7 +17,6 @@ import type {
   DirectionRoute,
   TravelMode,
 } from "@/components/campus/helper_methods/googleDirections";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 type ModeData = {
   mode: TravelMode;
@@ -57,10 +56,6 @@ function getMetroDetails(route: DirectionRoute): string[] {
     }
   }
   return [...set];
-}
-
-function hasMetroFromRoute(route: DirectionRoute): boolean {
-  return getMetroDetails(route).length > 0;
 }
 
 function formatDuration(text?: string): string {
@@ -170,7 +165,9 @@ export default function TravelOptionsPopup({
           return (
             <Pressable
               key={m.mode}
-              onPress={() => onSelectMode(m.mode)}
+              onPress={() => {
+                onSelectMode(m.mode);
+              }}
               style={[s.modeChip, active && s.modeChipActive]}
               testID={`mode-${m.mode}`}
             >
@@ -198,6 +195,8 @@ export default function TravelOptionsPopup({
       >
         {routes.map((r, idx) => {
           const active = idx === selectedRouteIndex;
+          const buses = selectedMode === "transit" ? getBusDetails(r) : [];
+          const metros = selectedMode === "transit" ? getMetroDetails(r) : [];
 
           return (
             <Pressable
@@ -210,29 +209,29 @@ export default function TravelOptionsPopup({
                 <Text style={s.routeBig}>{r.durationText}</Text>
                 <Text style={s.routeMeta}>{r.distanceText}</Text>
                 {!!r.summary && <Text style={s.routeSummary}>{r.summary}</Text>}
+
+                {/*Rendering the bus and metro chips in the summary*/}
+                {selectedMode === "transit" && (r.transitLines?.length ?? 0) > 0 && (
+                  <View style={s.transitRow}>
+                    {buses.slice(0, 4).map((bus) => (
+                      <View key={bus} style={s.busChip}>
+                        <Text style={s.busChipText}>{bus}</Text>
+                      </View>
+                    ))}
+
+                    {buses.length > 4 && (
+                      <Text style={s.moreText}>+{buses.length - 4}</Text>
+                    )}
+
+                    {metros.slice(0, 2).map((metro) => (
+                      <View key={`metro-${metro}`} style={s.metroChip}>
+                        <Text style={s.metroChipText}>{metro}</Text>
+                      </View>
+                    ))}
+
+                  </View>
+                )}
               </View>
-
-              {/*Rendering the bus and metro chips in the summary*/}
-              {selectedMode === "transit" && (r.transitLines?.length ?? 0) > 0 && (
-                <View style={s.transitRow}>
-                  {getBusDetails(r).slice(0, 4).map((bus) => (
-                    <View key={bus} style={s.busChip}>
-                      <Text style={s.busChipText}>{bus}</Text>
-                    </View>
-                  ))}
-
-                  {getBusDetails(r).length > 4 && (
-                    <Text style={s.moreText}>+{getBusDetails(r).length - 4}</Text>
-                  )}
-
-                  {getMetroDetails(r).slice(0, 2).map((metro) => (
-                    <View key={`metro-${metro}`} style={s.metroChip}>
-                      <Text style={s.metroChipText}>{metro}</Text>
-                    </View>
-                  ))}
-
-                </View>
-              )}
 
               <Pressable
                 onPress={(e: any) => {
