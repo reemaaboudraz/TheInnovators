@@ -41,6 +41,7 @@ import BuildingPopup from "@/components/campus/BuildingPopup";
 import BrandBar from "@/components/layout/BrandBar";
 import { styles } from "@/components/Styles/mapStyle";
 import { useNavigation } from "@/hooks/useNavigation";
+import { useRouteNavigation } from "@/hooks/useRouteNavigation";
 import RoutePlanner from "@/components/campus/RoutePlanner"; // diamond button only
 import RouteInput from "@/components/campus/RouteInput";
 import {
@@ -59,6 +60,17 @@ import {
   type DirectionRoute,
   type TravelMode,
 } from "@/components/campus/helper_methods/googleDirections";
+import { TopDirectionsCard } from "@/components/ui/TopDirectionsCard";
+import { StepsDropdown } from "@/components/ui/StepsDropdown";
+import { BottomNavigationBar } from "@/components/ui/BottomNavigationBar";
+import { StartLiveBanner } from "@/components/ui/StartLiveBanner";
+import { bearingDegrees } from "@/components/campus/helper_methods/geo";
+import {
+  formatArrivalTimeFromNow,
+  metersToKmString,
+  secondsToMinutesString,
+} from "@/components/campus/helper_methods/navigationFormat"
+
 
 // Re-export for backwards compatibility with tests
 export {
@@ -159,6 +171,22 @@ export default function CampusMap() {
     { latitude: number; longitude: number }[]
   >([]);
 
+  const routeNavigation = useRouteNavigation({
+  origin: nav.routeStart
+    ? { latitude: nav.routeStart.latitude, longitude: nav.routeStart.longitude }
+    : null,
+  destination: nav.routeDest
+    ? { latitude: nav.routeDest.latitude, longitude: nav.routeDest.longitude }
+    : null,
+    userLocation,
+  onStarted: () => setTravelPopupVisible(false),
+  });
+  const [stepsOpen, setStepsOpen] = useState(false);
+  const [isFollowingUser, setIsFollowingUser] = useState(true);
+  const lastCameraUpdateRef = useRef(0);
+
+
+
   // Auto fetch user location on mount
   useEffect(() => {
     let cancelled = false;
@@ -184,15 +212,19 @@ export default function CampusMap() {
 
   const handleLocationFound = (location: UserLocation) => {
     setUserLocation(location);
-    mapRef.current?.animateToRegion(
-      {
-        latitude: location.latitude,
-        longitude: location.longitude,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
-      },
-      500,
-    );
+    setIsFollowingUser(true);
+
+    if (!routeNavigation.isNavigating) {
+      mapRef.current?.animateToRegion(
+        {
+          latitude: location.latitude,
+          longitude: location.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        },
+        500,
+      );
+    }
   };
 
   const handleCampusChange = (campus: Campus) => {
@@ -229,6 +261,7 @@ export default function CampusMap() {
       );
     }).slice(0, 6);
   }, [query, ALL_BUILDINGS]);
+
 
   useEffect(() => {
     const start = nav.routeStart;
@@ -327,6 +360,36 @@ export default function CampusMap() {
     nav.routeDest?.latitude,
     nav.routeDest?.longitude,
   ]);
+
+ useEffect(() => {
+  if (!routeNavigation.isNavigating) return;
+  if (!isFollowingUser) return;
+  if (!userLocation) return;
+
+  const now = Date.now();
+  if (now - lastCameraUpdateRef.current < 900) return; 
+  lastCameraUpdateRef.current = now;
+
+  const target = routeNavigation.currentStep?.end;
+  const heading = target ? bearingDegrees(userLocation, target) : 0;
+
+  mapRef.current?.animateCamera(
+    {
+      center: userLocation,
+      zoom: 18,      
+      heading,       
+      pitch: 0,
+    },
+    { duration: 500 },
+  );
+}, [
+  routeNavigation.isNavigating,
+  isFollowingUser,
+  userLocation,
+  routeNavigation.activeStepIndex, 
+]);
+
+
 
   const focusBuilding = (b: Building) => {
     // keep your behavior
@@ -486,6 +549,9 @@ export default function CampusMap() {
         onRegionChangeComplete={(r) => {
           if (r?.latitude != null && r?.longitude != null) setRegion(r);
         }}
+         onPanDrag={() => {
+          if (routeNavigation.isNavigating) setIsFollowingUser(false);
+        }}
         onPress={() => {
           // Only clear popup in normal mode
           if (!nav.isRouteMode && selected) {
@@ -630,7 +696,7 @@ export default function CampusMap() {
         )}
 
         {/* ROUTE MODE UI */}
-        {nav.isRouteMode && (
+        {nav.isRouteMode && !routeNavigation.isNavigating && (
           <>
             <View style={routeStyles.routePanel} testID="routePanel">
               <RouteInput
@@ -716,6 +782,7 @@ export default function CampusMap() {
       <View style={[floatingStyles.container, { bottom: floatingBottom }]}>
         <CurrentLocationButton onLocationFound={handleLocationFound} />
 
+        {!routeNavigation.isNavigating && (
         <RoutePlanner
           isRouteMode={nav.isRouteMode}
           onToggle={() => {
@@ -745,7 +812,9 @@ export default function CampusMap() {
             nav.toggleRouteMode();
           }}
         />
+        )}
       </View>
+      
 
       {/* Popup only in normal mode */}
       {!nav.isRouteMode && selected && (
@@ -762,7 +831,7 @@ export default function CampusMap() {
       )}
 
       {/* Travel options popup only in route mode */}
-      {nav.isRouteMode && (
+      {nav.isRouteMode && !routeNavigation.isNavigating && (
         <TravelOptionsPopup
           campusTheme={focusedCampus}
           visible={travelPopupVisible}
@@ -780,8 +849,67 @@ export default function CampusMap() {
           }}
           onSelectRouteIndex={(index) => applySelection(selectedMode, index)}
           onClose={() => setTravelPopupVisible(false)}
+          onGo={async (mode, index) => {
+            await routeNavigation.startNavigation(mode, index);
+            setIsFollowingUser(true);  
+          }}
+
         />
       )}
+      
+
+
+      <TopDirectionsCard
+        visible={routeNavigation.isNavigating}
+        distanceText={
+          routeNavigation.isArrived 
+          ? "Arrived" 
+          : (routeNavigation.currentStep?.distanceText ?? "")}
+        streetText={routeNavigation.isArrived 
+          ? "You've reached your destination." 
+          : (routeNavigation.currentStep?.instruction ?? "")}
+        onPress={() => setStepsOpen((v) => !v)}
+      />
+
+      <StepsDropdown
+        visible={stepsOpen && routeNavigation.isNavigating}
+        steps={routeNavigation.activeSteps}
+        activeIndex={routeNavigation.activeStepIndex}
+        onClose={() => setStepsOpen(false)}
+      />
+
+      <StartLiveBanner
+        visible={routeNavigation.isNavigating && !routeNavigation.isNearStart&& !routeNavigation.isArrived}
+        bottomOffset={40}
+        onExit={()=> {
+          routeNavigation.exitNavigation();
+          setSelectedRouteCoords([]);
+        }}
+      />
+
+      <BottomNavigationBar
+        visible={routeNavigation.isNavigating && routeNavigation.isNearStart&& !routeNavigation.isArrived}
+        bottomOffset={40} // BrandBar default height
+        arrivalTimeText={
+          routeNavigation.activeSummary
+            ? formatArrivalTimeFromNow(routeNavigation.activeSummary.durationSec)
+            : "--:--"
+        }
+        durationMinText={
+          routeNavigation.activeSummary
+            ? secondsToMinutesString(routeNavigation.activeSummary.durationSec)
+            : "--"
+        }
+        distanceKmText={
+          routeNavigation.activeSummary
+            ? metersToKmString(routeNavigation.activeSummary.distanceMeters)
+            : "--"
+        }
+        onExit={()=> {
+          routeNavigation.exitNavigation();
+          setSelectedRouteCoords([]);
+        }}
+      />
 
       <BrandBar
         testID="brandbar"
