@@ -107,9 +107,20 @@ async function fetchAndSortRoutes(
   destination: { latitude: number; longitude: number },
   mode: TravelMode,
 ): Promise<readonly [TravelMode, DirectionRoute[]]> {
-  const routes = await fetchDirections({ origin, destination, mode });
-  const sorted = [...routes].sort((a, b) => a.durationSec - b.durationSec);
-  return [mode, sorted] as const;
+  try {
+    const debugTag = Date.now().toString();
+    console.log(`Fetching directions... mode=${mode} tag=${debugTag}`);
+
+    const routes = await fetchDirections({ origin, destination, mode });
+
+    console.log(`Directions OK (${mode}), routes:`, routes.length);
+
+    const sorted = [...routes].sort((a, b) => a.durationSec - b.durationSec);
+    return [mode, sorted] as const;
+  } catch (e) {
+    console.log(`❌ fetchDirections failed (${mode}):`, e);
+    return [mode, []] as const;
+  }
 }
 
 export default function CampusMap() {

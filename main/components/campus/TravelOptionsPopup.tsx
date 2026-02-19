@@ -3,6 +3,7 @@ import {
   Pressable,
   StyleSheet,
   Text,
+  Image,
   View,
   useWindowDimensions,
 } from "react-native";
@@ -17,6 +18,9 @@ import type {
   DirectionRoute,
   TravelMode,
 } from "@/components/campus/helper_methods/googleDirections";
+
+const ICON_SUBWAY = require("../../assets/icons/icon-subway.png");
+const ICON_BUS = require("../../assets/icons/icon-bus.png");
 
 type ModeData = {
   mode: TravelMode;
@@ -80,6 +84,45 @@ function iconForMode(mode: TravelMode) {
       return "directions-bike";
   }
 }
+
+function metroLineColor(name: string): string {
+  const n = name.trim().toLowerCase();
+
+  // Common values Google returns: "Green", "Orange", "Yellow", "Blue"
+  if (n.includes("1")) return "#2E7D32";
+  if (n.includes("2")) return "#EF6C00";
+  if (n.includes("4")) return "#F9A825";
+  if (n.includes("5")) return "#1565C0";
+
+  // fallback
+  return "rgba(139, 32, 52, 0.27)";
+}
+
+function metroTextColor(bg: string): "#111" | "#fff" {
+  // Yellow needs dark text for contrast
+  return bg === "#F9A825" ? "#111" : "#fff";
+}
+
+type LineChipProps = {
+  label: string;
+  iconSource: any; // PNG module from require()
+  backgroundColor: string;
+  textColor: string;
+};
+
+function LineChip({ label, iconSource, backgroundColor, textColor }: LineChipProps) {
+  return (
+    <View style={[s.lineChip, { backgroundColor }]}>
+      <Image
+        source={iconSource}
+        style={[s.chipIcon, { tintColor: textColor }]} // tintColor works best if PNG is monochrome
+        resizeMode="contain"
+      />
+      <Text style={[s.lineChipText, { color: textColor }]}>{label}</Text>
+    </View>
+  );
+}
+
 
 export default function TravelOptionsPopup({
   campusTheme,
@@ -214,20 +257,34 @@ export default function TravelOptionsPopup({
                 {selectedMode === "transit" && (r.transitLines?.length ?? 0) > 0 && (
                   <View style={s.transitRow}>
                     {buses.slice(0, 4).map((bus) => (
-                      <View key={bus} style={s.busChip}>
-                        <Text style={s.busChipText}>{bus}</Text>
-                      </View>
+                      <LineChip
+                        key={`bus-${bus}`}
+                        label={bus}
+                        iconSource={ICON_BUS}
+                        backgroundColor="rgba(0, 98, 255, 0.12)"
+                        textColor="#111"
+                      />
+
                     ))}
 
                     {buses.length > 4 && (
                       <Text style={s.moreText}>+{buses.length - 4}</Text>
                     )}
 
-                    {metros.slice(0, 2).map((metro) => (
-                      <View key={`metro-${metro}`} style={s.metroChip}>
-                        <Text style={s.metroChipText}>{metro}</Text>
-                      </View>
-                    ))}
+                    {metros.slice(0, 2).map((metro) => {
+                      const bg = metroLineColor(metro);
+                      const fg = metroTextColor(bg);
+
+                      return (
+                        <LineChip
+                          key={`metro-${metro}`}
+                          label={metro}
+                          iconSource={ICON_SUBWAY}
+                          backgroundColor={bg}
+                          textColor={fg}
+                        />
+                      );
+                    })}
 
                   </View>
                 )}
@@ -263,7 +320,7 @@ const s = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: "rgba(17,17,17,0.10)",
+    backgroundColor: "rgb(0, 98, 255)",
   },
 
   busChipText: {
@@ -284,6 +341,26 @@ const s = StyleSheet.create({
     fontWeight: "900",
     color: "#111",
   },
+
+  chipIcon: {
+    width: 14,
+    height: 14,
+    marginRight: 6,
+  },
+
+  lineChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+  },
+
+  lineChipText: {
+    fontSize: 12,
+    fontWeight: "900",
+  },
+
 
   moreText: {
     fontSize: 12,
