@@ -4,11 +4,10 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 type Props = {
   visible: boolean;
-  distanceText: string;      
-  streetText: string; 
+  distanceText: string;
+  streetText: string;
   onPress?: () => void;
 };
-
 
 export function TopDirectionsCard({
   visible,
@@ -50,7 +49,7 @@ const shadow = Platform.select({
 const styles = StyleSheet.create({
   wrap: {
     position: "absolute",
-    top: 52,           
+    top: 52,
     left: 10,
     right: 10,
     zIndex: 9999,

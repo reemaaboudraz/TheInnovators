@@ -1,5 +1,12 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, Platform, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Platform,
+  Pressable,
+} from "react-native";
 import type { DirectionStep } from "@/components/campus/helper_methods/googleDirections";
 
 type Props = {
@@ -24,24 +31,29 @@ export function StepsDropdown({
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
       {/* Tap-outside backdrop */}
-      <Pressable
-        style={styles.backdrop}
-        onPress={onClose}
-      />
+      <Pressable style={styles.backdrop} onPress={onClose} />
 
       {/* Dropdown card */}
       <View pointerEvents="box-none" style={styles.wrap}>
         {/* Prevent taps inside card from closing */}
         <Pressable style={styles.card} onPress={() => {}}>
-          <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+          <ScrollView
+            style={styles.scroll}
+            contentContainerStyle={styles.content}
+          >
             {slice.map((s, idx) => {
               const isCurrent = idx === 0;
               return (
-                <View key={activeIndex + idx} style={[styles.row, isCurrent && styles.rowActive]}>
+                <View
+                  key={activeIndex + idx}
+                  style={[styles.row, isCurrent && styles.rowActive]}
+                >
                   <Text style={styles.text} numberOfLines={2}>
                     {s.instruction}
                   </Text>
-                  {!!s.distanceText && <Text style={styles.sub}>{s.distanceText}</Text>}
+                  {!!s.distanceText && (
+                    <Text style={styles.sub}>{s.distanceText}</Text>
+                  )}
                 </View>
               );
             })}
@@ -70,7 +82,7 @@ const styles = StyleSheet.create({
   },
   wrap: {
     position: "absolute",
-    top: 110, 
+    top: 110,
     left: 10,
     right: 10,
     zIndex: 9999,
@@ -82,7 +94,7 @@ const styles = StyleSheet.create({
     ...shadow,
   },
   scroll: {
-    maxHeight: 260, 
+    maxHeight: 260,
   },
   content: {},
   row: {

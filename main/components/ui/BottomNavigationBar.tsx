@@ -3,10 +3,10 @@ import { View, Text, Pressable, StyleSheet, Platform } from "react-native";
 
 type Props = {
   visible: boolean;
-  bottomOffset: number;      // to sit above BrandBar
-  arrivalTimeText: string;  
-  durationMinText: string;   
-  distanceKmText: string;    
+  bottomOffset: number; // to sit above BrandBar
+  arrivalTimeText: string;
+  durationMinText: string;
+  distanceKmText: string;
   onExit: () => void;
 };
 
@@ -21,7 +21,10 @@ export function BottomNavigationBar({
   if (!visible) return null;
 
   return (
-    <View pointerEvents="box-none" style={[styles.wrap, { bottom: bottomOffset }]}>
+    <View
+      pointerEvents="box-none"
+      style={[styles.wrap, { bottom: bottomOffset }]}
+    >
       <View style={styles.bar}>
         <View style={styles.metrics}>
           <Metric value={arrivalTimeText} label="arrival" />
@@ -31,7 +34,10 @@ export function BottomNavigationBar({
 
         <Pressable
           onPress={onExit}
-          style={({ pressed }) => [styles.exitBtn, pressed && { opacity: 0.92 }]}
+          style={({ pressed }) => [
+            styles.exitBtn,
+            pressed && { opacity: 0.92 },
+          ]}
         >
           <Text style={styles.exitText}>Exit</Text>
         </Pressable>
@@ -52,7 +58,7 @@ function Metric({ value, label }: { value: string; label: string }) {
 const shadow = Platform.select({
   ios: {
     shadowColor: "#000",
-    shadowOpacity: 0.10,
+    shadowOpacity: 0.1,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: -4 },
   },
@@ -110,4 +116,3 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 });
-

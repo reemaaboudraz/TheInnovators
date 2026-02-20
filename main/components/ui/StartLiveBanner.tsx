@@ -11,13 +11,19 @@ export function StartLiveBanner({ visible, bottomOffset, onExit }: Props) {
   if (!visible) return null;
 
   return (
-    <View pointerEvents="box-none" style={[styles.wrap, { bottom: bottomOffset }]}>
+    <View
+      pointerEvents="box-none"
+      style={[styles.wrap, { bottom: bottomOffset }]}
+    >
       <View style={styles.card}>
         <Text style={styles.text}>Go to start to begin live navigation</Text>
 
         <Pressable
           onPress={onExit}
-          style={({ pressed }) => [styles.exitBtn, pressed && { opacity: 0.92 }]}
+          style={({ pressed }) => [
+            styles.exitBtn,
+            pressed && { opacity: 0.92 },
+          ]}
         >
           <Text style={styles.exitText}>Exit</Text>
         </Pressable>
@@ -29,7 +35,7 @@ export function StartLiveBanner({ visible, bottomOffset, onExit }: Props) {
 const shadow = Platform.select({
   ios: {
     shadowColor: "#000",
-    shadowOpacity: 0.10,
+    shadowOpacity: 0.1,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: -4 },
   },
