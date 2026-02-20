@@ -13,16 +13,6 @@ jest.mock("@/components/campus/helper_methods/googleDirections", () => ({
   decodePolyline: jest.fn(),
 }));
 
-const googleDirections = jest.requireMock(
-  "@/components/campus/helper_methods/googleDirections",
-) as jest.Mocked<
-  typeof import("@/components/campus/helper_methods/googleDirections")
->;
-
-const mockFetchDirections = googleDirections.fetchDirections;
-const mockPickFastestRoute = googleDirections.pickFastestRoute;
-const mockDecodePolyline = googleDirections.decodePolyline;
-
 // Simplify heavy UI components
 jest.mock("@/components/campus/BuildingShapesLayer", () => {
   const React = require("react");
@@ -247,6 +237,17 @@ jest.mock("react-native-maps", () => {
 
 // Import AFTER mocks
 import CampusMap from "../CampusMap";
+
+const googleDirections =
+  require("@/components/campus/helper_methods/googleDirections") as {
+    fetchDirections: jest.Mock;
+    pickFastestRoute: jest.Mock;
+    decodePolyline: jest.Mock;
+  };
+
+const mockFetchDirections = googleDirections.fetchDirections;
+const mockPickFastestRoute = googleDirections.pickFastestRoute;
+const mockDecodePolyline = googleDirections.decodePolyline;
 
 function makeRoute(
   polyline: string,
