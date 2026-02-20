@@ -2,25 +2,24 @@
 import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
-import {
-  fetchDirections,
-  pickFastestRoute,
-  decodePolyline,
-} from "@/components/campus/helper_methods/googleDirections";
-
-const mockFetchDirections = fetchDirections as unknown as jest.Mock;
-const mockPickFastestRoute = pickFastestRoute as unknown as jest.Mock;
-const mockDecodePolyline = decodePolyline as unknown as jest.Mock;
 
 // --- Mocks ---
 jest.mock("expo-status-bar", () => ({ StatusBar: () => null }));
 
 jest.mock("@/components/campus/helper_methods/googleDirections", () => ({
   __esModule: true,
-  mockFetchDirections: jest.fn(),
-  mockPickFastestRoute: jest.fn(),
-  mockDecodePolyline: jest.fn(),
+  fetchDirections: jest.fn(),
+  pickFastestRoute: jest.fn(),
+  decodePolyline: jest.fn(),
 }));
+
+const googleDirections = jest.requireMock(
+  "@/components/campus/helper_methods/googleDirections",
+) as jest.Mocked<typeof import("@/components/campus/helper_methods/googleDirections")>;
+
+const mockFetchDirections = googleDirections.fetchDirections;
+const mockPickFastestRoute = googleDirections.pickFastestRoute;
+const mockDecodePolyline = googleDirections.decodePolyline;
 
 // Simplify heavy UI components
 jest.mock("@/components/campus/BuildingShapesLayer", () => {
