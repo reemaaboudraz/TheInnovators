@@ -6,6 +6,13 @@ import { describe, it, expect, beforeEach, jest } from "@jest/globals";
 // --- Mocks ---
 jest.mock("expo-status-bar", () => ({ StatusBar: () => null }));
 
+jest.mock("@/components/campus/helper_methods/googleDirections", () => ({
+  __esModule: true,
+  fetchDirections: jest.fn(),
+  pickFastestRoute: jest.fn(),
+  decodePolyline: jest.fn(),
+}));
+
 // Simplify heavy UI components
 jest.mock("@/components/campus/BuildingShapesLayer", () => {
   const React = require("react");
@@ -13,6 +20,57 @@ jest.mock("@/components/campus/BuildingShapesLayer", () => {
   return {
     __esModule: true,
     default: () => React.createElement(View, { testID: "mock-shapes" }),
+  };
+});
+
+jest.mock("@/components/campus/TravelOptionsPopup", () => {
+  const React = require("react");
+  const { View, Text, Pressable } = require("react-native");
+
+  return {
+    __esModule: true,
+    default: ({
+      visible,
+      modes,
+      selectedMode,
+      onSelectMode,
+      onSelectRouteIndex,
+    }: any) => {
+      if (!visible) return null;
+
+      const selected =
+        modes.find((m: any) => m.mode === selectedMode) ?? modes[0];
+
+      return (
+        <View testID="travel-popup">
+          <Text>Directions</Text>
+
+          {/* mode buttons */}
+          {modes.map((m: any) => (
+            <Pressable
+              key={m.mode}
+              testID={`mode-${m.mode}`}
+              onPress={() => onSelectMode(m.mode)}
+            >
+              <Text testID={`mode-${m.mode}-time`}>
+                {m.routes?.[0]?.durationText ?? "--"}
+              </Text>
+            </Pressable>
+          ))}
+
+          {/* route cards for the selected mode */}
+          {selected.routes.map((r: any, idx: number) => (
+            <Pressable
+              key={`${selectedMode}-${idx}`}
+              testID={`route-${selectedMode}-${idx}`}
+              onPress={() => onSelectRouteIndex(idx)}
+            >
+              <Text>{r.durationText}</Text>
+            </Pressable>
+          ))}
+        </View>
+      );
+    },
   };
 });
 
@@ -140,18 +198,6 @@ jest.mock("@/hooks/useNavigation", () => ({
   useNavigation: () => mockNav,
 }));
 
-// Mock google directions helpers to control sorting + selection
-const mockFetchDirections = jest.fn() as jest.Mock;
-const mockPickFastestRoute = jest.fn() as jest.Mock;
-const mockDecodePolyline = jest.fn() as jest.Mock;
-
-jest.mock("@/components/campus/helper_methods/googleDirections", () => ({
-  __esModule: true,
-  fetchDirections: (...args: any[]) => mockFetchDirections(...args),
-  pickFastestRoute: (...args: any[]) => mockPickFastestRoute(...args),
-  decodePolyline: (...args: any[]) => mockDecodePolyline(...args),
-}));
-
 // MapView mock with fitToCoordinates support
 const mockAnimateToRegion = jest.fn();
 const mockFitToCoordinates = jest.fn();
@@ -191,6 +237,17 @@ jest.mock("react-native-maps", () => {
 
 // Import AFTER mocks
 import CampusMap from "../CampusMap";
+
+const googleDirections =
+  require("@/components/campus/helper_methods/googleDirections") as {
+    fetchDirections: jest.Mock;
+    pickFastestRoute: jest.Mock;
+    decodePolyline: jest.Mock;
+  };
+
+const mockFetchDirections = googleDirections.fetchDirections;
+const mockPickFastestRoute = googleDirections.pickFastestRoute;
+const mockDecodePolyline = googleDirections.decodePolyline;
 
 function makeRoute(
   polyline: string,

@@ -25,6 +25,10 @@ jest.mock("../BuildingPin", () => () => null);
 jest.mock("../CurrentLocationButton", () => () => null);
 jest.mock("../RoutePlanner", () => () => null);
 jest.mock("../RouteInput", () => () => null);
+jest.mock("../TravelOptionsPopup", () => ({
+  __esModule: true,
+  default: () => null,
+}));
 jest.mock("@/components/layout/BrandBar", () => () => null);
 
 // Make ToggleButton controllable
