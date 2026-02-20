@@ -209,11 +209,28 @@ export function pickFastestRoute(
 
 //ADDED HELPER + FUNCTION DIRECTION WITH STEPS
 function stripHtml(input: string): string {
-  return input
-    .replace(/<[^>]*>/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  let out = "";
+  let insideTag = false;
+
+  for (let i = 0; i < input.length; i++) {
+    const ch = input[i];
+
+    if (ch === "<") {
+      insideTag = true;
+      continue;
+    }
+    if (ch === ">") {
+      insideTag = false;
+      out += " "; // keep word separation
+      continue;
+    }
+
+    if (!insideTag) out += ch;
+  }
+
+  return out.replace(/\s+/g, " ").trim();
 }
+
 
 export async function fetchDirectionsWithSteps(params: {
   origin: LatLng;
