@@ -15,7 +15,9 @@ jest.mock("@/components/campus/helper_methods/googleDirections", () => ({
 
 const googleDirections = jest.requireMock(
   "@/components/campus/helper_methods/googleDirections",
-) as jest.Mocked<typeof import("@/components/campus/helper_methods/googleDirections")>;
+) as jest.Mocked<
+  typeof import("@/components/campus/helper_methods/googleDirections")
+>;
 
 const mockFetchDirections = googleDirections.fetchDirections;
 const mockPickFastestRoute = googleDirections.pickFastestRoute;
@@ -46,7 +48,8 @@ jest.mock("@/components/campus/TravelOptionsPopup", () => {
     }: any) => {
       if (!visible) return null;
 
-      const selected = modes.find((m: any) => m.mode === selectedMode) ?? modes[0];
+      const selected =
+        modes.find((m: any) => m.mode === selectedMode) ?? modes[0];
 
       return (
         <View testID="travel-popup">
