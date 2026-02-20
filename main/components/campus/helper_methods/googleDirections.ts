@@ -231,7 +231,6 @@ function stripHtml(input: string): string {
   return out.replace(/\s+/g, " ").trim();
 }
 
-
 export async function fetchDirectionsWithSteps(params: {
   origin: LatLng;
   destination: LatLng;
