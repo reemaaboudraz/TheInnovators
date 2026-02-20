@@ -36,4 +36,3 @@ export function bearingDegrees(a: LatLng, b: LatLng): number {
   const brng = toDeg(Math.atan2(y, x));
   return (brng + 360) % 360;
 }
-

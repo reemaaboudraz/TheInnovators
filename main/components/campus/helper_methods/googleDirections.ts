@@ -141,9 +141,12 @@ export function pickFastestRoute(
   return routes[0];
 }
 
-//ADDED HELPER + FUNCTION DIRECTION WITH STEPS 
+//ADDED HELPER + FUNCTION DIRECTION WITH STEPS
 function stripHtml(input: string): string {
-  return input.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  return input
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export async function fetchDirectionsWithSteps(params: {

@@ -7,7 +7,6 @@ import {
 } from "@/components/campus/helper_methods/googleDirections";
 import { distanceMeters } from "@/components/campus/helper_methods/geo";
 
-
 type ActiveRouteSummary = {
   mode: TravelMode;
   durationText: string;
@@ -17,9 +16,8 @@ type ActiveRouteSummary = {
   summary: string;
 };
 
-const START_THRESHOLD_M = 35; 
+const START_THRESHOLD_M = 35;
 const STEP_END_THRESHOLD_M = 25;
-
 
 export function useRouteNavigation(params: {
   origin: LatLng | null;
@@ -39,48 +37,46 @@ export function useRouteNavigation(params: {
   const [isStarting, setIsStarting] = useState(false);
   const [isNearStart, setIsNearStart] = useState(false);
 
-
   const currentStep = useMemo(
     () => activeSteps[activeStepIndex] ?? null,
     [activeSteps, activeStepIndex],
   );
 
-  
-const lastAdvanceAtRef = useRef(0);
+  const lastAdvanceAtRef = useRef(0);
 
-useEffect(() => {
-  if (!isNavigating) return;
-  if (!userLocation || !origin) return;
+  useEffect(() => {
+    if (!isNavigating) return;
+    if (!userLocation || !origin) return;
 
-  // Are we near the starting point?
-  const dStart = distanceMeters(userLocation, origin);
-  const near = dStart <= START_THRESHOLD_M;
-  setIsNearStart(near);
+    // Are we near the starting point?
+    const dStart = distanceMeters(userLocation, origin);
+    const near = dStart <= START_THRESHOLD_M;
+    setIsNearStart(near);
 
-  // Don't advance steps until near the start 
-  if (!near) return;
+    // Don't advance steps until near the start
+    if (!near) return;
 
-  // Auto-advance when close to the end of the current step
-  if (!currentStep) return;
+    // Auto-advance when close to the end of the current step
+    if (!currentStep) return;
 
-  const now = Date.now();
-  if (now - lastAdvanceAtRef.current < 1200) return; // debounce: 1.2s
+    const now = Date.now();
+    if (now - lastAdvanceAtRef.current < 1200) return; // debounce: 1.2s
 
-  const dEnd = distanceMeters(userLocation, currentStep.end);
+    const dEnd = distanceMeters(userLocation, currentStep.end);
 
-  const isLast = activeStepIndex >= activeSteps.length - 1;
-  if (!isLast && dEnd <= STEP_END_THRESHOLD_M) {
-    lastAdvanceAtRef.current = now;
-    setActiveStepIndex((i) => Math.min(i + 1, activeSteps.length - 1));
-  }
-}, [
-  isNavigating,
-  userLocation,
-  origin,
-  currentStep,
-  activeStepIndex,
-  activeSteps.length,
-]);
+    const isLast = activeStepIndex >= activeSteps.length - 1;
+    if (!isLast && dEnd <= STEP_END_THRESHOLD_M) {
+      lastAdvanceAtRef.current = now;
+      setActiveStepIndex((i) => Math.min(i + 1, activeSteps.length - 1));
+    }
+  }, [
+    isNavigating,
+    userLocation,
+    origin,
+    currentStep,
+    activeStepIndex,
+    activeSteps.length,
+  ]);
 
   const startNavigation = useCallback(
     async (mode: TravelMode, index: number) => {
@@ -99,7 +95,9 @@ useEffect(() => {
           mode,
         });
 
-        const sorted = [...detailed].sort((a, b) => a.durationSec - b.durationSec);
+        const sorted = [...detailed].sort(
+          (a, b) => a.durationSec - b.durationSec,
+        );
         const chosen = sorted[index];
 
         if (!chosen) {

@@ -188,7 +188,7 @@ export default function TravelOptionsPopup({
               <Pressable
                 onPress={(e: any) => {
                   e?.stopPropagation?.();
-                  onGo(selectedMode, idx);
+                  onGo?.(selectedMode, idx);
                 }}
                 style={s.goBtn}
                 testID={`go-${selectedMode}-${idx}`}

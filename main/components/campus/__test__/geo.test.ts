@@ -1,4 +1,7 @@
-import { bearingDegrees, distanceMeters } from "@/components/campus/helper_methods/geo";
+import {
+  bearingDegrees,
+  distanceMeters,
+} from "@/components/campus/helper_methods/geo";
 import type { LatLng } from "@/components/campus/helper_methods/googleDirections";
 
 describe("geo.ts", () => {

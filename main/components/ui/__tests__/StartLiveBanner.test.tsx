@@ -31,4 +31,3 @@ describe("StartLiveBanner", () => {
     expect(onExit).toHaveBeenCalledTimes(1);
   });
 });
-
