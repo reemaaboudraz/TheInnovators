@@ -17,9 +17,9 @@ jest.mock("expo-status-bar", () => ({ StatusBar: () => null }));
 
 jest.mock("@/components/campus/helper_methods/googleDirections", () => ({
   __esModule: true,
-  fetchDirections: jest.fn(),
-  pickFastestRoute: jest.fn(),
-  decodePolyline: jest.fn(),
+  mockFetchDirections: jest.fn(),
+  mockPickFastestRoute: jest.fn(),
+  mockDecodePolyline: jest.fn(),
 }));
 
 // Simplify heavy UI components
