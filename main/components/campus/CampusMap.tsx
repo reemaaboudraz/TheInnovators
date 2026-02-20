@@ -62,10 +62,7 @@ import {
 } from "@/components/campus/helper_methods/googleDirections";
 import DirectionsLoadError from "../ui/DirectionLoadError";
 import { toDirectionsErrorMessage } from "@/components/campus/helper_methods/directionErrors";
-import { TopDirectionsCard } from "@/components/ui/TopDirectionsCard";
-import { StepsDropdown } from "@/components/ui/StepsDropdown";
-import { BottomNavigationBar } from "@/components/ui/BottomNavigationBar";
-import { StartLiveBanner } from "@/components/ui/StartLiveBanner";
+import { NavigationOverlay } from "@/components/campus/NavigationOverlay";
 import { bearingDegrees } from "@/components/campus/helper_methods/geo";
 import {
   formatArrivalTimeFromNow,
@@ -919,49 +916,22 @@ export default function CampusMap() {
         }}
         accentColor={focusedCampus === "SGW" ? "#912338" : "#E0B100"}
       />
-
-      <TopDirectionsCard
-        visible={routeNavigation.isNavigating}
-        distanceText={
-          routeNavigation.isArrived
-            ? "Arrived"
-            : (routeNavigation.currentStep?.distanceText ?? "")
+      <NavigationOverlay
+        isNavigating={routeNavigation.isNavigating}
+        isNearStart={routeNavigation.isNearStart}
+        isArrived={routeNavigation.isArrived}
+        stepsOpen={stepsOpen}
+        onToggleSteps={() => setStepsOpen((v) => !v)}
+        onCloseSteps={() => setStepsOpen(false)}
+        activeSteps={routeNavigation.activeSteps}
+        activeStepIndex={routeNavigation.activeStepIndex}
+        currentStepDistanceText={
+          routeNavigation.currentStep?.distanceText ?? ""
         }
-        streetText={
-          routeNavigation.isArrived
-            ? "You've reached your destination."
-            : (routeNavigation.currentStep?.instruction ?? "")
-        }
-        onPress={() => setStepsOpen((v) => !v)}
-      />
-
-      <StepsDropdown
-        visible={stepsOpen && routeNavigation.isNavigating}
-        steps={routeNavigation.activeSteps}
-        activeIndex={routeNavigation.activeStepIndex}
-        onClose={() => setStepsOpen(false)}
-      />
-
-      <StartLiveBanner
-        visible={
-          routeNavigation.isNavigating &&
-          !routeNavigation.isNearStart &&
-          !routeNavigation.isArrived
+        currentStepInstructionText={
+          routeNavigation.currentStep?.instruction ?? ""
         }
         bottomOffset={40}
-        onExit={() => {
-          routeNavigation.exitNavigation();
-          setAllRouteCoords([]);
-        }}
-      />
-
-      <BottomNavigationBar
-        visible={
-          routeNavigation.isNavigating &&
-          routeNavigation.isNearStart &&
-          !routeNavigation.isArrived
-        }
-        bottomOffset={40} // BrandBar default height
         arrivalTimeText={
           routeNavigation.activeSummary
             ? formatArrivalTimeFromNow(
