@@ -30,7 +30,6 @@ jest.mock("@/components/campus/TravelOptionsPopup", () => ({
   default: () => null,
 }));
 
-
 jest.mock("@/components/Buildings/data/Loyola_data.json", () => [
   {
     id: "loy-ad",

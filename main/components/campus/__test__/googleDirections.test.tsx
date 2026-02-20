@@ -166,7 +166,9 @@ describe("googleDirections", () => {
                           short_name: " 51 ",
                           name: "ShouldNotUseThis",
                           vehicle: { type: "BUS" },
-                          agencies: [{ name: " Société de transport de Montréal " }],
+                          agencies: [
+                            { name: " Société de transport de Montréal " },
+                          ],
                         },
                       },
                     },
@@ -179,7 +181,9 @@ describe("googleDirections", () => {
                         line: {
                           short_name: "51",
                           vehicle: { type: "BUS" },
-                          agencies: [{ name: "Société de transport de Montréal" }],
+                          agencies: [
+                            { name: "Société de transport de Montréal" },
+                          ],
                         },
                       },
                     },
@@ -291,8 +295,6 @@ describe("googleDirections", () => {
 
       expect(res[0].transitLines).toBeUndefined();
     });
-
-
 
     it("throws when HTTP response is not ok", async () => {
       (global as any).fetch.mockResolvedValueOnce({

@@ -55,7 +55,11 @@ function getMetroDetails(route: DirectionRoute): string[] {
   const set = new Set<string>();
 
   for (const line of route.transitLines ?? []) {
-    if ((line.vehicleType?.toLowerCase() === "subway" || line.vehicleType?.toLowerCase() === "metro") && line.name) {
+    if (
+      (line.vehicleType?.toLowerCase() === "subway" ||
+        line.vehicleType?.toLowerCase() === "metro") &&
+      line.name
+    ) {
       set.add(line.name);
     }
   }
@@ -110,7 +114,12 @@ type LineChipProps = {
   textColor: string;
 };
 
-function LineChip({ label, iconSource, backgroundColor, textColor }: LineChipProps) {
+function LineChip({
+  label,
+  iconSource,
+  backgroundColor,
+  textColor,
+}: LineChipProps) {
   return (
     <View style={[s.lineChip, { backgroundColor }]}>
       <Image
@@ -122,7 +131,6 @@ function LineChip({ label, iconSource, backgroundColor, textColor }: LineChipPro
     </View>
   );
 }
-
 
 export default function TravelOptionsPopup({
   campusTheme,
@@ -254,40 +262,39 @@ export default function TravelOptionsPopup({
                 {!!r.summary && <Text style={s.routeSummary}>{r.summary}</Text>}
 
                 {/*Rendering the bus and metro chips in the summary*/}
-                {selectedMode === "transit" && (r.transitLines?.length ?? 0) > 0 && (
-                  <View style={s.transitRow}>
-                    {buses.slice(0, 4).map((bus) => (
-                      <LineChip
-                        key={`bus-${bus}`}
-                        label={bus}
-                        iconSource={ICON_BUS}
-                        backgroundColor="rgba(0, 98, 255, 0.12)"
-                        textColor="#111"
-                      />
-
-                    ))}
-
-                    {buses.length > 4 && (
-                      <Text style={s.moreText}>+{buses.length - 4}</Text>
-                    )}
-
-                    {metros.slice(0, 2).map((metro) => {
-                      const bg = metroLineColor(metro);
-                      const fg = metroTextColor(bg);
-
-                      return (
+                {selectedMode === "transit" &&
+                  (r.transitLines?.length ?? 0) > 0 && (
+                    <View style={s.transitRow}>
+                      {buses.slice(0, 4).map((bus) => (
                         <LineChip
-                          key={`metro-${metro}`}
-                          label={metro}
-                          iconSource={ICON_SUBWAY}
-                          backgroundColor={bg}
-                          textColor={fg}
+                          key={`bus-${bus}`}
+                          label={bus}
+                          iconSource={ICON_BUS}
+                          backgroundColor="rgba(0, 98, 255, 0.12)"
+                          textColor="#111"
                         />
-                      );
-                    })}
+                      ))}
 
-                  </View>
-                )}
+                      {buses.length > 4 && (
+                        <Text style={s.moreText}>+{buses.length - 4}</Text>
+                      )}
+
+                      {metros.slice(0, 2).map((metro) => {
+                        const bg = metroLineColor(metro);
+                        const fg = metroTextColor(bg);
+
+                        return (
+                          <LineChip
+                            key={`metro-${metro}`}
+                            label={metro}
+                            iconSource={ICON_SUBWAY}
+                            backgroundColor={bg}
+                            textColor={fg}
+                          />
+                        );
+                      })}
+                    </View>
+                  )}
               </View>
 
               <Pressable
@@ -360,7 +367,6 @@ const s = StyleSheet.create({
     fontSize: 12,
     fontWeight: "900",
   },
-
 
   moreText: {
     fontSize: 12,

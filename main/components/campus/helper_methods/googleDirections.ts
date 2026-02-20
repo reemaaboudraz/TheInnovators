@@ -7,10 +7,10 @@ export type LatLng = { latitude: number; longitude: number };
 /*this type will allow us to fetch and store/display the transit details on the 
 routes summary for better UI experience when selecting a route*/
 export type TransitLine = {
-  name: string;          // e.g. "211"
-  vehicleType?: string;  // e.g. "BUS", "SUBWAY"
-  headsign?: string;     // e.g. "WEST"
-  agency?: string;       // e.g. "STM"
+  name: string; // e.g. "211"
+  vehicleType?: string; // e.g. "BUS", "SUBWAY"
+  headsign?: string; // e.g. "WEST"
+  agency?: string; // e.g. "STM"
 };
 
 export type DirectionRoute = {
@@ -35,11 +35,17 @@ function getTransitLinesFromLeg(leg: unknown): TransitLine[] {
     const transitDetails = step.transit_details;
     const line = transitDetails?.line;
 
-    if (!line) { continue; }
+    if (!line) {
+      continue;
+    }
 
-    const lineName: string = String(line?.short_name ?? line?.name ?? "").trim();
+    const lineName: string = String(
+      line?.short_name ?? line?.name ?? "",
+    ).trim();
 
-    if (!lineName) { continue; }
+    if (!lineName) {
+      continue;
+    }
 
     const vehicleType: string | undefined = line?.vehicle?.type;
     const headsign: string | undefined =
@@ -47,7 +53,8 @@ function getTransitLinesFromLeg(leg: unknown): TransitLine[] {
         ? transitDetails.headsign.trim()
         : undefined;
     const agencyName: string | undefined =
-      Array.isArray(line?.agencies) && typeof line.agencies[0]?.name === "string"
+      Array.isArray(line?.agencies) &&
+      typeof line.agencies[0]?.name === "string"
         ? line.agencies[0].name.trim()
         : undefined; //some lines might have multiple agencies, so we will only use the first one as reference
 
@@ -64,7 +71,6 @@ function getTransitLinesFromLeg(leg: unknown): TransitLine[] {
       headsign: headsign,
       agency: agencyName,
     });
-
   }
   return transitLines;
 }
@@ -165,7 +171,6 @@ export async function fetchDirections(params: {
       //for transit routes' details
       const transitLines =
         mode === "transit" && leg ? getTransitLinesFromLeg(leg) : undefined;
-
 
       return {
         summary: r.summary ?? "",

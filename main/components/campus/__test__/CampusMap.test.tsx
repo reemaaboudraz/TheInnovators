@@ -76,7 +76,6 @@ jest.mock("@/components/campus/TravelOptionsPopup", () => ({
   default: () => null,
 }));
 
-
 const mockGetDeviceLocation = jest.fn(async () => null);
 jest.mock("@/components/campus/helper_methods/locationUtils", () => ({
   // Keep LocationError here so CampusMap's `instanceof LocationError` works in tests
