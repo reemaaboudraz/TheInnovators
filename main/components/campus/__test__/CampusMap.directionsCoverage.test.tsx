@@ -2,9 +2,25 @@
 import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
+import {
+  fetchDirections,
+  pickFastestRoute,
+  decodePolyline,
+} from "@/components/campus/helper_methods/googleDirections";
+
+const mockFetchDirections = fetchDirections as unknown as jest.Mock;
+const mockPickFastestRoute = pickFastestRoute as unknown as jest.Mock;
+const mockDecodePolyline = decodePolyline as unknown as jest.Mock;
 
 // --- Mocks ---
 jest.mock("expo-status-bar", () => ({ StatusBar: () => null }));
+
+jest.mock("@/components/campus/helper_methods/googleDirections", () => ({
+  __esModule: true,
+  fetchDirections: jest.fn(),
+  pickFastestRoute: jest.fn(),
+  decodePolyline: jest.fn(),
+}));
 
 // Simplify heavy UI components
 jest.mock("@/components/campus/BuildingShapesLayer", () => {
@@ -16,10 +32,55 @@ jest.mock("@/components/campus/BuildingShapesLayer", () => {
   };
 });
 
-jest.mock("@/components/campus/TravelOptionsPopup", () => ({
-  __esModule: true,
-  default: () => null,
-}));
+jest.mock("@/components/campus/TravelOptionsPopup", () => {
+  const React = require("react");
+  const { View, Text, Pressable } = require("react-native");
+
+  return {
+    __esModule: true,
+    default: ({
+      visible,
+      modes,
+      selectedMode,
+      onSelectMode,
+      onSelectRouteIndex,
+    }: any) => {
+      if (!visible) return null;
+
+      const selected = modes.find((m: any) => m.mode === selectedMode) ?? modes[0];
+
+      return (
+        <View testID="travel-popup">
+          <Text>Directions</Text>
+
+          {/* mode buttons */}
+          {modes.map((m: any) => (
+            <Pressable
+              key={m.mode}
+              testID={`mode-${m.mode}`}
+              onPress={() => onSelectMode(m.mode)}
+            >
+              <Text testID={`mode-${m.mode}-time`}>
+                {m.routes?.[0]?.durationText ?? "--"}
+              </Text>
+            </Pressable>
+          ))}
+
+          {/* route cards for the selected mode */}
+          {selected.routes.map((r: any, idx: number) => (
+            <Pressable
+              key={`${selectedMode}-${idx}`}
+              testID={`route-${selectedMode}-${idx}`}
+              onPress={() => onSelectRouteIndex(idx)}
+            >
+              <Text>{r.durationText}</Text>
+            </Pressable>
+          ))}
+        </View>
+      );
+    },
+  };
+});
 
 jest.mock("@/components/campus/BuildingPopup", () => {
   const React = require("react");
@@ -143,18 +204,6 @@ const mockNav: any = {
 
 jest.mock("@/hooks/useNavigation", () => ({
   useNavigation: () => mockNav,
-}));
-
-// Mock google directions helpers to control sorting + selection
-const mockFetchDirections = jest.fn() as jest.Mock;
-const mockPickFastestRoute = jest.fn() as jest.Mock;
-const mockDecodePolyline = jest.fn() as jest.Mock;
-
-jest.mock("@/components/campus/helper_methods/googleDirections", () => ({
-  __esModule: true,
-  fetchDirections: (...args: any[]) => mockFetchDirections(...args),
-  pickFastestRoute: (...args: any[]) => mockPickFastestRoute(...args),
-  decodePolyline: (...args: any[]) => mockDecodePolyline(...args),
 }));
 
 // MapView mock with fitToCoordinates support
