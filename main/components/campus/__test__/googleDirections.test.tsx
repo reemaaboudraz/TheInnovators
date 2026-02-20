@@ -122,7 +122,7 @@ describe("googleDirections", () => {
 
       // Only Route A remains
       expect(res).toHaveLength(1);
-      expect(res[0]).toEqual({
+      expect(res[0]).toMatchObject({
         summary: "Route A",
         polyline: "polyA",
         durationSec: 120,
@@ -130,6 +130,7 @@ describe("googleDirections", () => {
         distanceMeters: 300,
         distanceText: "0.3 km",
       });
+      expect(res[0].transitLines).toBeUndefined();
 
       // Also confirm fetch was called with a URL containing key pieces
       const calledUrl = (global as any).fetch.mock.calls[0][0] as string;
@@ -137,6 +138,161 @@ describe("googleDirections", () => {
       expect(calledUrl).toContain("alternatives=true");
       expect(calledUrl).toContain("key=test-key");
     });
+
+    it("extracts transitLines for transit mode (trims, prefers short_name, uses first agency, dedupes, skips missing line)", async () => {
+      (global as any).fetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          status: "OK",
+          routes: [
+            {
+              summary: "Transit Route",
+              overview_polyline: { points: "polyT" },
+              legs: [
+                {
+                  duration: { value: 600, text: "10 mins" },
+                  distance: { value: 2000, text: "2.0 km" },
+                  steps: [
+                    // Non-transit step should be ignored
+                    { travel_mode: "WALKING" },
+
+                    // Transit step with line.short_name (trimmed), headsign trimmed, agency trimmed
+                    {
+                      travel_mode: "TRANSIT",
+                      transit_details: {
+                        headsign: "  Ouest  ",
+                        line: {
+                          short_name: " 51 ",
+                          name: "ShouldNotUseThis",
+                          vehicle: { type: "BUS" },
+                          agencies: [{ name: " Société de transport de Montréal " }],
+                        },
+                      },
+                    },
+
+                    // Duplicate of the same transit line should be deduped
+                    {
+                      travel_mode: "TRANSIT",
+                      transit_details: {
+                        headsign: "Ouest",
+                        line: {
+                          short_name: "51",
+                          vehicle: { type: "BUS" },
+                          agencies: [{ name: "Société de transport de Montréal" }],
+                        },
+                      },
+                    },
+
+                    // Transit step missing line should be skipped (no throw)
+                    {
+                      travel_mode: "TRANSIT",
+                      transit_details: {
+                        headsign: "Nord",
+                        // line missing
+                      },
+                    },
+
+                    // Different headsign => different key => should appear as another line
+                    {
+                      travel_mode: "TRANSIT",
+                      transit_details: {
+                        headsign: " Est ",
+                        line: {
+                          // no short_name => fallback to name
+                          name: "  Orange Line  ",
+                          vehicle: { type: "SUBWAY" },
+                          agencies: [{ name: " STM " }, { name: "Other" }],
+                        },
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        }),
+      });
+
+      const res = await fetchDirections({
+        origin: { latitude: 45.0, longitude: -73.0 },
+        destination: { latitude: 45.1, longitude: -73.1 },
+        mode: "transit",
+      });
+
+      expect(res).toHaveLength(1);
+
+      // Core route fields still correct
+      expect(res[0]).toMatchObject({
+        summary: "Transit Route",
+        polyline: "polyT",
+        durationSec: 600,
+        durationText: "10 mins",
+        distanceMeters: 2000,
+        distanceText: "2.0 km",
+      });
+
+      // Validate extracted transit lines
+      expect(res[0].transitLines).toEqual([
+        {
+          name: "51",
+          vehicleType: "BUS",
+          headsign: "Ouest",
+          agency: "Société de transport de Montréal",
+        },
+        {
+          name: "Orange Line",
+          vehicleType: "SUBWAY",
+          headsign: "Est",
+          agency: "STM", // only first agency
+        },
+      ]);
+    });
+
+    it("does not set transitLines when mode is not transit (even if response contains steps)", async () => {
+      (global as any).fetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          status: "OK",
+          routes: [
+            {
+              summary: "Route A",
+              overview_polyline: { points: "polyA" },
+              legs: [
+                {
+                  duration: { value: 120, text: "2 mins" },
+                  distance: { value: 300, text: "0.3 km" },
+                  steps: [
+                    {
+                      travel_mode: "TRANSIT",
+                      transit_details: {
+                        headsign: "West",
+                        line: {
+                          short_name: "51",
+                          vehicle: { type: "BUS" },
+                          agencies: [{ name: "STM" }],
+                        },
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        }),
+      });
+
+      const res = await fetchDirections({
+        origin: { latitude: 45.0, longitude: -73.0 },
+        destination: { latitude: 45.1, longitude: -73.1 },
+        mode: "walking",
+      });
+
+      expect(res[0].transitLines).toBeUndefined();
+    });
+
+
 
     it("throws when HTTP response is not ok", async () => {
       (global as any).fetch.mockResolvedValueOnce({

@@ -25,6 +25,12 @@ jest.mock("@/components/Buildings/data/SGW_data.json", () => [
   },
 ]);
 
+jest.mock("@/components/campus/TravelOptionsPopup", () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+
 jest.mock("@/components/Buildings/data/Loyola_data.json", () => [
   {
     id: "loy-ad",

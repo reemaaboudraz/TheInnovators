@@ -1,6 +1,10 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
-import TravelOptionsPopup from "@/components/campus/TravelOptionsPopup";
+// Mock PNG requires used inside TravelOptionsPopup
+jest.mock("../../assets/icons/icon-subway.png", () => 1);
+jest.mock("../../assets/icons/icon-bus.png", () => 1);
+const TravelOptionsPopup =
+  require("@/components/campus/TravelOptionsPopup").default;
 import type {
   DirectionRoute,
   TravelMode,
@@ -37,6 +41,7 @@ function makeRoute(
   durationSec = 60,
   distanceMeters = 100,
   polyline = "abc123",
+  transitLines?: any[],
 ): DirectionRoute {
   return {
     summary,
@@ -45,6 +50,7 @@ function makeRoute(
     durationText,
     distanceMeters,
     distanceText,
+    transitLines,
   };
 }
 
@@ -58,8 +64,22 @@ function buildModes(): ModeData[] {
     },
     {
       mode: "transit",
-      routes: [makeRoute("5 mins", "1.0 km", "Bus 105", 300)],
+      routes: [
+        makeRoute(
+          "5 mins",
+          "1.0 km",
+          "Transit route",
+          300,
+          1000,
+          "poly-transit",
+          [
+            { name: "105", vehicleType: "BUS" },
+            { name: "2", vehicleType: "SUBWAY" },
+          ],
+        ),
+      ],
     },
+
     {
       mode: "walking",
       routes: [
@@ -75,6 +95,27 @@ function buildModes(): ModeData[] {
 }
 
 describe("TravelOptionsPopup", () => {
+  it("renders bus + metro chips when selectedMode is transit", () => {
+    const { getByText } = render(
+      <TravelOptionsPopup
+        campusTheme="SGW"
+        visible
+        modes={buildModes()}
+        selectedMode="transit"
+        selectedRouteIndex={0}
+        onSelectMode={jest.fn()}
+        onSelectRouteIndex={jest.fn()}
+        onClose={jest.fn()}
+      />,
+    );
+
+    // bus chip label
+    getByText("105");
+
+    // metro chip label
+    getByText("2");
+  });
+
   it("does not render when visible is false", () => {
     const { queryByTestId } = render(
       <TravelOptionsPopup

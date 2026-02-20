@@ -71,6 +71,12 @@ jest.mock("@/components/Buildings/data/Loyola_data.json", () => [
 // -------------------- UI Mocks --------------------
 jest.mock("expo-status-bar", () => ({ StatusBar: () => null }));
 
+jest.mock("@/components/campus/TravelOptionsPopup", () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+
 const mockGetDeviceLocation = jest.fn(async () => null);
 jest.mock("@/components/campus/helper_methods/locationUtils", () => ({
   // Keep LocationError here so CampusMap's `instanceof LocationError` works in tests

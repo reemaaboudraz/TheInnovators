@@ -16,6 +16,12 @@ jest.mock("@/components/campus/BuildingShapesLayer", () => {
   };
 });
 
+jest.mock("@/components/campus/TravelOptionsPopup", () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+
 jest.mock("@/components/campus/BuildingPopup", () => {
   const React = require("react");
   const { View } = require("react-native");
