@@ -951,7 +951,7 @@ export default function CampusMap() {
         bottomOffset={40}
         onExit={()=> {
           routeNavigation.exitNavigation();
-          setSelectedRouteCoords([]);
+          setAllRouteCoords([]);;
         }}
       />
 
@@ -975,7 +975,7 @@ export default function CampusMap() {
         }
         onExit={()=> {
           routeNavigation.exitNavigation();
-          setSelectedRouteCoords([]);
+          setAllRouteCoords([]);;
         }}
       />
 
