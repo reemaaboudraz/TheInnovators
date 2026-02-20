@@ -3,6 +3,7 @@ import {
   Pressable,
   StyleSheet,
   Text,
+  Image,
   View,
   useWindowDimensions,
 } from "react-native";
@@ -17,6 +18,9 @@ import type {
   DirectionRoute,
   TravelMode,
 } from "@/components/campus/helper_methods/googleDirections";
+
+const ICON_SUBWAY = require("../../assets/icons/icon-subway.png");
+const ICON_BUS = require("../../assets/icons/icon-bus.png");
 
 type ModeData = {
   mode: TravelMode;
@@ -34,6 +38,34 @@ type Props = {
   onClose: () => void;
   onGo: (mode: TravelMode, index: number) => void;
 };
+
+//formatting the transitDetails we extracted from the directions response to be more user friendly when displayed on the UI
+//i.e. show the bus number of the buses used to create the routes given to the user instead of simple duration
+function getBusDetails(route: DirectionRoute): string[] {
+  const set = new Set<string>();
+
+  for (const line of route.transitLines ?? []) {
+    if (line.vehicleType?.toLowerCase() === "bus" && line.name) {
+      set.add(line.name);
+    }
+  }
+  return [...set];
+}
+
+function getMetroDetails(route: DirectionRoute): string[] {
+  const set = new Set<string>();
+
+  for (const line of route.transitLines ?? []) {
+    if (
+      (line.vehicleType?.toLowerCase() === "subway" ||
+        line.vehicleType?.toLowerCase() === "metro") &&
+      line.name
+    ) {
+      set.add(line.name);
+    }
+  }
+  return [...set];
+}
 
 function formatDuration(text?: string): string {
   if (!text) return "--";
@@ -56,6 +88,49 @@ function iconForMode(mode: TravelMode) {
     case "bicycling":
       return "directions-bike";
   }
+}
+
+function metroLineColor(name: string): string {
+  const n = name.trim().toLowerCase();
+
+  // Common values Google returns: "Green", "Orange", "Yellow", "Blue"
+  if (n.includes("1")) return "#2E7D32";
+  if (n.includes("2")) return "#EF6C00";
+  if (n.includes("4")) return "#F9A825";
+  if (n.includes("5")) return "#1565C0";
+
+  // fallback
+  return "rgba(139, 32, 52, 0.27)";
+}
+
+function metroTextColor(bg: string): "#111" | "#fff" {
+  // Yellow needs dark text for contrast
+  return bg === "#F9A825" ? "#111" : "#fff";
+}
+
+type LineChipProps = {
+  label: string;
+  iconSource: any; // PNG module from require()
+  backgroundColor: string;
+  textColor: string;
+};
+
+function LineChip({
+  label,
+  iconSource,
+  backgroundColor,
+  textColor,
+}: LineChipProps) {
+  return (
+    <View style={[s.lineChip, { backgroundColor }]}>
+      <Image
+        source={iconSource}
+        style={[s.chipIcon, { tintColor: textColor }]} // tintColor works best if PNG is monochrome
+        resizeMode="contain"
+      />
+      <Text style={[s.lineChipText, { color: textColor }]}>{label}</Text>
+    </View>
+  );
 }
 
 export default function TravelOptionsPopup({
@@ -143,7 +218,9 @@ export default function TravelOptionsPopup({
           return (
             <Pressable
               key={m.mode}
-              onPress={() => onSelectMode(m.mode)}
+              onPress={() => {
+                onSelectMode(m.mode);
+              }}
               style={[s.modeChip, active && s.modeChipActive]}
               testID={`mode-${m.mode}`}
             >
@@ -171,6 +248,8 @@ export default function TravelOptionsPopup({
       >
         {routes.map((r, idx) => {
           const active = idx === selectedRouteIndex;
+          const buses = selectedMode === "transit" ? getBusDetails(r) : [];
+          const metros = selectedMode === "transit" ? getMetroDetails(r) : [];
 
           return (
             <Pressable
@@ -183,6 +262,41 @@ export default function TravelOptionsPopup({
                 <Text style={s.routeBig}>{r.durationText}</Text>
                 <Text style={s.routeMeta}>{r.distanceText}</Text>
                 {!!r.summary && <Text style={s.routeSummary}>{r.summary}</Text>}
+
+                {/*Rendering the bus and metro chips in the summary*/}
+                {selectedMode === "transit" &&
+                  (r.transitLines?.length ?? 0) > 0 && (
+                    <View style={s.transitRow}>
+                      {buses.slice(0, 4).map((bus) => (
+                        <LineChip
+                          key={`bus-${bus}`}
+                          label={bus}
+                          iconSource={ICON_BUS}
+                          backgroundColor="rgba(0, 98, 255, 0.12)"
+                          textColor="#111"
+                        />
+                      ))}
+
+                      {buses.length > 4 && (
+                        <Text style={s.moreText}>+{buses.length - 4}</Text>
+                      )}
+
+                      {metros.slice(0, 2).map((metro) => {
+                        const bg = metroLineColor(metro);
+                        const fg = metroTextColor(bg);
+
+                        return (
+                          <LineChip
+                            key={`metro-${metro}`}
+                            label={metro}
+                            iconSource={ICON_SUBWAY}
+                            backgroundColor={bg}
+                            textColor={fg}
+                          />
+                        );
+                      })}
+                    </View>
+                  )}
               </View>
 
               <Pressable
@@ -204,6 +318,65 @@ export default function TravelOptionsPopup({
 }
 
 const s = StyleSheet.create({
+  transitRow: {
+    marginTop: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    flexWrap: "wrap",
+  },
+
+  busChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: "rgb(0, 98, 255)",
+  },
+
+  busChipText: {
+    fontSize: 12,
+    fontWeight: "900",
+    color: "#111",
+  },
+
+  metroChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: "rgba(145,35,56,0.12)", // optional; can theme later
+  },
+
+  metroChipText: {
+    fontSize: 12,
+    fontWeight: "900",
+    color: "#111",
+  },
+
+  chipIcon: {
+    width: 14,
+    height: 14,
+    marginRight: 6,
+  },
+
+  lineChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+  },
+
+  lineChipText: {
+    fontSize: 12,
+    fontWeight: "900",
+  },
+
+  moreText: {
+    fontSize: 12,
+    fontWeight: "900",
+    color: "rgba(17,17,17,0.55)",
+  },
+
   sheetBackground: {
     borderWidth: 1,
     borderRadius: 18,
