@@ -23,12 +23,11 @@ export type DirectionRoute = {
   transitLines?: TransitLine[];
 };
 
-function getTransitLinesFromLeg(leg: any): TransitLine[] {
+function getTransitLinesFromLeg(leg: unknown): TransitLine[] {
   const transitLines: TransitLine[] = [];
   const extracted = new Set<string>(); // To not store duplicate transit lines details
 
-
-  for (const step of leg?.steps ?? []) {
+  for (const step of (leg as any)?.steps ?? []) {
     //We only want to extract the transit details of the part of the trip (step) that is done by transit
     //Therefore, if the mode is not transit then we skip it and move on to the next step
     if (step?.travel_mode !== "TRANSIT") continue;
@@ -39,6 +38,9 @@ function getTransitLinesFromLeg(leg: any): TransitLine[] {
     if (!line) { continue; }
 
     const lineName: string = String(line?.short_name ?? line?.name ?? "").trim();
+
+    if (!lineName) { continue; }
+
     const vehicleType: string | undefined = line?.vehicle?.type;
     const headsign: string | undefined =
       typeof transitDetails?.headsign === "string"
