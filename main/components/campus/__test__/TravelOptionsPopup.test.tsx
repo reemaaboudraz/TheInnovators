@@ -1,8 +1,8 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
 // Mock PNG requires used inside TravelOptionsPopup
-jest.mock("../../assets/icons/icon-subway.png", () => 1);
-jest.mock("../../assets/icons/icon-bus.png", () => 1);
+jest.mock("../../../assets/icons/icon-subway.png", () => 1);
+jest.mock("../../../assets/icons/icon-bus.png", () => 1);
 const TravelOptionsPopup =
   require("@/components/campus/TravelOptionsPopup").default;
 import type {
