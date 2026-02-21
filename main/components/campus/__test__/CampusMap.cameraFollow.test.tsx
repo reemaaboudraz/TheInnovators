@@ -10,16 +10,18 @@ jest.mock("react-native-maps", () => {
   const React = require("react");
   const { View } = require("react-native");
 
-  const MapView = React.forwardRef((props: any, ref: any) => {
+  const MapView = React.forwardRef(function MockMapView(props: any, ref: any) {
     React.useImperativeHandle(ref, () => ({
       animateCamera: mockAnimateCamera,
       animateToRegion: mockAnimateToRegion,
-      fitToCoordinates: jest.fn(), // optional, but common
+      fitToCoordinates: jest.fn(),
     }));
     return <View testID={props.testID || "map"}>{props.children}</View>;
   });
 
-  const Dummy = (props: any) => <View {...props}>{props.children}</View>;
+  function Dummy(props: any) {
+    return <View {...props}>{props.children}</View>;
+  }
 
   return {
     __esModule: true,
@@ -56,16 +58,13 @@ jest.mock("@/hooks/useRouteNavigation", () => ({
 // ---- CurrentLocationButton mock (so userLocation becomes non-null) ----
 const mockUserLocation = { latitude: 45.4973, longitude: -73.5789 };
 
-jest.mock("@/components/campus/CurrentLocationButton", () => {
-  return {
-    __esModule: true,
-    default: (props: any) => {
-      // No React/useEffect here -> no hoisting/out-of-scope issues
-      props.onLocationFound(mockUserLocation);
-      return null;
-    },
-  };
-});
+jest.mock("@/components/campus/CurrentLocationButton", () => ({
+  __esModule: true,
+  default: function MockCurrentLocationButton(props: any) {
+    props.onLocationFound(mockUserLocation);
+    return null;
+  },
+}));
 
 describe("CampusMap camera-follow useEffect", () => {
   beforeEach(() => {
