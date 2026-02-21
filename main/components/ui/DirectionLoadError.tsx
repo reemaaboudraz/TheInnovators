@@ -3,26 +3,26 @@ import LoadErrorOverlay from "./LoadError";
 
 type Props = Readonly<{
   visible: boolean;
+  message: string;
   onRefresh: () => void;
   accentColor?: string;
-  testIDPrefix?: string;
 }>;
 
-export default function BuildingsLoadError({
+export default function DirectionsLoadError({
   visible,
+  message,
   onRefresh,
   accentColor = "#D84A4A",
-  testIDPrefix = "buildings-error",
 }: Props) {
   return (
     <LoadErrorOverlay
       visible={visible}
-      title="Whoops!"
-      message="There was an error loading the buildings. Please refresh the page."
+      title="Directions unavailable"
+      message={message}
       primaryLabel="Refresh"
       onPrimary={onRefresh}
       accentColor={accentColor}
-      testIDPrefix={testIDPrefix}
+      testIDPrefix="directions-error"
     />
   );
 }
