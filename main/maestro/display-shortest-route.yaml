@@ -4,7 +4,7 @@ appId: com.theinnovators.campusguide
 - launchApp
 - waitForAnimationToEnd
 
-# welcome - Guest
+# welcome Guest
 - assertVisible:
     id: "guest-sign-in-button"
 - tapOn:
