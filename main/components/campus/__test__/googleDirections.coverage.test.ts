@@ -1,3 +1,5 @@
+import { fetchDirectionsWithSteps } from "../helper_methods/googleDirections";
+
 jest.mock("expo-constants", () => ({
   __esModule: true,
   default: {
@@ -8,8 +10,6 @@ jest.mock("expo-constants", () => ({
     },
   },
 }));
-
-import { fetchDirectionsWithSteps } from "../helper_methods/googleDirections";
 
 describe("fetchDirectionsWithSteps (Sonar coverage)", () => {
   beforeEach(() => {

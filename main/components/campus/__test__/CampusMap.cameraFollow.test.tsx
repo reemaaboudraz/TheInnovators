@@ -1,6 +1,8 @@
 import React from "react";
 import { render, act } from "@testing-library/react-native";
 
+import CampusMap from "@/components/campus/CampusMap";
+
 const mockAnimateCamera = jest.fn();
 const mockAnimateToRegion = jest.fn();
 
@@ -64,8 +66,6 @@ jest.mock("@/components/campus/CurrentLocationButton", () => {
     },
   };
 });
-
-import CampusMap from "@/components/campus/CampusMap";
 
 describe("CampusMap camera-follow useEffect", () => {
   beforeEach(() => {

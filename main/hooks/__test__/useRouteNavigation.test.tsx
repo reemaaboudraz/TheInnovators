@@ -7,6 +7,9 @@ import type {
   LatLng,
 } from "@/components/campus/helper_methods/googleDirections";
 
+import { fetchDirectionsWithSteps } from "@/components/campus/helper_methods/googleDirections";
+import { distanceMeters } from "@/components/campus/helper_methods/geo";
+
 jest.mock("@/components/campus/helper_methods/googleDirections", () => ({
   fetchDirectionsWithSteps: jest.fn(),
 }));
@@ -14,9 +17,6 @@ jest.mock("@/components/campus/helper_methods/googleDirections", () => ({
 jest.mock("@/components/campus/helper_methods/geo", () => ({
   distanceMeters: jest.fn(),
 }));
-
-import { fetchDirectionsWithSteps } from "@/components/campus/helper_methods/googleDirections";
-import { distanceMeters } from "@/components/campus/helper_methods/geo";
 
 type HookProps = { userLoc: LatLng };
 
