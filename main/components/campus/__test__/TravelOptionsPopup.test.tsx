@@ -1,14 +1,14 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
+import type {
+  DirectionRoute,
+  TravelMode,
+} from "@/components/campus/helper_methods/googleDirections";
 // Mock PNG requires used inside TravelOptionsPopup
 jest.mock("../../../assets/icons/icon-subway.png", () => 1);
 jest.mock("../../../assets/icons/icon-bus.png", () => 1);
 const TravelOptionsPopup =
   require("@/components/campus/TravelOptionsPopup").default;
-import type {
-  DirectionRoute,
-  TravelMode,
-} from "@/components/campus/helper_methods/googleDirections";
 
 jest.mock("@gorhom/bottom-sheet", () => {
   const React = require("react");

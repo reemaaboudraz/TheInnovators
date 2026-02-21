@@ -36,6 +36,7 @@ type Props = {
   onSelectMode: (mode: TravelMode) => void;
   onSelectRouteIndex: (index: number) => void;
   onClose: () => void;
+  onGo: (mode: TravelMode, index: number) => void;
 };
 
 //formatting the transitDetails we extracted from the directions response to be more user friendly when displayed on the UI
@@ -141,6 +142,7 @@ export default function TravelOptionsPopup({
   onSelectMode,
   onSelectRouteIndex,
   onClose,
+  onGo,
 }: Readonly<Props>) {
   const sheetRef = useRef<BottomSheet>(null);
   const insets = useSafeAreaInsets();
@@ -300,6 +302,7 @@ export default function TravelOptionsPopup({
               <Pressable
                 onPress={(e: any) => {
                   e?.stopPropagation?.();
+                  onGo?.(selectedMode, idx);
                 }}
                 style={s.goBtn}
                 testID={`go-${selectedMode}-${idx}`}

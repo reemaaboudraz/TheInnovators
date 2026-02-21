@@ -75,6 +75,18 @@ function getTransitLinesFromLeg(leg: unknown): TransitLine[] {
   return transitLines;
 }
 
+export type DirectionStep = {
+  instruction: string;
+  distanceText: string;
+  durationText: string;
+  start: LatLng;
+  end: LatLng;
+};
+
+export type DirectionRouteWithSteps = DirectionRoute & {
+  steps: DirectionStep[];
+};
+
 function getGoogleMapsKey(): string {
   const key = (Constants.expoConfig?.extra as any)?.googleMapsApiKey;
   if (!key)
@@ -193,4 +205,99 @@ export function pickFastestRoute(
 ): DirectionRoute | null {
   if (!routes.length) return null;
   return routes[0];
+}
+
+//ADDED HELPER + FUNCTION DIRECTION WITH STEPS
+function stripHtml(input: string): string {
+  let out = "";
+  let insideTag = false;
+
+  for (let i = 0; i < input.length; i++) {
+    const ch = input[i];
+
+    if (ch === "<") {
+      insideTag = true;
+      continue;
+    }
+    if (ch === ">") {
+      insideTag = false;
+      out += " "; // keep word separation
+      continue;
+    }
+
+    if (!insideTag) out += ch;
+  }
+
+  return out.replace(/\s+/g, " ").trim();
+}
+
+export async function fetchDirectionsWithSteps(params: {
+  origin: LatLng;
+  destination: LatLng;
+  mode: TravelMode;
+}): Promise<DirectionRouteWithSteps[]> {
+  const key = getGoogleMapsKey();
+  const { origin, destination, mode } = params;
+
+  const url =
+    "https://maps.googleapis.com/maps/api/directions/json" +
+    `?origin=${origin.latitude},${origin.longitude}` +
+    `&destination=${destination.latitude},${destination.longitude}` +
+    `&mode=${mode}` +
+    `&alternatives=true` +
+    `&language=en` +
+    `&region=ca` +
+    `&key=${key}`;
+
+  const res = await fetch(url);
+  const json = await res.json();
+
+  if (!res.ok) throw new Error(`Directions HTTP ${res.status}`);
+  if (json.status !== "OK") {
+    throw new Error(
+      `Directions API status: ${json.status} ${json.error_message ?? ""}`.trim(),
+    );
+  }
+
+  const routes = (json.routes ?? []) as any[];
+
+  return routes
+    .map((r) => {
+      const leg = r.legs?.[0];
+      const duration = leg?.duration;
+      const distance = leg?.distance;
+
+      const stepsRaw = (leg?.steps ?? []) as any[];
+      const steps: DirectionStep[] = stepsRaw
+        .map((s) => {
+          const start = s?.start_location;
+          const end = s?.end_location;
+
+          return {
+            instruction: stripHtml(String(s?.html_instructions ?? "")),
+            distanceText: String(s?.distance?.text ?? ""),
+            durationText: String(s?.duration?.text ?? ""),
+            start: {
+              latitude: Number(start?.lat ?? 0),
+              longitude: Number(start?.lng ?? 0),
+            },
+            end: {
+              latitude: Number(end?.lat ?? 0),
+              longitude: Number(end?.lng ?? 0),
+            },
+          };
+        })
+        .filter((st) => st.instruction.length > 0);
+
+      return {
+        summary: r.summary ?? "",
+        polyline: r.overview_polyline?.points ?? "",
+        durationSec: duration?.value ?? Number.MAX_SAFE_INTEGER,
+        durationText: duration?.text ?? "",
+        distanceMeters: distance?.value ?? 0,
+        distanceText: distance?.text ?? "",
+        steps,
+      } as DirectionRouteWithSteps;
+    })
+    .filter((r) => !!r.polyline);
 }
