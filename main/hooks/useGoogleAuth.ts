@@ -4,12 +4,13 @@ import { auth } from "@/firebase/firebase";
 
 // Only load native Google Sign-In when not in Expo Go (native module isn't available there)
 const isExpoGo = Constants.appOwnership === "expo";
-let GoogleSignin: typeof import("@react-native-google-signin/google-signin").GoogleSignin | null =
-  null;
+let GoogleSignin:
+  | typeof import("@react-native-google-signin/google-signin").GoogleSignin
+  | null = null;
 if (!isExpoGo) {
   try {
-    GoogleSignin = require("@react-native-google-signin/google-signin")
-      .GoogleSignin;
+    GoogleSignin =
+      require("@react-native-google-signin/google-signin").GoogleSignin;
   } catch {
     GoogleSignin = null;
   }
@@ -32,7 +33,7 @@ export function configureGoogleSignIn() {
 export async function signInWithGoogle() {
   if (!GoogleSignin) {
     throw new Error(
-      "Google Sign-In is not available in Expo Go. Use a development build (npx expo run:ios or run:android) to sign in with Google."
+      "Google Sign-In is not available in Expo Go. Use a development build (npx expo run:ios or run:android) to sign in with Google.",
     );
   }
   await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
