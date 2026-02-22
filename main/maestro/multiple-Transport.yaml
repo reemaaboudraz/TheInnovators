@@ -1,0 +1,58 @@
+appId: com.theinnovators.campusguide
+---
+- launchApp
+- waitForAnimationToEnd
+
+# Welcome Screen -> Guest
+- assertVisible:
+    id: "guest-sign-in-button"
+- tapOn:
+    id: "guest-sign-in-button"
+
+# Map loaded
+- assertVisible:
+    id: "campusMap-root"
+- assertVisible:
+    id: "campusToggle"
+
+# Switch to route mode
+- tapOn:
+    id: "routeModeButton"
+
+# Select a starting point
+- tapOn: Enter your starting location
+- waitForAnimationToEnd
+- inputText: "Hall Building"
+- tapOn: "H - Henry F. Hall Building (SGW)"
+- waitForAnimationToEnd
+
+# Select a destination
+- tapOn: Enter your destination
+- waitForAnimationToEnd
+- inputText: "Physical"
+- tapOn: "PS - Physical Services Building (LOY)"
+- waitForAnimationToEnd
+
+# Verify that the modes are displayed
+# "driving" | "walking" | "transit" | "bicycling
+- assertVisible:
+    id: "mode-driving"
+- takeScreenshot: "after-selecting-driving-mode"
+- assertVisible:
+    id: "mode-walking"
+- tapOn:
+    id: "mode-walking"
+- waitForAnimationToEnd
+- takeScreenshot: "after-selecting-walking-mode"
+- assertVisible:
+    id: "mode-transit"
+- tapOn:
+    id: "mode-transit"
+- waitForAnimationToEnd
+- takeScreenshot: "after-selecting-transit-mode"
+- assertVisible:
+    id: "mode-bicycling"
+- tapOn:
+    id: "mode-bicycling"
+- waitForAnimationToEnd
+- takeScreenshot: "after-selecting-bicycling-mode"
