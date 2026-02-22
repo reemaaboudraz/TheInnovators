@@ -1,0 +1,21 @@
+appId: com.theinnovators.campusguide
+---
+- launchApp
+
+# Assumption: start/end already selected and TravelOptionsPopup is visible
+
+# Tap GO for walking, route #0
+- tapOn:
+    id: go-walking-0
+
+# Assert directions show up 
+- assertVisible:
+    id: directions-panel
+- assertVisible:
+    id: directions-street
+
+# Exit navigation and assert directions disappear
+- tapOn:
+    id: exit-btn
+- assertNotVisible:
+    id: directions-panel

@@ -18,15 +18,19 @@ export function TopDirectionsCard({
   if (!visible) return null;
 
   return (
-    <View pointerEvents="box-none" style={styles.wrap}>
+    <View testID="directions-panel" pointerEvents="box-none" style={styles.wrap}>
       <Pressable
+        testID="directions-card"
+        accessibilityLabel="Directions"
         onPress={onPress}
         style={({ pressed }) => [styles.card, pressed && { opacity: 0.92 }]}
       >
         <MaterialIcons name="turn-right" size={28} color="#111" />
         <View style={styles.textCol}>
-          <Text style={styles.distance}>{distanceText}</Text>
-          <Text style={styles.street} numberOfLines={1}>
+          <Text testID="directions-distance" style={styles.distance}>
+            {distanceText}
+          </Text>
+          <Text testID="directions-street" style={styles.street} numberOfLines={1}>
             {streetText}
           </Text>
         </View>

@@ -33,6 +33,7 @@ export function BottomNavigationBar({
         </View>
 
         <Pressable
+          testID = "exit-btn"
           onPress={onExit}
           style={({ pressed }) => [
             styles.exitBtn,
