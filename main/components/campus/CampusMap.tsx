@@ -201,6 +201,23 @@ export default function CampusMap() {
   });
   const [stepsOpen, setStepsOpen] = useState(false);
   const [isFollowingUser, setIsFollowingUser] = useState(true);
+  // Android: track whether pin images have loaded so we can stop tracksViewChanges
+  const [startPinTracking, setStartPinTracking] = useState(true);
+  const [destPinTracking, setDestPinTracking] = useState(true);
+
+  // Keep tracksViewChanges=true for 500 ms after building changes, then stop.
+  // Using a timer (not onLoad) ensures the image is fully painted before we
+  // stop re-capturing — onLoad fires when data is decoded, not when painted.
+  useEffect(() => {
+    setStartPinTracking(true);
+    const t = setTimeout(() => setStartPinTracking(false), 500);
+    return () => clearTimeout(t);
+  }, [nav.routeStart?.id]);
+  useEffect(() => {
+    setDestPinTracking(true);
+    const t = setTimeout(() => setDestPinTracking(false), 500);
+    return () => clearTimeout(t);
+  }, [nav.routeDest?.id]);
   const lastCameraUpdateRef = useRef(0);
 
   // Auto fetch user location on mount
@@ -630,7 +647,7 @@ export default function CampusMap() {
 
         {otherRoutes.map(({ coords, index }) => (
           <Polyline
-            key={`${selectedMode}-${index}`}
+            key={`${selectedMode}-${index}-${routeStrokeWidth}`}
             coordinates={coords}
             tappable
             onPress={() => applySelection(selectedMode, index)}
@@ -644,7 +661,7 @@ export default function CampusMap() {
 
         {selectedCoordsForRender.length > 0 && (
           <Polyline
-            key={`${selectedMode}-selected-${selectedRouteIndex}`}
+            key={`${selectedMode}-selected-${selectedRouteIndex}-${routeStrokeWidth}`}
             coordinates={selectedCoordsForRender}
             tappable
             onPress={() => applySelection(selectedMode, selectedRouteIndex)}
@@ -657,15 +674,15 @@ export default function CampusMap() {
         )}
 
         {nav.routeStart && (
-          // Start and destination pins (route mode) - building name on pin, size fixed for visibility
+          // anchor y: size=48 → pinHeight=72, PAD=4 → container 80px tall, image bottom at 76px → 76/80
           <Marker
             testID="startPin"
             coordinate={{
               latitude: nav.routeStart.latitude,
               longitude: nav.routeStart.longitude,
             }}
-            anchor={{ x: 0.5, y: 1 }}
-            tracksViewChanges={false}
+            anchor={{ x: 0.5, y: 76 / 80 }}
+            tracksViewChanges={Platform.OS === "android" ? startPinTracking : false}
           >
             <BuildingPin
               code={nav.routeStart.code}
@@ -683,8 +700,8 @@ export default function CampusMap() {
               latitude: nav.routeDest.latitude,
               longitude: nav.routeDest.longitude,
             }}
-            anchor={{ x: 0.5, y: 1 }}
-            tracksViewChanges={false}
+            anchor={{ x: 0.5, y: 76 / 80 }}
+            tracksViewChanges={Platform.OS === "android" ? destPinTracking : false}
           >
             <BuildingPin
               code={nav.routeDest.code}
